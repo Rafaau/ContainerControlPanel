@@ -1,0 +1,6 @@
+@ContainerControlPanel.API_HostAddress = http://localhost:5121
+
+GET {{ContainerControlPanel.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

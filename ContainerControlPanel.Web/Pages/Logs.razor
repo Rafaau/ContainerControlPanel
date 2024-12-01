@@ -1,0 +1,42 @@
+﻿@page "/logs"
+
+<div class="label">
+	<h1>Logs</h1>
+	@if (containerId != string.Empty) 
+	{
+		<svg @onclick="async () => { await LoadLogs(); }" xmlns="http://www.w3.org/2000/svg" height="24px" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+			<path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+			<path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+		</svg>
+	}
+</div>
+
+<div class="flex">
+	<select class="select" @bind="containerId">
+		<option value="" selected disabled hidden>Choose container...</option>
+		@foreach (var container in containers)
+		{
+			<option value="@container.ContainerId">@container.Names</option>
+		}
+	</select>
+	<select class="select" @bind="timestamp">
+		<option value="" selected disabled hidden>Choose timestamp...</option>
+		<option value="15m">15 minutes</option>
+		<option value="30m">30 minutes</option>
+		<option value="60m">1 hour</option>
+		<option value="360m">6 hours</option>
+		<option value="720m">12 hours</option>
+		<option value="1440m">24 hours</option>
+		<option value="10080m">7 days</option>
+	</select>
+	<InputDate @bind-Value="filterDate" />
+</div>
+
+
+@if (logs.Length > 0) 
+{
+	<div class="logs-container">
+		@logs
+		<div id="logs-bottom"></div>
+	</div>
+}

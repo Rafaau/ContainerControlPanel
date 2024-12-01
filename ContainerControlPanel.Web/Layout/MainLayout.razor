@@ -1,0 +1,35 @@
+﻿@using MudBlazor
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="MyCustomTheme" @bind-IsDarkMode="IsDarkMode"/>
+<MudPopoverProvider />
+<MudDialogProvider />
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+        </div>
+
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool IsDarkMode { get; set; } = true;
+    private MudTheme MyCustomTheme = new MudTheme()
+    {
+		PaletteDark = new() {
+                Primary = "#ffffff",
+				Dark = "#1e1e1e",
+				DarkDarken = "#1c1c1c",
+				DarkLighten = "#1f1f1f",
+                Surface = "#0d0d0d"
+        }
+    };
+}
