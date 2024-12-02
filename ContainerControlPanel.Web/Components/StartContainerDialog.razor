@@ -1,0 +1,28 @@
+﻿@using ContainerControlPanel.Web.Enums
+@using MudBlazor;
+
+<MudDialog>
+    <TitleContent>
+        @ActionType.ToString() container
+    </TitleContent>
+    <DialogContent>
+        <div class="question">
+            How do you want to @ActionType.ToString().ToLower() the container?
+        </div>
+        <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.JustStart); }">
+            Just @ActionType.ToString().ToLower()
+        </MudButton><br /><br />
+        <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.ReinstallAndStart); }">
+            Reinstall image and @ActionType.ToString().ToLower()
+        </MudButton><br /><br />
+        <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.StartByCompose); }">
+            @ActionType.ToString().ToLower() using docker-compose
+        </MudButton><br /><br />
+        <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.ReinstallAndStartByCompose); }">
+            Reinstall image and @ActionType.ToString().ToLower() using docker-compose
+        </MudButton><br /><br />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>

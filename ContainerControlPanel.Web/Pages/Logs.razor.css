@@ -50,6 +50,9 @@
 
 .flex {
 	display: flex;
+	width: 55%;
+	gap: 32px;
+	margin-left: 24px;
 }
 
 .before-scroll {

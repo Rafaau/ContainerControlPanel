@@ -1,3 +1,5 @@
+﻿using ContainerControlPanel.Domain.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,16 +25,16 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.UseCors("AllowBlazorClient"); // CORS musi być przed routingiem i endpointami
 
-app.UseCors("AllowBlazorClient");
+app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();
+

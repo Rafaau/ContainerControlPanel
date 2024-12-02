@@ -101,3 +101,9 @@
 		transform: rotate(360deg);
 	}
 }
+
+.not-found {
+	text-align: center;
+	margin-top: 32px;
+	user-select: none;
+}

@@ -1,5 +1,7 @@
+using ContainerControlPanel.Domain.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Net.Http.Json;
 
 namespace ContainerControlPanel.Web.Components;
 
@@ -13,6 +15,8 @@ public partial class ContainerDetailsDialog(HttpClient client)
 
     private HttpClient client { get; set; } = client;
 
+    private ContainerDetails containerDetails { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadContainerDetails();
@@ -20,10 +24,8 @@ public partial class ContainerDetailsDialog(HttpClient client)
 
     private async Task LoadContainerDetails()
     {
-        string result = await client.GetStringAsync($"api/getContainerDetails?containerId={ContainerId}");
+        containerDetails = await client.GetFromJsonAsync<ContainerDetails>($"api/getContainerDetails?containerId={ContainerId}");
     }
 
-    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
-
-    private void Cancel() => MudDialog.Cancel();
+    private void Ok() => MudDialog.Close(DialogResult.Ok(true));
 }

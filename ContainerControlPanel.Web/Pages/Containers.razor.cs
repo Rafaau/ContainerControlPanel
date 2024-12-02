@@ -1,5 +1,6 @@
-using ContainerControlPanel.Domain.Models;
+﻿using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Components;
+using ContainerControlPanel.Web.Enums;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net.Http.Json;
@@ -9,11 +10,17 @@ namespace ContainerControlPanel.Web.Pages;
 public partial class Containers(HttpClient client)
 {
     [Inject]
+    IServiceProvider ServiceProvider { get; set; }
+
+    [Inject]
     IDialogService DialogService { get; set; }
+
+    [Inject]
+    IConfiguration Configuration { get; set; }
 
     private HttpClient client { get; set; } = client;
     private List<Container> containers { get; set; } = new();
-    private string liveFilter { get; set; } = "true";
+    private bool liveFilter { get; set; } = true;
 
     private bool _open;
     private Anchor _anchor;
@@ -22,6 +29,18 @@ public partial class Containers(HttpClient client)
     protected override async Task OnInitializedAsync()
     {
         await LoadContainers(false);
+
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            _ = Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await LoadContainers(true);
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                }
+            });
+        }   
     }
 
     private async Task LoadContainers(bool force)
@@ -46,33 +65,36 @@ public partial class Containers(HttpClient client)
     private async Task RestartContainer(string containerId)
     {
         var container = containers.Find(x => x.ContainerId == containerId);
-        container.Status = "Restarting...";
+        
+        var dialog = await OpenStartContainerDialogAsync(containerId, ActionType.Restart);
+        var option = await dialog.Result;
 
-        string result = await client.GetStringAsync($"api/restartContainer?containerId={containerId}");
-
-        if (result.Contains(container.ContainerId))
+        if (option.Data.GetType() != typeof(StartOption))
+            return;
+        
+        if ((StartOption)option.Data == StartOption.JustStart)
         {
-            container.Status = "Up 2 seconds";
-        }
-        else
-        {
-            container.Status = "Exited";
+            container.Status = "Restarting...";
+            this.StateHasChanged();
+            await client.GetStringAsync($"api/restartContainer?containerId={containerId}");
         }
     }
 
     private async Task StartContainer(string containerId)
     {
-        var container = containers.Find(x => x.ContainerId == containerId);
-        container.Status = "Starting...";
-        string result = await client.GetStringAsync($"api/startContainer?containerId={containerId}");
+        var container = containers.Find(x => x.ContainerId == containerId);  
 
-        if (result.Contains(container.ContainerId))
+        var dialog = await OpenStartContainerDialogAsync(containerId, ActionType.Start);
+        var option = await dialog.Result;
+
+        if (option.Data.GetType() != typeof(StartOption))
+            return;
+
+        if ((StartOption)option.Data == StartOption.JustStart)
         {
-            container.Status = "Up 2 seconds";
-        }
-        else
-        {
-            container.Status = "Exited";
+            container.Status = "Starting...";
+            this.StateHasChanged();
+            await client.GetStringAsync($"api/startContainer?containerId={containerId}");
         }
     }
 
@@ -86,6 +108,20 @@ public partial class Containers(HttpClient client)
             { 
                 { "ContainerId", containerId } 
             }, 
+            options
+        );
+    }
+
+    private async Task<IDialogReference> OpenStartContainerDialogAsync(string containerId, ActionType actionType)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        return await DialogService.ShowAsync<StartContainerDialog>(
+            "Simple Dialog",
+            new DialogParameters()
+            {
+                { "ContainerId", containerId },
+                { "ActionType", actionType }
+            },
             options
         );
     }

@@ -27,7 +27,7 @@ public static class ContainerReader
             using (StreamReader reader = process.StandardOutput)
             {
                 string output = await reader.ReadToEndAsync();
-                return Parser.ParseContainers(output);
+                return await Parser.ParseContainers(output);
             }
         }
     }
@@ -60,7 +60,7 @@ public static class ContainerReader
         {
             using (StreamReader reader = process.StandardOutput)
             {
-                return await reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync();      
             }
         }
     }
