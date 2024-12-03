@@ -1,7 +1,6 @@
 using ContainerControlPanel.Domain.Models;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Net.Http.Json;
 
 namespace ContainerControlPanel.Web.Pages;
@@ -9,9 +8,18 @@ namespace ContainerControlPanel.Web.Pages;
 public partial class Logs(HttpClient client)
 {
     [Inject]
-    IConfiguration Configuration { get; set; }
+    IConfiguration configuration { get; set; }
     [Inject]
     IScrollHandler scrollHandler { get; set; }
+    [Inject]
+    NavigationManager navManager { get; set; }
+
+    [Parameter]
+    public string? ContainerId { get; set; }
+    [Parameter]
+    public string? Timestamp { get; set; }
+    [Parameter]
+    public string? FilterDate { get; set; }
 
     private HttpClient client { get; set; } = client;
     private List<Container> containers { get; set; } = new();
@@ -21,7 +29,8 @@ public partial class Logs(HttpClient client)
         get => _container;
         set
         {
-            _container = value;
+            _container = value;         
+            navManager.NavigateTo($"{navManager.BaseUri}logs/{value.ContainerId}/{filterDate.Value.ToString("yyyyMMdd")}");
             firstScroll = false;
             LoadLogs();
         }
@@ -33,6 +42,7 @@ public partial class Logs(HttpClient client)
         set
         {
             _timestamp = value;
+            filterDate = DateTime.Now;
             firstScroll = false;
             LoadLogs();
         }
@@ -44,6 +54,8 @@ public partial class Logs(HttpClient client)
         set
         {
             _filterDate = value;
+            if (ContainerId != null)
+                navManager.NavigateTo($"{navManager.BaseUri}logs/{ContainerId}/{value.Value.ToString("yyyyMMdd")}");
             firstScroll = false;
             LoadLogs();
         }
@@ -54,7 +66,18 @@ public partial class Logs(HttpClient client)
     {
         await LoadContainers(false);
 
-        if (bool.Parse(Configuration["Realtime"]))
+        if (containers.Count > 0 && ContainerId != null)
+        {
+            container = containers.Find(c => c.ContainerId == ContainerId);
+
+            if (Timestamp != null)
+                timestamp = Timestamp;
+
+            if (FilterDate != null)
+                filterDate = DateTime.ParseExact(FilterDate, "yyyyMMdd", null);
+        }
+
+        if (bool.Parse(configuration["Realtime"]))
         {
             _ = Task.Run(async () =>
             {
@@ -80,13 +103,13 @@ public partial class Logs(HttpClient client)
             return;
         }
 
-        if (filterDate.HasValue)
+        if (!string.IsNullOrWhiteSpace(timestamp))
         {
-            filterString = $"&date={filterDate.Value.ToShortDateString()}";
+            filterString += $"&timestamp={timestamp}";
         }
-        else if (!string.IsNullOrWhiteSpace(timestamp))
+        else if (filterDate.HasValue)
         {
-            filterString = $"&timestamp={timestamp}";
+            filterString += $"&date={filterDate.Value.ToShortDateString()}";
         }
 
         logs = await client.GetStringAsync($"api/getContainerLogs?containerId={container.ContainerId}{filterString}");
