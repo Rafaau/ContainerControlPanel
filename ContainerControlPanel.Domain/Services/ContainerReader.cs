@@ -32,14 +32,19 @@ public static class ContainerReader
         }
     }
 
-    public static async Task<string> GetContainerLogsAsync(string containerId, string timestamp = null, DateTime? date = null)
+    public static async Task<string> GetContainerLogsAsync(
+        string containerId, 
+        string timestamp = null, 
+        DateTime? date = null,
+        string timeFrom = "00:00:00",
+        string timeTo = "23:59:59")
     {
         string filterString = string.Empty;
 
         if (date.HasValue) 
         {
-            filterString += $" --since \"{date.Value.ToString("yyyy-MM-ddT00:00:00")}\"";
-            filterString += $" --until \"{date.Value.ToString("yyyy-MM-ddT23:59:59")}\"";
+            filterString += $" --since \"{date.Value.ToString($"yyyy-MM-ddT{timeFrom}")}\"";
+            filterString += $" --until \"{date.Value.ToString($"yyyy-MM-ddT{timeTo}")}\"";
         }
         else if (timestamp != null)
         {

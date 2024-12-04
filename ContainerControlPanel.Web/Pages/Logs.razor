@@ -32,14 +32,25 @@
 		<MudSelectItem Value="@("1440m")">24 hours</MudSelectItem>
 		<MudSelectItem Value="@("10080m")">7 days</MudSelectItem>
 	</MudSelect>
-	<MudDatePicker @bind-Date="filterDate" Clearable="true" DateFormat="dd.MM.yyyy"/>
+	<div class="date-picker">
+		<MudDatePicker @bind-Date="filterDate" Clearable="true" DateFormat="dd.MM.yyyy"/>
+	</div>
+	<div class="time-flex">
+		<MudTimePicker Editable="true" @bind-Time="timeFrom"/>
+		<MudTimePicker Editable="true" @bind-Time="timeTo"/>
+	</div>
 </div>
 
 
 @if (logs.Length > 0) 
 {
-	<div class="logs-container">
-		@logs
-		<div id="logs-bottom"></div>
+	<div class="logs-flex">
+		<div class="logs-container">
+			@logs
+			<div id="logs-bottom"></div>
+		</div>
+		<svg @onclick="@(async () => { await scrollHandler.ScrollToElementByIdAsync("logs-bottom"); })" class="scroll-down" xmlns="http://www.w3.org/2000/svg" height="32px" fill="currentColor" viewBox="0 0 16 16">
+			<path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4" />
+		</svg>
 	</div>
 }

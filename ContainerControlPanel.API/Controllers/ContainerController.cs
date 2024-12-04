@@ -28,9 +28,14 @@ namespace ContainerControlPanel.API.Controllers
         }
 
         [HttpGet("GetContainerLogs")]
-        public async Task<IActionResult> GetContainerLogs(string containerId, string timestamp = null, DateTime? date = null)
+        public async Task<IActionResult> GetContainerLogs(
+            string containerId, 
+            string timestamp = null, 
+            DateTime? date = null,
+            string timeFrom = "00:00:00",
+            string timeTo = "23:59:59")
         {
-            var result = await ContainerReader.GetContainerLogsAsync(containerId, timestamp, date);
+            var result = await ContainerReader.GetContainerLogsAsync(containerId, timestamp, date, timeFrom, timeTo);
             return Ok(result);
         }
 

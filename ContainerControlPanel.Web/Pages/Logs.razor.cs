@@ -60,6 +60,29 @@ public partial class Logs(HttpClient client)
             LoadLogs();
         }
     }
+    private TimeSpan? _timeFrom = new TimeSpan(0, 0, 0);
+    private TimeSpan? _timeTo = new TimeSpan(23, 59, 59);
+    private TimeSpan? timeFrom
+    {
+        get => _timeFrom;
+        set
+        {
+            _timeFrom = value;
+            firstScroll = false;
+            LoadLogs();
+        }
+    }
+    private TimeSpan? timeTo
+    {
+        get => _timeTo;
+        set
+        {
+            _timeTo = value;
+            firstScroll = false;
+            LoadLogs();
+        }
+    }
+
     private bool firstScroll { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
@@ -109,7 +132,7 @@ public partial class Logs(HttpClient client)
         }
         else if (filterDate.HasValue)
         {
-            filterString += $"&date={filterDate.Value.ToShortDateString()}";
+            filterString += $"&date={filterDate.Value.ToShortDateString()}&timeFrom={timeFrom.ToString()}&timeTo={timeTo.ToString()}";
         }
 
         logs = await client.GetStringAsync($"api/getContainerLogs?containerId={container.ContainerId}{filterString}");
