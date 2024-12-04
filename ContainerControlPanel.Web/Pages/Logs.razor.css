@@ -39,7 +39,9 @@
 }
 
 .flex {
-	display: flex;
+	display: inline-flex;
+	align-self: center;
+	position: relative;
 	width: 900px;
 	gap: 32px;
 	margin-left: 24px;
@@ -68,4 +70,15 @@
 	width: 250px;
 	display: flex;
 	gap: 32px;
+}
+
+.not-found {
+	text-align: center;
+	margin-top: 32px;
+	user-select: none;
+}
+
+.switch {
+	margin-left: auto;
+	margin-top: 10px;
 }

@@ -82,8 +82,8 @@ public partial class Logs(HttpClient client)
             LoadLogs();
         }
     }
-
     private bool firstScroll { get; set; } = false;
+    private bool enableColors { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,11 +120,12 @@ public partial class Logs(HttpClient client)
 
     private async Task LoadLogs()
     {
-        string filterString = string.Empty;
         if (string.IsNullOrWhiteSpace(container?.ContainerId))
         {
             return;
         }
+
+        string filterString = string.Empty;
 
         if (!string.IsNullOrWhiteSpace(timestamp))
         {
@@ -137,11 +138,11 @@ public partial class Logs(HttpClient client)
 
         logs = await client.GetStringAsync($"api/getContainerLogs?containerId={container.ContainerId}{filterString}");
         this.StateHasChanged();
-
+     
         if (!firstScroll)
         {
             await scrollHandler.ScrollToElementByIdAsync("logs-bottom");
             firstScroll = true;
-        }
+        }   
     }
 }

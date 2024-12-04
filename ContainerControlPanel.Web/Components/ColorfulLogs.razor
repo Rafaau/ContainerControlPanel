@@ -1,0 +1,19 @@
+﻿@foreach (var word in Logs.Split(" "))
+{
+	@if (CheckForErrorMessage(word.ToLower()))
+	{
+		<span style="color: red;">@word&nbsp;</span>
+	}
+	else if (CheckForWarningMessage(word.ToLower()))
+	{
+		<span style="color: yellow;">@word&nbsp;</span>
+	}
+	else if (CheckForSuccessMessage(word.ToLower()))
+	{
+		<span style="color: green;">@word&nbsp;</span>
+	}
+	else
+	{
+		<span>@word&nbsp;</span>
+	}
+}

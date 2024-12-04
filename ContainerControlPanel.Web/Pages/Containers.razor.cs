@@ -17,6 +17,8 @@ public partial class Containers(HttpClient client)
 
     [Inject]
     IConfiguration Configuration { get; set; }
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
 
     private HttpClient client { get; set; } = client;
     private List<Container> containers { get; set; } = new();
@@ -124,5 +126,10 @@ public partial class Containers(HttpClient client)
             },
             options
         );
+    }
+
+    private void ViewLogs(string containerId)
+    {
+        NavigationManager.NavigateTo($"/logs/{containerId}");
     }
 }
