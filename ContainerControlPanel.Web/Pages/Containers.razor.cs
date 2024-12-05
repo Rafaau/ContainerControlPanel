@@ -1,13 +1,14 @@
 ﻿using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Components;
 using ContainerControlPanel.Web.Enums;
+using ContainerControlPanel.Web.Interfaces;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net.Http.Json;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Containers(HttpClient client)
+public partial class Containers(IContainerAPI containerAPI)
 {
     [Inject]
     IServiceProvider ServiceProvider { get; set; }
@@ -20,7 +21,7 @@ public partial class Containers(HttpClient client)
     [Inject]
     NavigationManager NavigationManager { get; set; }
 
-    private HttpClient client { get; set; } = client;
+    private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
     private bool liveFilter { get; set; } = true;
 
@@ -47,7 +48,7 @@ public partial class Containers(HttpClient client)
 
     private async Task LoadContainers(bool force)
     {
-        containers = await client.GetFromJsonAsync<List<Container>>($"api/getContainersList?force={force}&liveFilter={liveFilter}");
+        containers = await containerAPI.GetContainers(force, liveFilter);
         this.StateHasChanged();
     }
 
@@ -56,7 +57,7 @@ public partial class Containers(HttpClient client)
         var container = containers.Find(x => x.ContainerId == containerId);
         container.Status = "Stopping...";
 
-        string result = await client.GetStringAsync($"api/stopContainer?containerId={containerId}");
+        string result = await containerAPI.StopContainer(containerId);
 
         if (result.Contains(container.ContainerId))
         {
@@ -78,7 +79,7 @@ public partial class Containers(HttpClient client)
         {
             container.Status = "Restarting...";
             this.StateHasChanged();
-            await client.GetStringAsync($"api/restartContainer?containerId={containerId}");
+            await containerAPI.RestartContainer(containerId);
         }
     }
 
@@ -96,7 +97,7 @@ public partial class Containers(HttpClient client)
         {
             container.Status = "Starting...";
             this.StateHasChanged();
-            await client.GetStringAsync($"api/startContainer?containerId={containerId}");
+            await containerAPI.StartContainer(containerId);
         }
     }
 

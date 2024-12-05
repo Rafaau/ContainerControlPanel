@@ -1,11 +1,12 @@
 using ContainerControlPanel.Domain.Models;
+using ContainerControlPanel.Web.Interfaces;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Logs(HttpClient client)
+public partial class Logs(IContainerAPI containerAPI)
 {
     [Inject]
     IConfiguration configuration { get; set; }
@@ -21,7 +22,7 @@ public partial class Logs(HttpClient client)
     [Parameter]
     public string? FilterDate { get; set; }
 
-    private HttpClient client { get; set; } = client;
+    private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
     private string logs = string.Empty;
     private Container _container = null;
@@ -115,7 +116,7 @@ public partial class Logs(HttpClient client)
 
     private async Task LoadContainers(bool force)
     {
-        containers = await client.GetFromJsonAsync<List<Container>>($"api/getContainersList?force={force}&liveFilter=true");
+        containers = await containerAPI.GetContainers(force, true);
     }
 
     private async Task LoadLogs()
@@ -136,7 +137,7 @@ public partial class Logs(HttpClient client)
             filterString += $"&date={filterDate.Value.ToShortDateString()}&timeFrom={timeFrom.ToString()}&timeTo={timeTo.ToString()}";
         }
 
-        logs = await client.GetStringAsync($"api/getContainerLogs?containerId={container.ContainerId}{filterString}");
+        logs = await containerAPI.GetContainerLogs(container.ContainerId, timestamp, filterDate, timeFrom.ToString(), timeTo.ToString());
         this.StateHasChanged();
      
         if (!firstScroll)
