@@ -1,5 +1,6 @@
 using ContainerControlPanel.Web;
 using ContainerControlPanel.Web.Interfaces;
+using ContainerControlPanel.Web.Services;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -21,6 +22,7 @@ builder.Services
 
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddTransient<IScrollHandler, ScrollHandler>();
+builder.Services.AddSingleton<WebSocketService>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

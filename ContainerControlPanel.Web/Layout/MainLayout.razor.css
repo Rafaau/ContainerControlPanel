@@ -44,13 +44,11 @@
 
     .sidebar {
         width: 75px;
-        height: 100vh;
         position: sticky;
         top: 0;
     }
 
     .top-row {
-        position: sticky;
         top: 0;
         z-index: 1;
     }
@@ -71,8 +69,10 @@ main {
     background-color: #333333;
     color: white;
     flex: 1;
+    border-left: 1px solid #484848;
+    border-top: 1px solid #484848;
 }
 
 .content {
-    padding: 0; !important
+    padding: 0 !important;
 }

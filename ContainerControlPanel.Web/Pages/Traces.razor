@@ -1,0 +1,60 @@
+﻿@page "/traces"
+@using ContainerControlPanel.Domain.Models
+
+<div class="label">
+	<h1>Traces</h1>
+</div>
+
+<div class="data-grid">
+	<div class="data-grid-row header">
+		<div class="data-grid-cell">
+			Timestamp
+		</div>
+		<div class="data-grid-cell">
+			Request
+		</div>
+		<div class="data-grid-cell">
+			Source
+		</div>
+		<div class="data-grid-cell">
+			Duration
+		</div>
+		<div class="data-grid-cell">
+			Action
+		</div>
+	</div>
+	@if (allTraces.Count == 0)
+	{
+		<div class="data-grid-row data" style="text-align: center;">
+			No traces found
+		</div>
+	}
+	else 
+	{
+		@foreach (var traceRoot in allTraces)
+		{
+			@foreach (var trace in traceRoot.ResourceSpans) 
+			{
+				<div class="data-grid-row data">
+					<div class="data-grid-cell">
+						@trace.GetTimestamp().ToString("HH:mm:ss")
+					</div>
+					<div class="data-grid-cell">
+						@trace.GetTraceName()
+					</div>
+					<div class="data-grid-cell">
+						<div class="service-name-container">
+							<div class="service-name-badge" style="background-color: #@(GetHexString(@trace.GetServiceName()))"></div>
+							@trace.GetServiceName()
+						</div>		
+					</div>
+					<div class="data-grid-cell">
+						@trace.GetDuration().Milliseconds.ToString() ms
+					</div>
+					<div class="data-grid-cell">
+					</div>
+				</div>
+			}		
+		}
+	}
+</div>

@@ -1,7 +1,6 @@
 using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace ContainerControlPanel.API.Controllers
