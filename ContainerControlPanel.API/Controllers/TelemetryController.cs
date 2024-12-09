@@ -6,27 +6,32 @@ using System.Net.Http.Headers;
 using OpenTelemetry.Proto.Collector.Trace.V1;
 using System.Buffers;
 using System.IO.Pipelines;
+using ContainerControlPanel.Domain.Models;
+using System.Text;
+using System;
+using System.Text.Json;
 
 [ApiController]
 [Route("/v1")]
 public class TelemetryController : ControllerBase
 {
     private readonly ILogger<TelemetryController> _logger;
+    private readonly RedisService _redisService;
 
     public const string ProtobufContentType = "application/x-protobuf";
     public const string JsonContentType = "application/json";
     public const string CorsPolicyName = "OtlpHttpCors";
 
-    public TelemetryController(ILogger<TelemetryController> logger)
+    public TelemetryController(ILogger<TelemetryController> logger, RedisService redisService)
     {
         _logger = logger;
+        _redisService = redisService;
     }
 
     [HttpPost("metrics")]
     public IActionResult CollectTelemetry([FromBody] dynamic telemetryData)
     {
         _logger.LogInformation("Received telemetry data: {Data}", [telemetryData]);
-        // Możesz tutaj przetwarzać dane, zapisywać je w bazie danych lub analizować.
         return Ok();
     }
 
@@ -35,7 +40,10 @@ public class TelemetryController : ControllerBase
     {
         try
         {
-            MessageBindable<ExportTraceServiceRequest>? bindable = await MessageBindable<ExportTraceServiceRequest>.BindAsync(HttpContext, null);
+            MessageBindable<ExportTraceServiceRequest>? bindable = 
+                await MessageBindable<ExportTraceServiceRequest>.BindAsync(HttpContext, null);
+
+            await _redisService.SetValueAsync($"trace{Guid.NewGuid().ToString()}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
             await TelemetryWebSocketHandler.BroadcastMessageAsync(bindable?.Message.ToString());
             return Ok();
         }
@@ -43,6 +51,21 @@ public class TelemetryController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+    }
+
+    [HttpGet("GetTraces")]
+    public async Task<IActionResult> GetTraces()
+    {
+        List<Root> traces = new();
+        var result = await _redisService.ScanKeysByPatternAsync("trace");
+
+        foreach (var item in result)
+        {
+            var deserialized = JsonSerializer.Deserialize<Root>(item);
+            traces.Add(deserialized);
+        }
+
+        return Ok(traces);
     }
 
     public sealed class MessageBindable<TMessage> : IBindableFromHttpContext<MessageBindable<TMessage>> where TMessage : IMessage<TMessage>, new()

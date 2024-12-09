@@ -9,7 +9,8 @@
       "applicationUrl": "http://localhost:5069",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "REALTIME": "true"
+        "REALTIME": "true",
+        "TIMEOFFSET": "1"
       }
     }
   }

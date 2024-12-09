@@ -73,3 +73,15 @@
 	margin-right: 6px;
 	filter: saturate(1000%);
 }
+
+.timestamp-span {
+	margin-right: 4px;
+}
+
+.flex {
+	display: flex;
+}
+
+.switch {
+	margin-left: auto;
+}

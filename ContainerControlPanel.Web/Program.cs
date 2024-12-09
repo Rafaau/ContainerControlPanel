@@ -20,6 +20,10 @@ builder.Services
     .AddRefitClient<IContainerAPI>()
     .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://localhost:5121"));
 
+builder.Services
+    .AddRefitClient<ITelemetryAPI>()
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://localhost:5121"));
+
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddTransient<IScrollHandler, ScrollHandler>();
 builder.Services.AddSingleton<WebSocketService>();

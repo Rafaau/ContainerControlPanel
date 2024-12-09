@@ -1,6 +1,7 @@
 ﻿using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,9 @@ builder.Services.AddGrpc();
 builder.Services.AddOpenTelemetry()
     .WithTracing(builder => builder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddConsoleExporter())
     .WithMetrics(builder => builder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddConsoleExporter());
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
+builder.Services.AddSingleton<RedisService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

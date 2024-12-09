@@ -71,6 +71,12 @@ main {
     flex: 1;
     border-left: 1px solid #484848;
     border-top: 1px solid #484848;
+    overflow: auto !important;
+    position: absolute;
+    left: 75px;
+    right: 0;
+    bottom: 0;
+    top: 0;
 }
 
 .content {

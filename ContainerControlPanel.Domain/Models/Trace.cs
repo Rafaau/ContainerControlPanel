@@ -72,6 +72,29 @@ public class Value
 
 public static class Extensions
 {
+    public static List<ResourceSpan> GetTracesList(
+        this List<Root> rootsList,
+        bool orderDesc = true,
+        string filter = "all",
+        bool routesOnly = false)
+    {
+        return rootsList
+            .SelectMany(x => x.ResourceSpans)
+            .Where(rs =>
+                filter == "all" ||
+                rs.Resource.Attributes
+                    .Any(attr => attr.Key == "service.name"
+                        && attr.Value?.StringValue == filter))
+            .Where(rs =>
+                !routesOnly ||
+                rs.ScopeSpans[0].Spans[0].Attributes.Any(a => a.Key == "url.path"))
+            .OrderByDescending(rs => rs.ScopeSpans
+                .SelectMany(ss => ss.Spans)
+                .Min(span => long.Parse(span.StartTimeUnixNano)))
+            .ToList();
+
+    }
+
     public static string GetServiceName(this ResourceSpan resourceSpan)
         => resourceSpan.Resource.Attributes.Find(x => x.Key.Equals("service.name")).Value.StringValue;
 
@@ -80,8 +103,8 @@ public static class Extensions
 
     public static string GetTraceName(this ResourceSpan resourceSpan)
     {
-        string method = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("http.request.method")).Value.StringValue;
-        string route = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path")).Value.StringValue;
+        string? method = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("http.request.method"))?.Value.StringValue;
+        string? route = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue;
 
         return $"{method} {route}";
     }
@@ -97,11 +120,11 @@ public static class Extensions
         return TimeSpan.FromMilliseconds(endTimeMilliseconds - startTimeMilliseconds);
     }
 
-    public static DateTime GetTimestamp(this ResourceSpan resourceSpan)
+    public static DateTime GetTimestamp(this ResourceSpan resourceSpan, int timeOffset)
     {
         var startTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].StartTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
 }
 
