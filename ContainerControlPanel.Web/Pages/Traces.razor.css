@@ -85,3 +85,18 @@
 .switch {
 	margin-left: auto;
 }
+
+.data-container {
+	position:absolute;
+	overflow: auto;
+	bottom: 35px;
+	top: 212px;
+	left: 0;
+	right: 0;
+}
+
+.footer {
+	position: absolute;
+	bottom: 6px;
+	left: 22px;
+}

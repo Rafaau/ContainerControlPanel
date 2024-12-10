@@ -2,6 +2,7 @@ using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Interfaces;
 using ContainerControlPanel.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using System.Text;
 
 namespace ContainerControlPanel.Web.Pages;
@@ -16,6 +17,9 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
 
     [Inject]
     IConfiguration Configuration { get; set; }
+
+    [Inject]
+    IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 

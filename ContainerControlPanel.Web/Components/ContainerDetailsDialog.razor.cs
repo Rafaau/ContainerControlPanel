@@ -1,6 +1,7 @@
 using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using MudBlazor;
 using System.Net.Http.Json;
 
@@ -8,6 +9,9 @@ namespace ContainerControlPanel.Web.Components;
 
 public partial class ContainerDetailsDialog(IContainerAPI containerAPI)
 {
+    [Inject]
+    IStringLocalizer<Locales.Resource> Localizer { get; set; }
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 

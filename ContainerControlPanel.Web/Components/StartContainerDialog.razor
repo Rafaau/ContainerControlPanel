@@ -3,26 +3,44 @@
 
 <MudDialog>
     <TitleContent>
-        @ActionType.ToString() container
+        @(ActionType == ActionType.Start 
+            ? @Localizer[Locales.Resource.Start] 
+            : @Localizer[Locales.Resource.Restart]) 
+        @Localizer[Locales.Resource.Container].ToString().ToLower()
     </TitleContent>
     <DialogContent>
         <div class="question">
-            How do you want to @ActionType.ToString().ToLower() the container?
+            @Localizer[Locales.Resource.HowDoYouWant] 
+            @(ActionType == ActionType.Start
+                ? @Localizer[Locales.Resource.StartInfinitive]
+                : @Localizer[Locales.Resource.RestartInfinitive])
+            @Localizer[Locales.Resource.Container].ToString().ToLower()?
         </div>
         <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.JustStart); }">
-            Just @ActionType.ToString().ToLower()
+            @Localizer[Locales.Resource.Just]
+            @(ActionType == ActionType.Start
+                ? @Localizer[Locales.Resource.Start]
+                : @Localizer[Locales.Resource.Restart])
         </MudButton><br /><br />
         <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.ReinstallAndStart); }">
-            Reinstall image and @ActionType.ToString().ToLower()
+            @Localizer[Locales.Resource.ReinstallImageAnd] 
+            @(ActionType == ActionType.Start
+                ? @Localizer[Locales.Resource.Start]
+                : @Localizer[Locales.Resource.Restart])
         </MudButton><br /><br />
         <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.StartByCompose); }">
-            @ActionType.ToString().ToLower() using docker-compose
+            @(ActionType == ActionType.Start
+                ? @Localizer[Locales.Resource.Start]
+                : @Localizer[Locales.Resource.Restart])
+            @Localizer[Locales.Resource.DockerCompose]
         </MudButton><br /><br />
         <MudButton Color="Color.Primary" OnClick="() => { ChooseOption(StartOption.ReinstallAndStartByCompose); }">
-            Reinstall image and @ActionType.ToString().ToLower() using docker-compose
+            @Localizer[Locales.Resource.ReinstallImageAnd] 
+            @Localizer[Locales.Resource.Start]
+            @Localizer[Locales.Resource.DockerCompose]
         </MudButton><br /><br />
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Primary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Cancel">@Localizer[Locales.Resource.Cancel]</MudButton>
     </DialogActions>
 </MudDialog>

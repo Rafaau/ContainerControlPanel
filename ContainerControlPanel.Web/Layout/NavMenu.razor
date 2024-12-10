@@ -1,11 +1,16 @@
-﻿<div class="@NavMenuCssClass nav-scrollable side-menu" @onclick="ToggleNavMenu">
+﻿@using Locales
+@using Microsoft.Extensions.Localization
+
+@inject IStringLocalizer<Resource> Localizer
+
+<div class="@NavMenuCssClass nav-scrollable side-menu" @onclick="ToggleNavMenu">
     <nav class="nav flex-column">
         <div class="nav-item">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <svg xmlns="http://www.w3.org/2000/svg" height="28px" fill="currentColor" class="bi" viewBox="0 0 16 16">
                     <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5zM15 4.239l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464z" />
                 </svg> 
-                Containers
+                @Localizer[Resource.Containers]
             </NavLink>
         </div>
         <div class="nav-item">
@@ -14,7 +19,7 @@
                     <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z" />
                     <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0" />
                 </svg> 
-                Logs
+                @Localizer[Resource.Logs]
             </NavLink>
         </div>
         <div class="nav-item">
@@ -22,7 +27,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="28px" height="23px" fill="currentColor" class="bi" viewBox="0 0 16 16">
                     <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0M2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z" />
                 </svg>
-                Traces
+                @Localizer[Resource.Traces]
             </NavLink>
         </div>
     </nav>

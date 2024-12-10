@@ -3,15 +3,19 @@
 @using MudBlazor
 
 <div class="label">
-	<h1>Traces</h1>
+	<h1>@Localizer[Locales.Resource.Traces]</h1>
 </div>
+
+@{
+	List<ResourceSpan> traces = allTraces.GetTracesList(filter: currentResource, routesOnly: routesOnly);
+}
 
 @if (allTraces.Count > 0) 
 {
 	<div class="flex">
 		<div style="margin-left: 26px; margin-bottom: 24px; width: 200px;">
 			<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
-				<MudSelectItem Value="@("all")">(All)</MudSelectItem>
+				<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
 				@foreach (var resource in allTraces.SelectMany(r => r.ResourceSpans)
 							.Select(rs => rs.Resource?.Attributes?
 							.FirstOrDefault(a => a.Key == "service.name")?.Value?.StringValue)
@@ -24,7 +28,7 @@
 			</MudSelect>
 		</div>
 		<div class="switch">
-			<MudSwitch @bind-Value="routesOnly" Label="Routes only" />
+			<MudSwitch @bind-Value="routesOnly" Label="@Localizer[Locales.Resource.RoutesOnly]" />
 		</div>
 	</div>
 }
@@ -32,71 +36,76 @@
 <div class="data-grid">
 	<div class="data-grid-row header">
 		<div class="data-grid-cell">
-			Timestamp
+			@Localizer[Locales.Resource.Timestamp]
 		</div>
 		<div class="data-grid-cell">
-			Request
+			@Localizer[Locales.Resource.Request]
 		</div>
 		<div class="data-grid-cell">
-			Source
+			@Localizer[Locales.Resource.Source]
 		</div>
 		<div class="data-grid-cell">
-			Duration
+			@Localizer[Locales.Resource.Duration]
 		</div>
 		<div class="data-grid-cell">
-			Action
+			@Localizer[Locales.Resource.Action]
 		</div>
 	</div>
-	@if (allTraces.GetTracesList(filter: currentResource, routesOnly: routesOnly).Count < 1)
+	@if (traces.Count < 1)
 	{
 		<div class="data-grid-row data" style="text-align: center;">
-			No traces found
+			@Localizer[Locales.Resource.NoTracesFound].
 		</div>
 	}
 	else 
 	{
-		@foreach (var trace in allTraces.GetTracesList(filter: currentResource, routesOnly: routesOnly))
-		{
-			<div class="data-grid-row data">
-				<div class="data-grid-cell">
-					@{
-						DateTime timestamp = trace.GetTimestamp(int.Parse(Configuration["TimeOffset"]));
-					}
-					@if (timestamp.Date == DateTime.Now.AddDays(-1).Date) 
-					{
-						<span class="timestamp-span">
-							Yesterday
-						</span>
-					}
-					else if (timestamp.Date == DateTime.Now.AddDays(-2).Date)
-					{
-						<span class="timestamp-span">
-							2 days ago
-						</span>
-					}
-					else if (timestamp.Date != DateTime.Now.Date)
-					{
-						<span class="timestamp-span">
-							@timestamp.ToString("dd MMMM")
-						</span>
-					}
-					@timestamp.ToString("HH:mm:ss")
-				</div>
-				<div class="data-grid-cell">
-					@trace.GetTraceName()
-				</div>
-				<div class="data-grid-cell">
-					<div class="service-name-container">
-						<div class="service-name-badge" style="background-color: #@(GetHexString(@trace.GetServiceName()))"></div>
-						@trace.GetServiceName()
+		<div class="data-container">
+			@foreach (var trace in traces)
+			{
+				<div class="data-grid-row data">
+					<div class="data-grid-cell">
+						@{
+							DateTime timestamp = trace.GetTimestamp(int.Parse(Configuration["TimeOffset"]));
+						}
+						@if (timestamp.Date == DateTime.Now.AddDays(-1).Date) 
+						{
+							<span class="timestamp-span">
+								@Localizer[Locales.Resource.Yesterday]
+							</span>
+						}
+						else if (timestamp.Date == DateTime.Now.AddDays(-2).Date)
+						{
+							<span class="timestamp-span">
+								@Localizer[Locales.Resource._2DaysAgo]
+							</span>
+						}
+						else if (timestamp.Date != DateTime.Now.Date)
+						{
+							<span class="timestamp-span">
+								@timestamp.ToString("dd MMMM")
+							</span>
+						}
+						@timestamp.ToString("HH:mm:ss")
+					</div>
+					<div class="data-grid-cell">
+						@trace.GetTraceName()
+					</div>
+					<div class="data-grid-cell">
+						<div class="service-name-container">
+							<div class="service-name-badge" style="background-color: #@(GetHexString(@trace.GetServiceName()))"></div>
+							@trace.GetServiceName()
+						</div>
+					</div>
+					<div class="data-grid-cell">
+						@trace.GetDuration().Milliseconds.ToString() ms
+					</div>
+					<div class="data-grid-cell">
 					</div>
 				</div>
-				<div class="data-grid-cell">
-					@trace.GetDuration().Milliseconds.ToString() ms
-				</div>
-				<div class="data-grid-cell">
-				</div>
-			</div>
-		}
+			}
+		</div>	
 	}
+</div>
+<div class="footer">
+	@Localizer[Locales.Resource.TotalNumberOfFoundTraces]: <b>@traces.Count</b>
 </div>

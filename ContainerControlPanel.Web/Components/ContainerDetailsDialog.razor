@@ -2,22 +2,25 @@
 
 <MudDialog>
     <TitleContent>
-        Container details
+        @if (containerDetails != null)
+        {
+            <span>@Localizer[Locales.Resource.Container]: @containerDetails.Name</span>
+        }
     </TitleContent>
     <DialogContent>
-        @if (containerDetails != null) 
-        {
-            <div class="details-content">
+        <div class="details-content">
+            @if (containerDetails != null)
+            {
                 <div class="detail-label">
-                    Environment variables
+                    @Localizer[Locales.Resource.EnvironmentVariables]
                 </div>
                 <div class="data-grid">
 		            <div class="data-grid-row header">
 			            <div class="data-grid-cell">
-						    Name
+                            @Localizer[Locales.Resource.Name]
                         </div>
                         <div class="data-grid-cell">
-                            Value
+                            @Localizer[Locales.Resource.Value]
                         </div>
                     </div>
                     @foreach (var env in containerDetails.Config.EnvironmentVariables)
@@ -51,8 +54,8 @@
                         </div>
 		            }               
                 </div>  
-            </div>
-        }
+            }
+        </div>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" OnClick="Ok">Ok</MudButton>

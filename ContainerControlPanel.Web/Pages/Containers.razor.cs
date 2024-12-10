@@ -3,6 +3,7 @@ using ContainerControlPanel.Web.Components;
 using ContainerControlPanel.Web.Enums;
 using ContainerControlPanel.Web.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using MudBlazor;
 using System.Net.Http.Json;
 
@@ -18,8 +19,12 @@ public partial class Containers(IContainerAPI containerAPI)
 
     [Inject]
     IConfiguration Configuration { get; set; }
+
     [Inject]
     NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
     private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
@@ -106,7 +111,7 @@ public partial class Containers(IContainerAPI containerAPI)
         var options = new DialogOptions { CloseOnEscapeKey = true };
 
         return DialogService.ShowAsync<ContainerDetailsDialog>(
-            "Simple Dialog", 
+            "", 
             new DialogParameters() 
             { 
                 { "ContainerId", containerId } 
@@ -119,7 +124,7 @@ public partial class Containers(IContainerAPI containerAPI)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         return await DialogService.ShowAsync<StartContainerDialog>(
-            "Simple Dialog",
+            "",
             new DialogParameters()
             {
                 { "ContainerId", containerId },

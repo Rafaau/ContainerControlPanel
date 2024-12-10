@@ -1,8 +1,9 @@
 ﻿@page "/"
 @using MudBlazor
+@using Locales
 
 <div class="label">
-	<h1>Containers</h1>
+	<h1>@Localizer[Resource.Containers]</h1>
 	@if (!bool.Parse(Configuration["Realtime"]))
 	{
 		<svg @onclick="() => { LoadContainers(true); }" xmlns="http://www.w3.org/2000/svg" height="24px" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
@@ -12,8 +13,8 @@
 	}
 	<div style="margin-left: auto; width: 200px;">
 		<MudSelect T="bool" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="liveFilter">		
-			<MudSelectItem Value="true">Running</MudSelectItem>
-			<MudSelectItem Value="false">All</MudSelectItem>	
+			<MudSelectItem Value="true">@Localizer[Resource.Running]</MudSelectItem>
+			<MudSelectItem Value="false">@Localizer[Resource.All]</MudSelectItem>
 		</MudSelect>
 	</div>
 </div>
@@ -21,31 +22,31 @@
 <div class="data-grid">
 	<div class="data-grid-row header">
 		<div class="data-grid-cell">
-			ContainerId
+			@Localizer[Resource.ContainerId]
 		</div>
 		<div class="data-grid-cell">
-			Name
+			@Localizer[Resource.Name]
 		</div>
 		<div class="data-grid-cell">
-			Image
+			@Localizer[Resource.Image]
 		</div>
 		<div class="data-grid-cell">
-			Ports
+			@Localizer[Resource.Ports]
 		</div>
 		<div class="data-grid-cell">
-			Created At
+			@Localizer[Resource.CreatedAt]
 		</div>
 		<div class="data-grid-cell">
-			Status
+			@Localizer[Resource.Status]
 		</div>
 		<div class="data-grid-cell">
-			Action
+			@Localizer[Resource.Action]
 		</div>
 	</div>
 	@if (containers.Count < 1)
 	{
 		<div class="not-found">
-			No alive containers found.
+			@Localizer[Resource.NoAliveContainers].
 		</div>
 	}	
 	else 
@@ -68,7 +69,7 @@
 					@container.Ports
 				</div>
 				<div class="data-grid-cell">
-					@container.Created.ToString("dd / MM / yyyy")
+					@container.Created.ToString("dd/MM/yyyy")
 				</div>
 				<div class="data-grid-cell">
 					@if (container.Status.StartsWith("Restarting")
@@ -117,8 +118,8 @@
 							</svg>
 						</ActivatorContent>
 						<ChildContent>
-							<MudMenuItem @onclick="() => { OpenDetailsDialogAsync(container.ContainerId); }">View details</MudMenuItem>
-							<MudMenuItem @onclick="() => { ViewLogs(container.ContainerId); }">View logs</MudMenuItem>
+							<MudMenuItem @onclick="() => { OpenDetailsDialogAsync(container.ContainerId); }">@Localizer[Resource.ViewDetails]</MudMenuItem>
+							<MudMenuItem @onclick="() => { ViewLogs(container.ContainerId); }">@Localizer[Resource.ViewLogs]</MudMenuItem>
 						</ChildContent>
 					</MudMenu>
 				</div>

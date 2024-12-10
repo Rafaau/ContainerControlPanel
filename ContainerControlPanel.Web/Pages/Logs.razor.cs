@@ -2,7 +2,7 @@ using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Interfaces;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
 using Microsoft.AspNetCore.Components;
-using System.Net.Http.Json;
+using Microsoft.Extensions.Localization;
 
 namespace ContainerControlPanel.Web.Pages;
 
@@ -10,10 +10,15 @@ public partial class Logs(IContainerAPI containerAPI)
 {
     [Inject]
     IConfiguration configuration { get; set; }
+
     [Inject]
     IScrollHandler scrollHandler { get; set; }
+
     [Inject]
     NavigationManager navManager { get; set; }
+
+    [Inject]
+    IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
     [Parameter]
     public string? ContainerId { get; set; }

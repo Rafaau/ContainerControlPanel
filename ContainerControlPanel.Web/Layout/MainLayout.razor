@@ -1,11 +1,52 @@
-﻿@using MudBlazor
+﻿@using Locales
+@using MudBlazor
 @inherits LayoutComponentBase
 
 <MudThemeProvider Theme="MyCustomTheme" @bind-IsDarkMode="IsDarkMode"/>
 <MudPopoverProvider />
 <MudDialogProvider />
-
-<div class="top-row"></div>
+<div class="top-row">
+    <MudMenu PositionAtCursor="true" Color="Color.Dark" AnchorOrigin="Origin.BottomLeft" Placeholder="Choose container...">
+        <ActivatorContent>
+            <svg style="cursor: pointer;" xmlns="http://www.w3.org/2000/svg" height="24px" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+            </svg>
+        </ActivatorContent>
+        <ChildContent>
+            <MudMenuItem @onclick="@(async () => { await SwitchLanguage("en-US"); })">
+                <div class="menu-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 32 32">
+                        <rect x="1" y="4" width="30" height="24" rx="4" ry="4" fill="#071b65"></rect>
+                        <path d="M5.101,4h-.101c-1.981,0-3.615,1.444-3.933,3.334L26.899,28h.101c1.981,0,3.615-1.444,3.933-3.334L5.101,4Z" fill="#fff"></path>
+                        <path d="M22.25,19h-2.5l9.934,7.947c.387-.353,.704-.777,.929-1.257l-8.363-6.691Z" fill="#b92932"></path>
+                        <path d="M1.387,6.309l8.363,6.691h2.5L2.316,5.053c-.387,.353-.704,.777-.929,1.257Z" fill="#b92932"></path>
+                        <path d="M5,28h.101L30.933,7.334c-.318-1.891-1.952-3.334-3.933-3.334h-.101L1.067,24.666c.318,1.891,1.952,3.334,3.933,3.334Z" fill="#fff"></path>
+                        <rect x="13" y="4" width="6" height="24" fill="#fff"></rect>
+                        <rect x="1" y="13" width="30" height="6" fill="#fff"></rect>
+                        <rect x="14" y="4" width="4" height="24" fill="#b92932"></rect>
+                        <rect x="14" y="1" width="4" height="30" transform="translate(32) rotate(90)" fill="#b92932"></rect>
+                        <path d="M28.222,4.21l-9.222,7.376v1.414h.75l9.943-7.94c-.419-.384-.918-.671-1.471-.85Z" fill="#b92932"></path>
+                        <path d="M2.328,26.957c.414,.374,.904,.656,1.447,.832l9.225-7.38v-1.408h-.75L2.328,26.957Z" fill="#b92932"></path>
+                        <path d="M27,4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4Zm3,20c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24Z" opacity=".15"></path>
+                        <path d="M27,5H5c-1.657,0-3,1.343-3,3v1c0-1.657,1.343-3,3-3H27c1.657,0,3,1.343,3,3v-1c0-1.657-1.343-3-3-3Z" fill="#fff" opacity=".2"></path>
+                    </svg> English
+                </div>
+            </MudMenuItem>         
+            <MudMenuItem @onclick="@(async () => { await SwitchLanguage("pl-PL"); })">
+                <div class="menu-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 32 32">
+                        <path d="M1,24c0,2.209,1.791,4,4,4H27c2.209,0,4-1.791,4-4V15H1v9Z" fill="#cb2e40"></path>
+                        <path d="M27,4H5c-2.209,0-4,1.791-4,4v8H31V8c0-2.209-1.791-4-4-4Z" fill="#fff"></path>
+                        <path d="M5,28H27c2.209,0,4-1.791,4-4V8c0-2.209-1.791-4-4-4H5c-2.209,0-4,1.791-4,4V24c0,2.209,1.791,4,4,4ZM2,8c0-1.654,1.346-3,3-3H27c1.654,0,3,1.346,3,3V24c0,1.654-1.346,3-3,3H5c-1.654,0-3-1.346-3-3V8Z" opacity=".15"></path>
+                        <path d="M27,5H5c-1.657,0-3,1.343-3,3v1c0-1.657,1.343-3,3-3H27c1.657,0,3,1.343,3,3v-1c0-1.657-1.343-3-3-3Z" fill="#fff" opacity=".2"></path>
+                    </svg> Polski
+                </div>
+            </MudMenuItem>
+        </ChildContent>
+    </MudMenu>
+    
+</div>
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -17,17 +58,4 @@
     </main>
 </div>
 
-@code {
-    private bool IsDarkMode { get; set; } = true;
-    private MudTheme MyCustomTheme = new MudTheme()
-    {
-		PaletteDark = new() {
-                Primary = "#1c1c1c",
-                TextPrimary = "#ffffff",
-				Dark = "#1e1e1e",
-				DarkDarken = "#1c1c1c",
-				DarkLighten = "#1f1f1f",
-                Surface = "#0d0d0d"
-        }
-    };
-}
+

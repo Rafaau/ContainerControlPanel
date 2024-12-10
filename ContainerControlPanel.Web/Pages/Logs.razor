@@ -7,7 +7,7 @@
 @using MudBlazor
 
 <div class="label">
-	<h1>Logs</h1>
+	<h1>@Localizer[Locales.Resource.Logs]</h1>
 	@if (!bool.Parse(configuration["Realtime"]) && container != null) 
 	{
 		<svg @onclick="async () => { await LoadLogs(); }" xmlns="http://www.w3.org/2000/svg" height="24px" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
@@ -16,25 +16,25 @@
 		</svg>
 	}
 	<div class="switch">
-		<MudSwitch @bind-Value="enableColors" Label="Enable colors"/>
+		<MudSwitch @bind-Value="enableColors" Label="@Localizer[Locales.Resource.EnableColors]" />
 	</div>	
 </div>
 
 <div class="flex">
-	<MudSelect T="Container" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose container..." TransformOrigin="Origin.TopCenter" @bind-Value="container">
+	<MudSelect T="Container" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseContainer]" TransformOrigin="Origin.TopCenter" @bind-Value="container">
 		@foreach (var container in containers)
 		{
 			<MudSelectItem Value="container">@container.Names</MudSelectItem>
 		}
 	</MudSelect>
-	<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose timestamp..." TransformOrigin="Origin.TopCenter" @bind-Value="timestamp" Clearable="true">
-		<MudSelectItem Value="@("15m")">15 minutes</MudSelectItem>
-		<MudSelectItem Value="@("30m")">30 minutes</MudSelectItem>
-		<MudSelectItem Value="@("60m")">1 hour</MudSelectItem>
-		<MudSelectItem Value="@("360m")">6 hours</MudSelectItem>
-		<MudSelectItem Value="@("720m")">12 hours</MudSelectItem>
-		<MudSelectItem Value="@("1440m")">24 hours</MudSelectItem>
-		<MudSelectItem Value="@("10080m")">7 days</MudSelectItem>
+	<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseTimestamp]" TransformOrigin="Origin.TopCenter" @bind-Value="timestamp" Clearable="true">
+		<MudSelectItem Value="@("15m")">15 @Localizer[Locales.Resource.Minutes]</MudSelectItem>
+		<MudSelectItem Value="@("30m")">30 @Localizer[Locales.Resource.Minutes]</MudSelectItem>
+		<MudSelectItem Value="@("60m")">1 @Localizer[Locales.Resource.Hour]</MudSelectItem>
+		<MudSelectItem Value="@("360m")">6 @Localizer[Locales.Resource.Hours]</MudSelectItem>
+		<MudSelectItem Value="@("720m")">12 @Localizer[Locales.Resource.Hours]</MudSelectItem>
+		<MudSelectItem Value="@("1440m")">24 @Localizer[Locales.Resource.Hours1]</MudSelectItem>
+		<MudSelectItem Value="@("10080m")">7 @Localizer[Locales.Resource.Days]</MudSelectItem>
 	</MudSelect>
 	<div class="date-picker">
 		<MudDatePicker @bind-Date="filterDate" Clearable="true" DateFormat="dd.MM.yyyy"/>
