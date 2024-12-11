@@ -18,6 +18,9 @@ public partial class MainLayout
     [Inject]
     NavigationManager NavigationManager { get; set; }
 
+    [Inject]
+    IConfiguration Configuration { get; set; }
+
     private bool IsDarkMode { get; set; } = true;
 
     private MudTheme MyCustomTheme = new MudTheme()
@@ -29,7 +32,10 @@ public partial class MainLayout
             Dark = "#1e1e1e",
             DarkDarken = "#1c1c1c",
             DarkLighten = "#1f1f1f",
-            Surface = "#0d0d0d"
+            Surface = "#0d0d0d",
+            Background = "#2B2B2B",
+            Divider = "#484848",
+            Success = "#00B577"
         }
     };
 

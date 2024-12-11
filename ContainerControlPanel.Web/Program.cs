@@ -2,10 +2,8 @@ using ContainerControlPanel.Web;
 using ContainerControlPanel.Web.Interfaces;
 using ContainerControlPanel.Web.Services;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.JSInterop;
 using MudBlazor.Services;
 using Refit;
@@ -33,14 +31,6 @@ builder.Services.AddTransient<IScrollHandler, ScrollHandler>();
 builder.Services.AddSingleton<WebSocketService>();
 builder.Services.AddMudServices();
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Locales");
-builder.Services.Configure<RequestLocalizationOptions>(options => 
-{ 
-    var supportedCultures = new[] { "en-US", "pl-PL" }; 
-    options
-        .SetDefaultCulture(supportedCultures[1])
-        .AddSupportedCultures(supportedCultures)
-        .AddSupportedUICultures(supportedCultures); 
-});
 
 var host = builder.Build();
 

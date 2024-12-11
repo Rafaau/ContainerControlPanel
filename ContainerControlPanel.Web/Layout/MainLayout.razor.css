@@ -5,11 +5,12 @@
 }
 
 .top-row {
-    background-color: #292929;
+    background-color: #242424;
     justify-content: flex-end;
-    height: 3.5rem;
+    height: 56px;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
@@ -46,6 +47,7 @@
         width: 75px;
         position: sticky;
         top: 0;
+        bottom: 0;
     }
 
     .top-row {
@@ -65,13 +67,12 @@
     }
 }
 
-main {
-    background-color: #333333;
+main { 
     color: white;
     flex: 1;
     border-left: 1px solid #484848;
     border-top: 1px solid #484848;
-    overflow: hidden;
+    overflow: auto;
     position: absolute;
     left: 75px;
     right: 0;
@@ -87,4 +88,26 @@ main {
     font-size: 12px;
     display: flex;
     gap: 8px;
+}
+
+.logo {
+    position: absolute;
+    left: 25px;
+    cursor: pointer;
+}
+
+.settings {
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.settings:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.app-name {
+    position: absolute;
+    left: 95px;
+    font-size: 24px;
+    cursor: pointer;
 }
