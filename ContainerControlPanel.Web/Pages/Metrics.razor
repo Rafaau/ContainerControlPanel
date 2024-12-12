@@ -1,0 +1,106 @@
+﻿@page "/metrics"
+@using ContainerControlPanel.Domain.Models
+@using MudBlazor
+
+<div class="label">
+	<h1>@Localizer[Locales.Resource.Metrics]</h1>
+</div>
+
+<div class="flex">
+	<div style="margin-left: 26px; margin-bottom: 24px; width: 200px;">
+		<MudSelect T="Resource" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
+			<MudSelectItem T="Resource" Value="@(null)">(None)</MudSelectItem>
+			@if (allMetrics.Count > 0)
+			{
+				@foreach (var resource in allMetrics.GetResources())
+				{
+					<MudSelectItem Value="@(@resource)">@resource.GetResourceName()</MudSelectItem>
+				}
+			}
+		</MudSelect>
+	</div>
+</div>
+
+@if (currentResource == null) 
+{
+	<div class="not-found">
+		@Localizer[Locales.Resource.ChooseResourceTo].
+	</div>
+}
+
+@if (currentResource != null)
+{
+	<div class="metrics-list">
+		<MudList T="string">
+		@foreach (var scopeMetric in allMetrics.GetMetricsScopes(currentResource.GetResourceName())) 
+		{
+			<div class="position-relative">
+				<span class="expand-icon">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+						<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+					</svg>
+				</span>
+				<MudListItem Text="@scopeMetric.Scope.Name" Expanded>
+					<NestedList>
+						@foreach (var metric in scopeMetric.Metrics) 
+						{
+							<MudListItem>
+								<span @onclick="() => { currentMetric = metric; }">
+									@metric
+								</span>							
+							</MudListItem>
+						}				
+					</NestedList>
+				</MudListItem>
+				@* @foreach (var metric in scopeMetric.Metrics)
+				{
+					<div class="metric">
+						@metric.Name
+					</div>
+				} *@
+			</div>
+		}
+		</MudList>
+	</div>
+	<div class="metric-details">
+		@if (currentMetric != null)
+		{
+			<h2>@currentMetric.Name</h2>
+			<span>@currentMetric.Description</span>
+
+			<div class="data-grid">
+				<div class="data-grid-row header">
+					<div class="data-grid-cell">
+						@Localizer[Locales.Resource.Time]
+					</div>
+					<div class="data-grid-cell">
+						P50 Seconds
+					</div>
+					<div class="data-grid-cell">
+						P90 Seconds
+					</div>
+					<div class="data-grid-cell">
+						P99 Seconds
+					</div>
+					<div class="data-grid-cell">
+						@Localizer[Locales.Resource.Examples]
+					</div>
+				</div>
+			</div>
+		}
+		else 
+		{
+			<span>
+				@Localizer[Locales.Resource.ChooseInstrument].
+			</span>		
+		}
+	</div>
+}
+else if (currentResource != null)
+{
+	<div class="not-found">
+		@Localizer[Locales.Resource.NoMetricsFound].
+	</div>
+}
+
+

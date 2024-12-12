@@ -16,12 +16,7 @@
 		<div style="margin-left: 26px; margin-bottom: 24px; width: 200px;">
 			<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
 				<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
-				@foreach (var resource in allTraces.SelectMany(r => r.ResourceSpans)
-							.Select(rs => rs.Resource?.Attributes?
-							.FirstOrDefault(a => a.Key == "service.name")?.Value?.StringValue)
-							.Where(serviceName => !string.IsNullOrEmpty(serviceName))
-							.Distinct()
-							.ToList())
+				@foreach (var resource in allTraces.GetResources())
 				{
 					<MudSelectItem Value="@(resource)">@resource</MudSelectItem>
 				}

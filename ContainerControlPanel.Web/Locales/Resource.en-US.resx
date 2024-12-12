@@ -255,4 +255,28 @@
   <data name="StartInfinitive" xml:space="preserve">
     <value>start</value>
   </data>
+  <data name="Metrics" xml:space="preserve">
+    <value>Metrics</value>
+  </data>
+  <data name="ChooseResource" xml:space="preserve">
+    <value>Choose resource...</value>
+  </data>
+  <data name="NoLogsFound" xml:space="preserve">
+    <value>There are no logs for the selected parameters</value>
+  </data>
+  <data name="NoMetricsFound" xml:space="preserve">
+    <value>No metrics found</value>
+  </data>
+  <data name="ChooseInstrument" xml:space="preserve">
+    <value>Choose instrument</value>
+  </data>
+  <data name="ChooseResourceTo" xml:space="preserve">
+    <value>Choose resource to show metrics</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Examples" xml:space="preserve">
+    <value>Examples</value>
+  </data>
 </root>

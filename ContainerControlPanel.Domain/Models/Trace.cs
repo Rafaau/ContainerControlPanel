@@ -2,10 +2,17 @@
 
 namespace ContainerControlPanel.Domain.Models;
 
+public class TracesRoot
+{
+    [JsonPropertyName("resourceSpans")]
+    public List<ResourceSpan> ResourceSpans { get; set; }
+}
+
 public class Attribute
 {
     [JsonPropertyName("key")]
     public string Key { get; set; }
+
     [JsonPropertyName("value")]
     public Value Value { get; set; }
 }
@@ -20,14 +27,9 @@ public class ResourceSpan
 {
     [JsonPropertyName("resource")]
     public Resource Resource { get; set; }
+
     [JsonPropertyName("scopeSpans")]
     public List<ScopeSpan> ScopeSpans { get; set; }
-}
-
-public class Root
-{
-    [JsonPropertyName("resourceSpans")]
-    public List<ResourceSpan> ResourceSpans { get; set; }
 }
 
 public class Scope
@@ -40,6 +42,7 @@ public class ScopeSpan
 {
     [JsonPropertyName("scope")]
     public Scope Scope { get; set; }
+
     [JsonPropertyName("spans")]
     public List<Span> Spans { get; set; }
 }
@@ -48,16 +51,22 @@ public class Span
 {
     [JsonPropertyName("traceId")]
     public string TraceId { get; set; }
+
     [JsonPropertyName("spanId")]
     public string SpanId { get; set; }
+
     [JsonPropertyName("name")]
     public string Name { get; set; }
+
     [JsonPropertyName("kind")]
     public string Kind { get; set; }
+
     [JsonPropertyName("startTimeUnixNano")]
     public string StartTimeUnixNano { get; set; }
+
     [JsonPropertyName("endTimeUnixNano")]
     public string EndTimeUnixNano { get; set; }
+
     [JsonPropertyName("attributes")]
     public List<Attribute> Attributes { get; set; }
 }
@@ -66,14 +75,15 @@ public class Value
 {
     [JsonPropertyName("stringValue")]
     public string StringValue { get; set; }
+
     [JsonPropertyName("intValue")]
     public string IntValue { get; set; }
 }
 
-public static class Extensions
+public static class TracesExtensions
 {
     public static List<ResourceSpan> GetTracesList(
-        this List<Root> rootsList,
+        this List<TracesRoot> rootsList,
         bool orderDesc = true,
         string filter = "all",
         bool routesOnly = false)
@@ -126,5 +136,13 @@ public static class Extensions
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
+
+    public static List<string> GetResources(this List<TracesRoot> tracesRoot)
+        => tracesRoot.SelectMany(r => r.ResourceSpans)
+                     .Select(rs => rs.Resource?.Attributes?
+                        .FirstOrDefault(a => a.Key == "service.name")?.Value?.StringValue)
+                        .Where(serviceName => !string.IsNullOrEmpty(serviceName))
+                     .Distinct()
+                     .ToList();
 }
 

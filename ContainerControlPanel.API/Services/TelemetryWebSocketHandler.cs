@@ -9,7 +9,7 @@ public static class TelemetryWebSocketHandler
     {
         WebSockets.Add(webSocket);
 
-        var buffer = new byte[1024 * 4];
+        var buffer = new byte[40960 * 4];
         WebSocketReceiveResult result;
 
         try

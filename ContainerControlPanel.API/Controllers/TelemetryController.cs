@@ -10,6 +10,7 @@ using ContainerControlPanel.Domain.Models;
 using System.Text;
 using System;
 using System.Text.Json;
+using OpenTelemetry.Proto.Collector.Metrics.V1;
 
 [ApiController]
 [Route("/v1")]
@@ -29,10 +30,36 @@ public class TelemetryController : ControllerBase
     }
 
     [HttpPost("metrics")]
-    public IActionResult CollectTelemetry([FromBody] dynamic telemetryData)
+    public async Task<IActionResult> CollectTelemetry()
     {
-        _logger.LogInformation("Received telemetry data: {Data}", [telemetryData]);
-        return Ok();
+        try
+        {
+            MessageBindable<ExportMetricsServiceRequest>? bindable =
+                await MessageBindable<ExportMetricsServiceRequest>.BindAsync(HttpContext, null);
+
+            var message = new WebSocketMessage
+            {
+                Type = WebSocketMessageType.Metrics,
+                Data = bindable?.Message.ToString()
+            };
+
+            MetricsRoot metricsRoot = JsonSerializer.Deserialize<MetricsRoot>(bindable?.Message.ToString());
+            string? serviceName = metricsRoot?.GetResource()?.GetResourceName();
+
+            string json = JsonSerializer.Serialize(message);
+            
+            if (serviceName != null)
+            {
+                await _redisService.SetValueAsync($"metrics{serviceName}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+                await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+            }
+                 
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("traces")]
@@ -43,8 +70,16 @@ public class TelemetryController : ControllerBase
             MessageBindable<ExportTraceServiceRequest>? bindable = 
                 await MessageBindable<ExportTraceServiceRequest>.BindAsync(HttpContext, null);
 
-            await _redisService.SetValueAsync($"trace{Guid.NewGuid().ToString()}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
-            await TelemetryWebSocketHandler.BroadcastMessageAsync(bindable?.Message.ToString());
+            var message = new WebSocketMessage
+            {
+                Type = WebSocketMessageType.Traces,
+                Data = bindable?.Message.ToString()
+            };
+
+            string json = JsonSerializer.Serialize(message);
+
+            //await _redisService.SetValueAsync($"trace{Guid.NewGuid().ToString()}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+            //await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             return Ok();
         }
         catch (Exception ex)
@@ -56,16 +91,29 @@ public class TelemetryController : ControllerBase
     [HttpGet("GetTraces")]
     public async Task<IActionResult> GetTraces()
     {
-        List<Root> traces = new();
+        List<TracesRoot> traces = new();
         var result = await _redisService.ScanKeysByPatternAsync("trace");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<Root>(item);
+            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
             traces.Add(deserialized);
         }
 
         return Ok(traces);
+    }
+
+    [HttpGet("GetMetrics")]
+    public async Task<IActionResult> GetMetrics()
+    {
+        List<MetricsRoot> metrics = new();
+        var result = await _redisService.ScanKeysByPatternAsync("metrics");
+        foreach (var item in result)
+        {
+            var deserialized = JsonSerializer.Deserialize<MetricsRoot>(item);
+            metrics.Add(deserialized);
+        }
+        return Ok(metrics);
     }
 
     public sealed class MessageBindable<TMessage> : IBindableFromHttpContext<MessageBindable<TMessage>> where TMessage : IMessage<TMessage>, new()

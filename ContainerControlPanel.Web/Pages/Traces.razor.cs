@@ -23,7 +23,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private List<Root> allTraces { get; set; } = new();
+    private List<TracesRoot> allTraces { get; set; } = new();
 
     private string currentResource { get; set; } = "all";
 
@@ -38,7 +38,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
         await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
     }
 
-    private void OnTracesUpdated(Root traces)
+    private void OnTracesUpdated(TracesRoot traces)
     {
         if (traces != null)
         {

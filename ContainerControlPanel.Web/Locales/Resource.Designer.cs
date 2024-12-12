@@ -106,6 +106,33 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wybierz instrument.
+        /// </summary>
+        public static string ChooseInstrument {
+            get {
+                return ResourceManager.GetString("ChooseInstrument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wybierz zasób....
+        /// </summary>
+        public static string ChooseResource {
+            get {
+                return ResourceManager.GetString("ChooseResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wybierz zasób, aby wyświetlić metryki.
+        /// </summary>
+        public static string ChooseResourceTo {
+            get {
+                return ResourceManager.GetString("ChooseResourceTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wybierz czas....
         /// </summary>
         public static string ChooseTimestamp {
@@ -196,6 +223,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Przykłady.
+        /// </summary>
+        public static string Examples {
+            get {
+                return ResourceManager.GetString("Examples", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to godzina.
         /// </summary>
         public static string Hour {
@@ -259,6 +295,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Metryki.
+        /// </summary>
+        public static string Metrics {
+            get {
+                return ResourceManager.GetString("Metrics", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to minut.
         /// </summary>
         public static string Minutes {
@@ -291,6 +336,24 @@ namespace Locales {
         public static string NoAliveContainers {
             get {
                 return ResourceManager.GetString("NoAliveContainers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nie znaleziono logów dla podanych parametrów.
+        /// </summary>
+        public static string NoLogsFound {
+            get {
+                return ResourceManager.GetString("NoLogsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nie wykryto żadnych metryk.
+        /// </summary>
+        public static string NoMetricsFound {
+            get {
+                return ResourceManager.GetString("NoMetricsFound", resourceCulture);
             }
         }
         
@@ -408,6 +471,15 @@ namespace Locales {
         public static string Stop {
             get {
                 return ResourceManager.GetString("Stop", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Czas.
+        /// </summary>
+        public static string Time {
+            get {
+                return ResourceManager.GetString("Time", resourceCulture);
             }
         }
         
