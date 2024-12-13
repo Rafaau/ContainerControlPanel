@@ -279,4 +279,7 @@
   <data name="Examples" xml:space="preserve">
     <value>Examples</value>
   </data>
+  <data name="Minute" xml:space="preserve">
+    <value>minute</value>
+  </data>
 </root>

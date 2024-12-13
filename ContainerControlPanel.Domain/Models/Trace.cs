@@ -144,5 +144,10 @@ public static class TracesExtensions
                         .Where(serviceName => !string.IsNullOrEmpty(serviceName))
                      .Distinct()
                      .ToList();
+
+    public static bool HasResource(this TracesRoot tracesRoot, string resource)
+        => tracesRoot.ResourceSpans.Any(rs => rs.Resource.Attributes
+            .Any(attr => attr.Key == "service.name"
+                && attr.Value?.StringValue == resource));
 }
 

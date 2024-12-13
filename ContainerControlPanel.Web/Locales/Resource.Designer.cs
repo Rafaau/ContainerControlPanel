@@ -304,6 +304,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to minuta.
+        /// </summary>
+        public static string Minute {
+            get {
+                return ResourceManager.GetString("Minute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to minut.
         /// </summary>
         public static string Minutes {

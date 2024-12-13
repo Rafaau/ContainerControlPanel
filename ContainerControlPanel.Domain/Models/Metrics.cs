@@ -104,6 +104,12 @@ public static class MetricsExtensions
                   .Select(rm => rm.Resource)
                   .ToList();
 
+    public static List<string> GetResourceNames(this List<Resource> resources)
+        => resources.Select(r => r.Attributes?
+                    .FirstOrDefault(a => a.Key == "service.name")?.Value?.StringValue ?? string.Empty)
+                    .Distinct()
+                    .ToList();
+
     public static string GetResourceName(this Resource resource)
         => resource.Attributes?
             .FirstOrDefault(a => a.Key == "service.name")?.Value?.StringValue ?? string.Empty;
@@ -113,7 +119,7 @@ public static class MetricsExtensions
                       .Select(rm => rm.Resource)
                       .FirstOrDefault();
 
-    public static List<ScopeMetric> GetMetricsScopes(this List<MetricsRoot> metricsRoots, string resource)
+    public static List<ScopeMetric> GetScopeMetricsByResource(this List<MetricsRoot> metricsRoots, string resource)
         => metricsRoots.SelectMany(mr => mr.ResourceMetrics)
                        .Where(rm => rm.Resource.Attributes
                            .Any(a => a.Key == "service.name" && a.Value.StringValue == resource))
@@ -121,32 +127,69 @@ public static class MetricsExtensions
                        .Distinct()
                        .ToList();
 
-    public static List<string> GetInstruments(this MetricsRoot metricsRoot, string metricScope)
-        => metricsRoot.ResourceMetrics
-                      .SelectMany(rs => rs.ScopeMetrics)
-                      .Where(s => s.Scope?.Name == metricScope)
-                      .SelectMany(s => s.Metrics)
-                      .Select(m => m.Name)
-                      .Where(metricName => !string.IsNullOrEmpty(metricName))
-                      .Distinct()
-                      .ToList();
+    public static string? GetRouteName(this MetricsRoot metricsRoot)
+        => metricsRoot?.ResourceMetrics?
+                       .SelectMany(rm => rm.ScopeMetrics ?? Enumerable.Empty<ScopeMetric>())
+                       .SelectMany(s => s.Metrics ?? Enumerable.Empty<Metric>())
+                       .SelectMany(m => m.Histogram?.DataPoints ?? Enumerable.Empty<DataPoint>())
+                       .SelectMany(dp => dp.Attributes ?? Enumerable.Empty<Attribute>())
+                       .FirstOrDefault(a => a.Key == "http.route")?.Value?.StringValue;
 
     public static List<Metric> GetMetrics(this MetricsRoot metricsRoot, string metricName)
-        => metricsRoot.ResourceMetrics
-                      .SelectMany(rs => rs.ScopeMetrics)
-                      .SelectMany(s => s.Metrics)
-                      .Where(m => m.Name == metricName)
-                      .ToList();
+        => metricsRoot?.ResourceMetrics?
+                       .SelectMany(rm => rm.ScopeMetrics ?? Enumerable.Empty<ScopeMetric>())
+                       .SelectMany(s => s.Metrics ?? Enumerable.Empty<Metric>())
+                       .Where(m => m.Name == metricName)
+                       .ToList();
 
-    public static List<Metric> GetMetricsWithRoute(this List<Metric> metrics)
-        => metrics.Where(m => m.Histogram.DataPoints
-                     .Any(dp => dp.Attributes
-                        .Any(a => a.Key == "http.route")))
-                  .ToList();
+    public static string CalculateP50Seconds(this DataPoint dataPoint)
+        => CalculatePercentile(dataPoint, 50).ToString("0.000");
 
-    public static List<DataPoint> GetDataPointsWithRoute(this List<Metric> metrics)
-        => metrics.SelectMany(m => m.Histogram.DataPoints)
-                  .Where(dp => dp.Attributes
-                     .Any(a => a.Key == "http.route"))
-                  .ToList();
+    public static string CalculateP90Seconds(this DataPoint dataPoint)
+        => CalculatePercentile(dataPoint, 90).ToString("0.000");
+
+    public static string CalculateP99Seconds(this DataPoint dataPoint)
+        => CalculatePercentile(dataPoint, 99).ToString("0.000");
+
+    private static double CalculatePercentile(DataPoint dataPoint, double percentile)
+    {
+        if (dataPoint == null || dataPoint.BucketCounts == null || dataPoint.ExplicitBounds == null)
+            throw new ArgumentNullException("DataPoint, BucketCounts, or ExplicitBounds cannot be null");
+
+        if (dataPoint.BucketCounts.Count != dataPoint.ExplicitBounds.Count + 1)
+            throw new ArgumentException("BucketCounts should have one more element than ExplicitBounds");
+
+        double targetCount = (percentile / 100.0) * double.Parse(dataPoint.Count);
+        long cumulativeCount = 0;
+
+        for (int i = 0; i < dataPoint.BucketCounts.Count; i++)
+        {
+            cumulativeCount += Int64.Parse(dataPoint.BucketCounts[i]);
+
+            if (cumulativeCount >= targetCount)
+            {
+                if (i == 0)
+                {
+                    return dataPoint.ExplicitBounds[0];
+                }
+
+                double lowerBound = dataPoint.ExplicitBounds[i - 1];
+                double upperBound = i < dataPoint.ExplicitBounds.Count ? dataPoint.ExplicitBounds[i] : lowerBound * 2;
+                double bucketSize = upperBound - lowerBound;
+
+                double bucketStartCount = cumulativeCount - Int64.Parse(dataPoint.BucketCounts[i]);
+                double positionInBucket = targetCount - bucketStartCount;
+
+                return lowerBound + (positionInBucket / Double.Parse(dataPoint.BucketCounts[i])) * bucketSize;
+            }
+        }
+
+        return TrimToThreeDecimalPlaces(dataPoint.ExplicitBounds.LastOrDefault());
+    }
+
+    private static double TrimToThreeDecimalPlaces(double value)
+    {
+        string formatted = value.ToString("0.###"); // Ucinanie do trzech miejsc dziesiętnych
+        return double.Parse(formatted);
+    }
 }

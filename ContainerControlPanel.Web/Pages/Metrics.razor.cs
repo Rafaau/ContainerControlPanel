@@ -1,4 +1,5 @@
 using ContainerControlPanel.Domain.Models;
+using ContainerControlPanel.Web.Components.Metrics;
 using ContainerControlPanel.Web.Interfaces;
 using ContainerControlPanel.Web.Services;
 using Microsoft.AspNetCore.Components;
@@ -16,11 +17,13 @@ public partial class Metrics(ITelemetryAPI telemetryAPI)
 
     private List<MetricsRoot> allMetrics { get; set; } = new();
 
-    private Resource? currentResource { get; set; } = null;
+    private string? currentResource { get; set; } = null;
 
     private Metric? currentMetric { get; set; } = null;
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
+
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,14 +38,19 @@ public partial class Metrics(ITelemetryAPI telemetryAPI)
     {
         if (metricsRoot != null)
         {
-            if (allMetrics.GetResources().Contains(metricsRoot.GetResource()))
+            if (allMetrics.GetResources().GetResourceNames().Contains(metricsRoot.GetResource().GetResourceName()))
             {
-                var current = allMetrics.FirstOrDefault(x => x.GetResource() == metricsRoot.GetResource());
+                var current = allMetrics.FirstOrDefault(x => x.GetResource().GetResourceName() == metricsRoot.GetResource().GetResourceName());
 
                 if (current != null)
                 {
                     allMetrics.Remove(current);
                     allMetrics.Add(metricsRoot);
+
+                    if (currentResource == metricsRoot.GetResource().GetResourceName())
+                    {
+                        currentMetric = metricsRoot.GetMetrics("http.server.request.duration")[0];
+                    }
                 }
             }
             else

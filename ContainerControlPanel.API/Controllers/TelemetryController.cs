@@ -45,12 +45,14 @@ public class TelemetryController : ControllerBase
 
             MetricsRoot metricsRoot = JsonSerializer.Deserialize<MetricsRoot>(bindable?.Message.ToString());
             string? serviceName = metricsRoot?.GetResource()?.GetResourceName();
+            string? routeName = metricsRoot?.GetRouteName();
 
             string json = JsonSerializer.Serialize(message);
             
-            if (serviceName != null)
+            if (serviceName != null 
+                && routeName != null)
             {
-                await _redisService.SetValueAsync($"metrics{serviceName}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+                await _redisService.SetValueAsync($"metrics{serviceName}{routeName}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
                  
@@ -78,8 +80,8 @@ public class TelemetryController : ControllerBase
 
             string json = JsonSerializer.Serialize(message);
 
-            //await _redisService.SetValueAsync($"trace{Guid.NewGuid().ToString()}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
-            //await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+            await _redisService.SetValueAsync($"trace{Guid.NewGuid().ToString()}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+            await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             return Ok();
         }
         catch (Exception ex)
@@ -89,7 +91,7 @@ public class TelemetryController : ControllerBase
     }
 
     [HttpGet("GetTraces")]
-    public async Task<IActionResult> GetTraces()
+    public async Task<IActionResult> GetTraces(string? resource)
     {
         List<TracesRoot> traces = new();
         var result = await _redisService.ScanKeysByPatternAsync("trace");
@@ -97,7 +99,9 @@ public class TelemetryController : ControllerBase
         foreach (var item in result)
         {
             var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
-            traces.Add(deserialized);
+
+            if (string.IsNullOrEmpty(resource) || deserialized.HasResource(resource))
+                traces.Add(deserialized);
         }
 
         return Ok(traces);
