@@ -39,7 +39,7 @@ public static class TelemetryWebSocketHandler
     public static async Task BroadcastMessageAsync(string message)
     {
         var buffer = Encoding.UTF8.GetBytes(message);
-        var tasks = WebSockets.Where(ws => ws.State == WebSocketState.Open)
+        var tasks = WebSockets.Where(ws => ws != null && ws.State == WebSocketState.Open)
                                .Select(ws => ws.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None));
         await Task.WhenAll(tasks);
     }

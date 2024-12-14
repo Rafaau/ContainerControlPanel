@@ -111,10 +111,13 @@ public static class TracesExtensions
     public static string GetTraceId(this ResourceSpan resourceSpan)
         => resourceSpan.ScopeSpans[0].Spans[0].TraceId;
 
+    public static string GetTraceRoute(this ResourceSpan resourceSpan)
+        => resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path")).Value.StringValue;
+
     public static string GetTraceName(this ResourceSpan resourceSpan)
     {
         string? method = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("http.request.method"))?.Value.StringValue;
-        string? route = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue;
+        string? route = resourceSpan.GetTraceRoute();
 
         return $"{method} {route}";
     }

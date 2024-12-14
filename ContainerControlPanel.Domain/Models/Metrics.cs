@@ -142,6 +142,9 @@ public static class MetricsExtensions
                        .Where(m => m.Name == metricName)
                        .ToList();
 
+    public static string GetRouteName(this DataPoint dataPoint)
+        => dataPoint.Attributes?.FirstOrDefault(a => a.Key == "http.route")?.Value?.StringValue ?? string.Empty;
+
     public static string CalculateP50Seconds(this DataPoint dataPoint)
         => CalculatePercentile(dataPoint, 50).ToString("0.000");
 

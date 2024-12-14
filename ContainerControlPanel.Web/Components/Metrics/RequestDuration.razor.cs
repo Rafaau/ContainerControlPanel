@@ -3,23 +3,22 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Plotly.Blazor.Traces;
 using Plotly.Blazor;
-using Plotly.Blazor.Traces;
-using Plotly.Blazor;
 using Plotly.Blazor.Traces.ScatterLib;
 using Plotly.Blazor.LayoutLib;
-using Plotly.Blazor.LayoutLib.XAxisLib;
-using Plotly.Blazor.Traces.TableLib;
 using System.Data;
 using System.Diagnostics;
-using System.Threading;
 using System.Collections.Concurrent;
 using ContainerControlPanel.Web.Interfaces;
 using MudBlazor.Extensions;
+using ContainerControlPanel.Web.Services;
 
 namespace ContainerControlPanel.Web.Components.Metrics;
 
 public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
 {
+    [Inject]
+    WebSocketService WebSocketService { get; set; }
+
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
@@ -45,7 +44,9 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
     private event EventHandler<DataJob> DataEvent;
     private int timestamp = 5;
     private List<ResourceSpan> traces;
-    private List<DataJob> currentDataJobs = new();
+    private decimal averageDuration;
+    private List<object> minMaxDuration;
+    private IndicatorChart averageDurationIndicator;
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,7 +56,11 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
         queue = new BlockingCollection<DataJob>();
         InitializeChart();
         await GetTraces();
-       
+        CalculateAverageDuration();
+
+        WebSocketService.TracesUpdated += OnTracesUpdated;
+        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+
         base.OnInitialized();
     }
 
@@ -65,7 +70,6 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
         {
             DataEvent += UpdateData;
             _ = WriteData();
-            //_ = Ass();
         }
 
         await base.OnAfterRenderAsync(firstRender);
@@ -106,7 +110,7 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
                     Range = new List<object> { 0, 0.1, 1, 10 },
                     Type = Plotly.Blazor.LayoutLib.YAxisLib.TypeEnum.Linear
                 }        
-            },
+            }
         };
 
         data = new List<ITrace>
@@ -123,7 +127,7 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
                     Color = "#009c1e",
                     Width = 2
                 },
-                FillColor = "#009c1e"          
+                FillColor = "#009c1e"
             },
             new Scatter
             {
@@ -150,8 +154,7 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
                 {
                     Color = "#b00000",
                     Width = 2
-                },
-                FillColor = "#b00000"
+                }
             }
         };
     }
@@ -202,30 +205,47 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
                 DataEvent?.Invoke(this, new DataJob(new DataEventArgs(px90, py90, 1), chart, data));
                 DataEvent?.Invoke(this, new DataJob(new DataEventArgs(px99, py99, 2), chart, data));
 
-                List<DataJob> dataJobs = await AssignDataJobs();
+                List<Scatter> requestMarkers = await AssignDataJobs();
+                List<int> tracesToRemove = new();
 
-                foreach (var (dataJob, index) in dataJobs.Select((dataJob, index) => (dataJob, index)))
+                try
                 {
-                    //DataEvent?.Invoke(this, dataJob);                    
-                }
-
-                if (currentDataJobs.Count > 0)
-                {
-                    foreach (var dataJob in currentDataJobs.Where(x => !dataJobs.Any(y => y.Id == x.Id)))
+                    if (data.Count > 3)
                     {
-                        await InvokeAsync(async () => await chart.DeleteTrace(3));
+                        if (requestMarkers.Count == 0)
+                        {
+                            for (int i = 3; i <= data.Count; i++)
+                            {
+                                await InvokeAsync(async () => await chart.DeleteTrace(3));
+                            }
+                        }
+                        else
+                        {
+                            foreach (Scatter removedMarker in data.Where(d => d.As<Scatter>().Meta != null))
+                            {
+                                if (requestMarkers.Any(r => r.Meta == removedMarker.Meta)) continue;
+
+                                int traceIndex = data.IndexOf(removedMarker);
+                                tracesToRemove.Add(traceIndex);
+                            }
+                        }
+                    }
+
+                    if (tracesToRemove.Count > 0)
+                    {
+                        tracesToRemove = tracesToRemove.OrderByDescending(index => index).ToList();
+
+                        foreach (int traceIndex in tracesToRemove)
+                        {
+                            await InvokeAsync(async () => await chart.DeleteTrace(traceIndex));
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
 
-                //if (currentDataJobs.Count > 0 && dataJobs.Count == 0)
-                //{
-                //    foreach (var dataJob in currentDataJobs)
-                //    {
-                //        await InvokeAsync(async () => await chart.DeleteTrace(3));
-                //    }
-                //}
-
-                currentDataJobs = dataJobs;
                 await Task.Delay(TimeSpan.FromSeconds(timestamp != 1 ? 1 : 0.1));
             }
         });
@@ -260,32 +280,32 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
     {
         var result = await telemetryAPI.GetTraces(ResourceName);
         traces = result.GetTracesList(routesOnly: true);
-        //await AssignDataJobs();
     }
 
-    private async Task<List<DataJob>> AssignDataJobs()
+    private async Task<List<Scatter>> AssignDataJobs()
     {
-        var result = new List<DataJob>();
+        var result = new List<Scatter>();
 
         if (traces == null || traces.Count == 0) return result;
 
         await Task.Run(() =>
         {
             foreach (var (trace, index) in traces.Select((trace, index) => (trace, index))
-                .Where(x => x.trace.GetTimestamp(int.Parse(Configuration["TimeOffset"])) >= DateTime.Now.AddMinutes(-timestamp)))
+                .Where(x => x.trace.GetTraceRoute().Contains(currentDataPoint.GetRouteName()) 
+                    && x.trace.GetTimestamp(int.Parse(Configuration["TimeOffset"])) >= DateTime.Now.AddMinutes(-timestamp)))
             {
                 var x = new List<object>
-            {
-                trace.GetTimestamp(int.Parse(Configuration["TimeOffset"])),
-            };
+                {
+                    trace.GetTimestamp(int.Parse(Configuration["TimeOffset"])),
+                };
 
                 double durationInMs = trace.GetDuration().Milliseconds;
                 double durationInSeconds = durationInMs / 1000;
 
                 var y = new List<object>
-            {
-                durationInSeconds
-            };
+                {
+                    durationInSeconds
+                };
 
                 var newScatter = new Scatter
                 {
@@ -299,21 +319,56 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
                         Size = 10
                     },
                     Meta = $"{trace.GetTraceId()}",
+                    ShowLegend = false
                 };
 
                 if (!data.Any(d => d.As<Scatter>().Meta == newScatter.Meta))
                 {
-                    data.Add(newScatter);
                     InvokeAsync(() => chart.AddTrace(newScatter));
                 }
 
-                result.Add(new DataJob(new DataEventArgs(x, y, index + 3), chart, data));
-                
-                //DataEvent?.Invoke(this, new DataJob(new DataEventArgs(x, y, index + 3), chart, data));
+                result.Add(newScatter);
             }
+
+            CalculateAverageDuration();
         });
 
         return result;
+    }
+
+    private void OnTracesUpdated(TracesRoot tracesRoot)
+    {
+        if (tracesRoot != null && tracesRoot.HasResource(ResourceName))
+        {
+            traces.AddRange(tracesRoot.ResourceSpans);
+            this.StateHasChanged();
+        }
+    }
+
+    private void CalculateAverageDuration()
+    {
+        var d = traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()));
+        var avg = (decimal)traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()))
+            .Select(t => t.GetDuration().Milliseconds)
+            .Average();
+
+        averageDuration = (decimal)traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()))
+            .Select(t => t.GetDuration().Milliseconds)
+            .Average() / 1000;
+
+        minMaxDuration = new List<object>
+        {
+            (decimal)traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()))
+                .Select(t => t.GetDuration().Milliseconds)
+                .Min() / 1000,
+            (decimal)traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()))
+                .Select(t => t.GetDuration().Milliseconds)
+                .Max() / 1000
+        };
+
+        averageDuration = Math.Truncate(averageDuration * 1000m) / 1000m;
+
+        averageDurationIndicator.RefreshChart();
     }
 
     public void Dispose()

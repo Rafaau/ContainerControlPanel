@@ -64,7 +64,20 @@
 
 .timestamp-select {
 	position: absolute;
-	left: 750px;
+	left: 730px;
 	top: 50px;
-	width: 150px;
+	width: 180px;
+}
+
+.current-route {
+	position: absolute;
+	left: 730px;
+	top: 93px;
+	z-index: 2;
+}
+
+.indicator-container {
+	position: absolute;
+	top: 143px;
+	left: 650px;
 }

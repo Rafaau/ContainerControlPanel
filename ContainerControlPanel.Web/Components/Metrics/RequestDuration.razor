@@ -33,7 +33,7 @@
 		{
 			<div @onclick="() => { currentDataPoint = endpoint; }" class="data-grid-row data">
 				<div class="data-grid-cell">
-					@endpoint.Attributes.Find(a => a.Key == "http.route").Value.StringValue
+					@endpoint.GetRouteName()
 				</div>
 				<div class="data-grid-cell">
 					@endpoint.CalculateP50Seconds()
@@ -53,6 +53,9 @@
 </div>
 
 <div class="chart-container">
+	<div class="current-route">
+		@currentDataPoint.GetRouteName()
+	</div>
 	<PlotlyChart @bind-Config="config" @bind-Data="data" @ref="chart" @bind-Layout="layout" />
 	<div class="timestamp-select">
 		<MudSelect T="int" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="timestamp">
@@ -66,4 +69,13 @@
 			<MudSelectItem Value="@(720)">12 @Localizer[Locales.Resource.Hours]</MudSelectItem>
 		</MudSelect>
 	</div>
+	<div class="indicator-container">
+		<IndicatorChart 
+			Value="@averageDuration" 
+			Reference="@(0.01m)" 
+			Range="minMaxDuration"
+			Suffix="@("s")"
+			@ref="averageDurationIndicator" />
+	</div>
 </div>
+
