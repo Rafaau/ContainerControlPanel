@@ -78,9 +78,12 @@ public class TelemetryController : ControllerBase
                 Data = bindable?.Message.ToString()
             };
 
+            TracesRoot tracesRoot = JsonSerializer.Deserialize<TracesRoot>(bindable?.Message.ToString());
+            string traceId = tracesRoot.GetTraceId();
+
             string json = JsonSerializer.Serialize(message);
 
-            await _redisService.SetValueAsync($"trace{Guid.NewGuid().ToString()}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+            await _redisService.SetValueAsync($"trace{traceId}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
             await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             return Ok();
         }
@@ -105,6 +108,20 @@ public class TelemetryController : ControllerBase
         }
 
         return Ok(traces);
+    }
+
+    [HttpGet("GetTrace")]
+    public async Task<IActionResult> GetTrace(string traceId)
+    {
+        var result = await _redisService.ScanKeysByPatternAsync($"trace{traceId}");
+
+        if (result.Count == 0)
+        {
+            return NotFound();
+        }
+
+        var deserialized = JsonSerializer.Deserialize<TracesRoot>(result[0]);
+        return Ok(deserialized);
     }
 
     [HttpGet("GetMetrics")]

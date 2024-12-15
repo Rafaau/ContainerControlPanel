@@ -21,6 +21,9 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
     private List<TracesRoot> allTraces { get; set; } = new();
@@ -51,5 +54,10 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
     {
         byte[] byteArray = Encoding.Default.GetBytes(text);
         return BitConverter.ToString(byteArray).Replace("-", "").Substring(0, 6);
+    }
+
+    private void LoadTrace(string traceId)
+    {
+        NavigationManager.NavigateTo($"/traces/{traceId}");
     }
 }

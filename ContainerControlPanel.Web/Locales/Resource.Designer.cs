@@ -187,6 +187,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Głębokość.
+        /// </summary>
+        public static string Depth {
+            get {
+                return ResourceManager.GetString("Depth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to za pomocą Docker-Compose.
         /// </summary>
         public static string DockerCompose {
@@ -403,6 +412,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Zasoby.
+        /// </summary>
+        public static string Resources {
+            get {
+                return ResourceManager.GetString("Resources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Uruchom ponownie.
         /// </summary>
         public static string Restart {
@@ -507,6 +525,15 @@ namespace Locales {
         public static string TotalNumberOfFoundTraces {
             get {
                 return ResourceManager.GetString("TotalNumberOfFoundTraces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Szczegóły śledzenia.
+        /// </summary>
+        public static string TraceDetails {
+            get {
+                return ResourceManager.GetString("TraceDetails", resourceCulture);
             }
         }
         

@@ -71,7 +71,7 @@
 	width: 15px;
 	height: 26px;
 	margin-right: 6px;
-	filter: saturate(1000%);
+	filter: saturate(2000%);
 }
 
 .timestamp-span {
@@ -99,4 +99,17 @@
 	position: absolute;
 	bottom: 6px;
 	left: 22px;
+}
+
+.trace-id {
+	margin-top: 2px;
+	margin-left: 14px;
+	width: 20%;
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 10px;
+	font-weight: 200;
+	color: #808080;
 }

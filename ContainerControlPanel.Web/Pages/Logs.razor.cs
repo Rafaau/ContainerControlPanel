@@ -22,8 +22,10 @@ public partial class Logs(IContainerAPI containerAPI)
 
     [Parameter]
     public string? ContainerId { get; set; }
+
     [Parameter]
     public string? Timestamp { get; set; }
+
     [Parameter]
     public string? FilterDate { get; set; }
 

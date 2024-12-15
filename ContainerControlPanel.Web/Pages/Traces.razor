@@ -57,7 +57,7 @@
 		<div class="data-container">
 			@foreach (var trace in traces)
 			{
-				<div class="data-grid-row data">
+				<div @onclick="() => { LoadTrace(trace.GetTraceId()); }" class="data-grid-row data">
 					<div class="data-grid-cell">
 						@{
 							DateTime timestamp = trace.GetTimestamp(int.Parse(Configuration["TimeOffset"]));
@@ -84,6 +84,9 @@
 					</div>
 					<div class="data-grid-cell">
 						@trace.GetTraceName()
+						<div class="trace-id">
+							@trace.GetTraceId()
+						</div>
 					</div>
 					<div class="data-grid-cell">
 						<div class="service-name-container">

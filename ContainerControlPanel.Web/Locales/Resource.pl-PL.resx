@@ -282,4 +282,13 @@
   <data name="Minute" xml:space="preserve">
     <value>minuta</value>
   </data>
+  <data name="TraceDetails" xml:space="preserve">
+    <value>Szczegóły śledzenia</value>
+  </data>
+  <data name="Resources" xml:space="preserve">
+    <value>Zasoby</value>
+  </data>
+  <data name="Depth" xml:space="preserve">
+    <value>Głębokość</value>
+  </data>
 </root>

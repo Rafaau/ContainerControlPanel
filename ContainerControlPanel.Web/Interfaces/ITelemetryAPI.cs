@@ -10,4 +10,7 @@ public interface ITelemetryAPI
 
     [Get("/v1/getMetrics")]
     Task<List<MetricsRoot>> GetMetrics();
+
+    [Get("/v1/getTrace?traceId={traceId}")]
+    Task<TracesRoot> GetTrace(string traceId);
 }

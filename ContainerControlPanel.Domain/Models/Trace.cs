@@ -111,26 +111,34 @@ public static class TracesExtensions
     public static string GetTraceId(this ResourceSpan resourceSpan)
         => resourceSpan.ScopeSpans[0].Spans[0].TraceId;
 
+    public static string GetTraceId(this TracesRoot tracesRoot)
+        => tracesRoot.ResourceSpans[0].ScopeSpans[0].Spans[0].TraceId;
+
     public static string GetTraceRoute(this ResourceSpan resourceSpan)
-        => resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path")).Value.StringValue;
+        => resourceSpan.ScopeSpans.Find(x => !x.Scope.Name.Equals("System.Net.Http")).Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue
+            ?? resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue;
 
     public static string GetTraceName(this ResourceSpan resourceSpan)
-    {
-        string? method = resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("http.request.method"))?.Value.StringValue;
-        string? route = resourceSpan.GetTraceRoute();
-
-        return $"{method} {route}";
-    }
+        => resourceSpan.ScopeSpans.Find(x => !x.Scope.Name.Equals("System.Net.Http")).Spans[0].Name
+            ?? resourceSpan.ScopeSpans[0].Spans[0].Name;
 
     public static TimeSpan GetDuration(this ResourceSpan resourceSpan)
     {
         var startTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].StartTimeUnixNano);
         var endTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].EndTimeUnixNano);
-
         long startTimeMilliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
         long endTimeMilliseconds = Convert.ToInt64(Math.Round(endTime / 1000000));
-
         return TimeSpan.FromMilliseconds(endTimeMilliseconds - startTimeMilliseconds);
+    }
+
+    public static TimeSpan GetDuration(this Span span)
+    {
+        var startTime = decimal.Parse(span.StartTimeUnixNano);
+        var endTime = decimal.Parse(span.EndTimeUnixNano);
+        decimal startTimeMilliseconds = startTime / 1000000;
+        decimal endTimeMilliseconds = endTime / 1000000;
+        decimal durationMilliseconds = Math.Round(endTimeMilliseconds - startTimeMilliseconds, 2);
+        return TimeSpan.FromMilliseconds((double)durationMilliseconds);
     }
 
     public static DateTime GetTimestamp(this ResourceSpan resourceSpan, int timeOffset)
@@ -140,6 +148,20 @@ public static class TracesExtensions
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
 
+    public static DateTime GetStartDate(this Span span)
+    {
+        var startTime = decimal.Parse(span.StartTimeUnixNano);
+        long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
+    }
+
+    public static DateTime GetEndDate(this Span span)
+    {
+        var endTime = decimal.Parse(span.EndTimeUnixNano);
+        long milliseconds = Convert.ToInt64(Math.Round(endTime / 1000000));
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
+    }
+
     public static List<string> GetResources(this List<TracesRoot> tracesRoot)
         => tracesRoot.SelectMany(r => r.ResourceSpans)
                      .Select(rs => rs.Resource?.Attributes?
@@ -147,6 +169,10 @@ public static class TracesExtensions
                         .Where(serviceName => !string.IsNullOrEmpty(serviceName))
                      .Distinct()
                      .ToList();
+
+    public static string GetAttributeValue(this Span span, string key)
+        => span.Attributes.Find(x => x.Key.Equals(key))?.Value?.StringValue
+            ?? (key == "http.route" ? "Browser Link" : string.Empty);
 
     public static bool HasResource(this TracesRoot tracesRoot, string resource)
         => tracesRoot.ResourceSpans.Any(rs => rs.Resource.Attributes

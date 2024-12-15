@@ -1,0 +1,108 @@
+﻿.flex {
+	display: flex;
+	align-items: center;
+	margin: 24px;
+	font-size: 16px;
+}
+
+.label {
+	font-size: 32px;
+	font-weight: 500;
+}
+
+.trace-id {
+	margin-left: 16px;
+	margin-top: 5px;
+	color: #808080;
+	font-weight: 200;
+	font-size: 14px;
+}
+
+.details-span {
+	margin-left: 8px;
+	margin-right: 24px;
+}
+
+.data-grid {
+	display: grid;
+	grid-template-rows: auto;
+	overflow: hidden;
+	margin-top: 16px;
+	width: 95%;
+}
+
+.header {
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.data-grid-header {
+	font-size: 1.4em;
+}
+
+.data-grid-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.data:hover {
+	background-color: rgba(255,255,255,0.1);
+}
+
+.data-grid-cell {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+	border-right: 1px solid #ffffff;
+	height: 40px;
+}
+
+	.data-grid-cell:first-child {
+		padding: 8px;
+		margin-left: 16px;
+	}
+
+.header .data-grid-cell {
+	padding: 8px;
+}
+
+.header .data-grid-cell:first-child {
+	margin-left: 16px;
+}
+
+.data {
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.duration-marker {
+	position: absolute;
+	padding: 8px;
+	filter: saturate(2000%);
+	z-index: 2;
+	border-radius: 4px;
+}
+
+.duration-span {
+	position: absolute;
+	margin-left: 5px;
+	color: #808080;
+	text-align: center;
+}
+
+.tab {
+	margin-left: 30% !important;
+}
+
+.method {
+	color: #808080;
+	margin-left: 6px;
+}
+
+.text-overflow {
+	width: 100%;
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
