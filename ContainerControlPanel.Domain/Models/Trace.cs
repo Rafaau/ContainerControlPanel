@@ -148,18 +148,18 @@ public static class TracesExtensions
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
 
-    public static DateTime GetStartDate(this Span span)
+    public static DateTime GetStartDate(this Span span, int timeOffset)
     {
         var startTime = decimal.Parse(span.StartTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
 
-    public static DateTime GetEndDate(this Span span)
+    public static DateTime GetEndDate(this Span span, int timeOffset)
     {
         var endTime = decimal.Parse(span.EndTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(endTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
 
     public static List<string> GetResources(this List<TracesRoot> tracesRoot)
@@ -173,6 +173,9 @@ public static class TracesExtensions
     public static string GetAttributeValue(this Span span, string key)
         => span.Attributes.Find(x => x.Key.Equals(key))?.Value?.StringValue
             ?? (key == "http.route" ? "Browser Link" : string.Empty);
+
+    public static List<(string Key, string Value)> GetAttributes(this Span span)
+        => span.Attributes.Select(attr => (attr.Key, attr.Value.StringValue ?? attr.Value.IntValue)).ToList();
 
     public static bool HasResource(this TracesRoot tracesRoot, string resource)
         => tracesRoot.ResourceSpans.Any(rs => rs.Resource.Attributes

@@ -53,7 +53,7 @@
 		</div>
 		@foreach (var (span, index) in spans.Select((value, i) => (value, i)))
 		{
-			<div class="data-grid-row data">
+			<div @onclick="() => { currentSpan = span; }" class="data-grid-row data" style="@(currentSpan == span ? "background-color: rgba(255,255,255,0.1);" : "")">
 				<div class="data-grid-cell @(index > 0 ? "tab" : "")">
 					@if (index == 0) 
 					{
@@ -98,6 +98,41 @@
 				</div>
 			</div>
 		}
+	</div>
+	<div class="span-container">
+		<div class="details-container">
+			<div class="details-label">@Localizer[Locales.Resource.Details]</div>
+			<div class="details-row">
+				<div>Trace ID</div>
+				<div class="text-overflow">@currentSpan.TraceId</div>
+			</div>
+			<div class="details-row">
+				<div>Name</div>
+				<div class="text-overflow">@currentSpan.Name</div>
+			</div>
+			<div class="details-row">
+				<div>Kind</div>
+				<div class="text-overflow">@currentSpan.Kind.Substring(@currentSpan.Kind.LastIndexOf("_") + 1)</div>
+			</div>
+			<div class="details-row">
+				<div>Start time</div>
+				<div class="text-overflow">@currentSpan.GetStartDate(int.Parse(Configuration["TimeOffset"])).ToString("HH:mm:ss.fffK")</div>
+			</div>
+			<div class="details-row">
+				<div>End time</div>
+				<div class="text-overflow">@currentSpan.GetEndDate(int.Parse(Configuration["TimeOffset"])).ToString("HH:mm:ss.fffK")</div>
+			</div>
+		</div>
+		<div class="details-container">
+			<div class="details-label">@Localizer[Locales.Resource.Attributes]</div>
+			@foreach (var attr in currentSpan.GetAttributes())
+			{
+				<div class="details-row">
+					<div>@attr.Key</div>
+					<div class="text-overflow">@attr.Value</div>
+				</div>
+			}
+		</div>
 	</div>
 }
 

@@ -291,4 +291,10 @@
   <data name="Depth" xml:space="preserve">
     <value>Depth</value>
   </data>
+  <data name="Attributes" xml:space="preserve">
+    <value>Attributes</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
 </root>

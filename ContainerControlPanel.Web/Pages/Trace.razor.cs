@@ -29,6 +29,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private DateTime end { get; set; }
 
+    private Span currentSpan { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadTrace();
@@ -49,8 +51,9 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
             .OrderByDescending(s => s.GetDuration())
             .ToList();
 
-        start = spans[0].GetStartDate();
-        end = spans[0].GetEndDate();
+        currentSpan = spans[0];
+        start = spans[0].GetStartDate(int.Parse(Configuration["TimeOffset"]));
+        end = spans[0].GetEndDate(int.Parse(Configuration["TimeOffset"]));
 
         intervals[0] = "0ms";
         intervals[1] = $"{(spans[0].GetDuration().TotalMicroseconds / 1000 * 0.25).ToString("0.00")}ms";
@@ -67,8 +70,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private string GetMarkerWidth(Span span)
     {
-        var spanStart = span.GetStartDate();
-        var spanEnd = span.GetEndDate();
+        var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
+        var spanEnd = span.GetEndDate(int.Parse(Configuration["TimeOffset"]));
 
         var duration = spanEnd - spanStart;
         var totalDuration = end - start;
@@ -80,7 +83,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private string GetMarkerLeft(Span span)
     {
-        var spanStart = span.GetStartDate();
+        var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
         var totalDuration = end - start;
         var left = (spanStart - start).TotalMilliseconds / totalDuration.TotalMilliseconds * 100;
         return $"{left}%";
@@ -88,8 +91,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private string GetDurationSpanLeft(Span span)
     {
-        var spanStart = span.GetStartDate();
-        var spanEnd = span.GetEndDate();
+        var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
+        var spanEnd = span.GetEndDate(int.Parse(Configuration["TimeOffset"]));
 
         var duration = spanEnd - spanStart;
         var totalDuration = end - start;

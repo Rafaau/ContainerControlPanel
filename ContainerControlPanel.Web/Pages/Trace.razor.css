@@ -106,3 +106,43 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+.span-container {
+	display: flex;
+	margin-top: 24px;
+}
+
+.details-container {
+	width: 50%;
+	border-top: 1px solid #484848;
+}
+
+.details-label {
+	font-size: 20px;
+	padding-left: 24px;
+	border-bottom: 1px solid #484848;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
+.details-row {
+	border-bottom: 1px solid #484848;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	display: flex;
+	padding-left: 24px;
+	font-weight: 200;
+}
+
+.details-container:first-child {
+	border-right: 1px solid #484848;
+}
+
+	.details-row div:first-child {
+		font-size: 14px;
+		width: 50%;
+	}
+
+	.details-row span {
+		font-size: 14px;
+	}
