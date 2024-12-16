@@ -11,6 +11,7 @@ using System.Text;
 using System;
 using System.Text.Json;
 using OpenTelemetry.Proto.Collector.Metrics.V1;
+using OpenTelemetry.Proto.Collector.Logs.V1;
 
 [ApiController]
 [Route("/v1")]
@@ -93,6 +94,35 @@ public class TelemetryController : ControllerBase
         }
     }
 
+    [HttpPost("logs")]
+    public async Task<IActionResult> CollectLogs()
+    {
+        try
+        {
+            MessageBindable<ExportLogsServiceRequest>? bindable =
+                await MessageBindable<ExportLogsServiceRequest>.BindAsync(HttpContext, null);
+
+            var message = new WebSocketMessage
+            {
+                Type = WebSocketMessageType.Logs,
+                Data = bindable?.Message.ToString()
+            };
+
+            LogsRoot logsRoot = JsonSerializer.Deserialize<LogsRoot>(bindable?.Message.ToString());
+            string traceId = logsRoot.GetTraceId();
+
+            string json = JsonSerializer.Serialize(message);
+
+            await _redisService.SetValueAsync($"log{traceId}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+            await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet("GetTraces")]
     public async Task<IActionResult> GetTraces(string? resource)
     {
@@ -135,6 +165,31 @@ public class TelemetryController : ControllerBase
             metrics.Add(deserialized);
         }
         return Ok(metrics);
+    }
+
+    [HttpGet("GetLogs")]
+    public async Task<IActionResult> GetLogs()
+    {
+        List<LogsRoot> logs = new();
+        var result = await _redisService.ScanKeysByPatternAsync("log");
+        foreach (var item in result)
+        {
+            var deserialized = JsonSerializer.Deserialize<LogsRoot>(item);
+            logs.Add(deserialized);
+        }
+        return Ok(logs);
+    }
+
+    [HttpGet("GetLog")]
+    public async Task<IActionResult> GetLog(string traceId)
+    {
+        var result = await _redisService.ScanKeysByPatternAsync($"log{traceId}");
+        if (result.Count == 0)
+        {
+            return NotFound();
+        }
+        var deserialized = JsonSerializer.Deserialize<LogsRoot>(result[0]);
+        return Ok(deserialized);
     }
 
     public sealed class MessageBindable<TMessage> : IBindableFromHttpContext<MessageBindable<TMessage>> where TMessage : IMessage<TMessage>, new()

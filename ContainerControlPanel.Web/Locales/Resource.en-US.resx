@@ -297,4 +297,22 @@
   <data name="Details" xml:space="preserve">
     <value>Details</value>
   </data>
+  <data name="Structured" xml:space="preserve">
+    <value>Structured</value>
+  </data>
+  <data name="StructuredLogs" xml:space="preserve">
+    <value>Structured logs</value>
+  </data>
+  <data name="_Resource" xml:space="preserve">
+    <value>Resource</value>
+  </data>
+  <data name="Severity" xml:space="preserve">
+    <value>Severity</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Trace" xml:space="preserve">
+    <value>Trace</value>
+  </data>
 </root>

@@ -54,16 +54,16 @@
                 border-radius: 25px;
             }
 
-    .nav-item svg {
-        margin-bottom: 2px;
-    }
-
-    .nav-item:first-child svg {
-        margin-left: 9px;
+    .nav-item {
+        padding-top: 10px;
     }
 
     .nav-item:nth-child(3) {
-        padding-top: 4px;
+        padding-top: 8px;
+    }
+
+    .nav-item:nth-child(4) {
+        padding-top: 12px;
     }
 
     .nav-item ::deep a:hover {

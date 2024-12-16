@@ -70,6 +70,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Zasób.
+        /// </summary>
+        public static string _Resource {
+            get {
+                return ResourceManager.GetString("_Resource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Akcja.
         /// </summary>
         public static string Action {
@@ -322,6 +331,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Komunikat.
+        /// </summary>
+        public static string Message {
+            get {
+                return ResourceManager.GetString("Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Metryki.
         /// </summary>
         public static string Metrics {
@@ -475,6 +493,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Poziom.
+        /// </summary>
+        public static string Severity {
+            get {
+                return ResourceManager.GetString("Severity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Źródło.
         /// </summary>
         public static string Source {
@@ -520,6 +547,24 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Strukturalne.
+        /// </summary>
+        public static string Structured {
+            get {
+                return ResourceManager.GetString("Structured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logi strukturalne.
+        /// </summary>
+        public static string StructuredLogs {
+            get {
+                return ResourceManager.GetString("StructuredLogs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Czas.
         /// </summary>
         public static string Time {
@@ -543,6 +588,15 @@ namespace Locales {
         public static string TotalNumberOfFoundTraces {
             get {
                 return ResourceManager.GetString("TotalNumberOfFoundTraces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ślad.
+        /// </summary>
+        public static string Trace {
+            get {
+                return ResourceManager.GetString("Trace", resourceCulture);
             }
         }
         

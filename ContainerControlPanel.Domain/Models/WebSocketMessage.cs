@@ -10,5 +10,6 @@ public class WebSocketMessage
 public enum WebSocketMessageType
 {
     Traces,
-    Metrics
+    Metrics,
+    Logs
 }

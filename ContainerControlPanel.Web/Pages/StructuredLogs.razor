@@ -1,0 +1,56 @@
+﻿@page "/structuredlogs"
+@using MudBlazor
+@using ContainerControlPanel.Domain.Models
+
+<div class="label">
+	<h1>@Localizer[Locales.Resource.StructuredLogs]</h1>
+</div>
+
+<div class="flex">
+	<div class="select">
+		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
+			<MudSelectItem T="string" Value="@(null)">(@Localizer[Locales.Resource.All])</MudSelectItem>
+
+		</MudSelect>
+	</div>
+</div>
+
+<div class="data-grid">
+	<div class="data-grid-row header">
+		<div class="data-grid-cell">
+			@Localizer[Locales.Resource._Resource]
+		</div>
+		<div class="data-grid-cell">
+			@Localizer[Locales.Resource.Severity]
+		</div>
+		<div class="data-grid-cell">
+			@Localizer[Locales.Resource.Timestamp]
+		</div>
+		<div class="data-grid-cell">
+			@Localizer[Locales.Resource.Message]
+		</div>
+		<div class="data-grid-cell">
+			@Localizer[Locales.Resource.Trace]
+		</div>
+	</div>
+	@foreach (var log in logsRoot.GetStructuredLogs())
+	{
+		<div class="data-grid-row data">
+			<div class="data-grid-cell">
+				@log.ResourceName
+			</div>
+			<div class="data-grid-cell">
+				@log.Severity
+			</div>
+			<div class="data-grid-cell">
+				@log.Timestamp
+			</div>
+			<div class="data-grid-cell">
+				@log.Message
+			</div>
+			<div class="data-grid-cell">
+				@log.TraceId
+			</div>
+		</div>
+	}
+</div>
