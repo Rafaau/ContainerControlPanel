@@ -321,4 +321,10 @@
   <data name="Filter" xml:space="preserve">
     <value>Filter...</value>
   </data>
+  <data name="Response" xml:space="preserve">
+    <value>Response</value>
+  </data>
+  <data name="Copied" xml:space="preserve">
+    <value>Copied to clipboard</value>
+  </data>
 </root>

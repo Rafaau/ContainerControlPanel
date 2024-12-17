@@ -31,7 +31,8 @@ public static class TelemetryWebSocketHandler
         finally
         {
             WebSockets.Remove(webSocket);
-            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+            if (webSocket.State != WebSocketState.Aborted)
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
             webSocket.Dispose();
         }
     }

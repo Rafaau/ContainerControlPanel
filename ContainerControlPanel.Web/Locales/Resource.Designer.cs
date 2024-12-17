@@ -196,6 +196,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Skopiowano do schowka.
+        /// </summary>
+        public static string Copied {
+            get {
+                return ResourceManager.GetString("Copied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Utworzony.
         /// </summary>
         public static string CreatedAt {
@@ -471,6 +480,15 @@ namespace Locales {
         public static string Resources {
             get {
                 return ResourceManager.GetString("Resources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Odpowiedź.
+        /// </summary>
+        public static string Response {
+            get {
+                return ResourceManager.GetString("Response", resourceCulture);
             }
         }
         

@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
@@ -102,8 +104,12 @@ public static class LogsExtensions
                             continue;
                         }
 
-                        if (filterString != null 
-                            && !logRecord.Body.StringValue.ToLower().Contains(filterString.ToLower()))
+                        var contains = logRecord.Body.StringValue.Contains("[REQUEST]");
+
+                        if (logRecord.Body.StringValue.Contains("[REQUEST]")
+                            || logRecord.Body.StringValue.Contains("[RESPONSE]")
+                            || logRecord.Body.StringValue.Contains("[ERROR]")
+                            || (filterString != null && !logRecord.Body.StringValue.ToLower().Contains(filterString.ToLower())))
                         {
                             continue;
                         }
@@ -132,5 +138,23 @@ public static class LogsExtensions
                 resources.Add(logsRoot.GetResourceName());
         }
         return resources;
+    }
+
+    public static RequestResponse? GetRequestResponse(this LogsRoot logsRoot)
+    {
+        var request = logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords.Find(x => x.Body.StringValue.Contains("[REQUEST]"));
+        var response = logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords.Find(x => x.Body.StringValue.Contains("[RESPONSE]"));
+
+        if (request != null && response != null)
+        {
+            var requestJson = JsonObject.Parse(request.Body.StringValue.Replace("[REQUEST]", ""));
+            return new RequestResponse
+            {
+                Request = JsonSerializer.Deserialize<Request>(requestJson),
+                Response = response.Body.StringValue.Replace("[RESPONSE]", "")
+            };
+        }
+
+        return null;
     }
 }

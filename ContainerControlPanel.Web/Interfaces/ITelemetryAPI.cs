@@ -19,4 +19,7 @@ public interface ITelemetryAPI
 
     [Get("/v1/getLogs?traceId={traceId}")]
     Task<LogsRoot> GetLog(string traceId);
+
+    [Get("/v1/getRequestAndResponse?traceId={traceId}")]
+    Task<ApiResponse<RequestResponse>> GetRequestAndResponse(string traceId);
 }

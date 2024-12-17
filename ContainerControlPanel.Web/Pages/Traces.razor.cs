@@ -58,6 +58,6 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
 
     private void LoadTrace(string traceId)
     {
-        NavigationManager.NavigateTo($"/traces/{traceId}");
+        NavigationManager.NavigateTo($"/trace/{traceId}");
     }
 }

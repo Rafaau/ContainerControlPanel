@@ -192,6 +192,25 @@ public class TelemetryController : ControllerBase
         return Ok(deserialized);
     }
 
+    [HttpGet("GetRequestAndResponse")]
+    public async Task<IActionResult> GetRequestAndResponse(string traceId)
+    {
+        var result = await _redisService.ScanKeysByPatternAsync($"log{traceId}");
+        if (result.Count == 0)
+        {
+            return NotFound();
+        }
+        var deserialized = JsonSerializer.Deserialize<LogsRoot>(result[0]);
+        RequestResponse reqRes = deserialized.GetRequestResponse();
+
+        if (reqRes == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(reqRes);
+    }
+
     public sealed class MessageBindable<TMessage> : IBindableFromHttpContext<MessageBindable<TMessage>> where TMessage : IMessage<TMessage>, new()
     {
         public static readonly MessageBindable<TMessage> Empty = new MessageBindable<TMessage>();

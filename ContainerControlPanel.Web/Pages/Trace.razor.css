@@ -90,7 +90,7 @@
 	text-align: center;
 }
 
-.tab {
+.pad {
 	margin-left: 30% !important;
 }
 
@@ -147,3 +147,60 @@
 	.details-row span {
 		font-size: 14px;
 	}
+
+.tabs {
+	display: flex;
+	height: 50px;
+	border-bottom: 1px solid #484848;
+}
+
+.tab {
+	width: 100%;
+	text-align: center;
+	align-items: center;
+	cursor: pointer;
+	padding-top: 15px;
+}
+
+	.tab:nth-child(2) {
+		border-right: 1px solid #484848;
+	}
+
+	.tab:nth-child(1) {
+		border-right: 1px solid #484848;
+	}
+
+	.tab:hover {
+		background-color: rgba(255,255,255,0.1);
+	}
+
+.active {
+	background-color: rgba(255,255,255,0.1);
+}
+
+.request-content {
+	height: 300px;
+	border-bottom: 1px solid #484848;
+	overflow: auto;
+	resize: vertical;
+	min-height: 50px;
+}
+
+.response-content {
+	height: 350px;
+	border-bottom: 1px solid #484848;
+	overflow: auto;
+	resize: vertical;
+	min-height: 50px;
+}
+
+.json {
+	padding: 10px;
+	font-family: Consolas;
+}
+
+.copy {
+	position: absolute;
+	right: 20px;
+	cursor: pointer;
+}
