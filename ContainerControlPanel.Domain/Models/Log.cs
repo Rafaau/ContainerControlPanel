@@ -68,29 +68,69 @@ public static class LogsExtensions
     public static string GetResourceName(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].Resource.GetResourceName();
 
-    public static List<(string ResourceName,
+    public static List<(
+        string ResourceName,
         string Severity,
         DateTime Timestamp,
         string Message,
-        string TraceId)> GetStructuredLogs(this List<LogsRoot> logsRoots)
+        string TraceId)> GetStructuredLogs(
+            this List<LogsRoot> logsRoots, 
+            int timeOffset, 
+            string? resource, 
+            string? severity, 
+            DateTime? timestamp,
+            string? filterString)
     {
         var logs = new List<(string ResourceName, string Severity, DateTime Timestamp, string Message, string TraceId)>();
         foreach (var logsRoot in logsRoots)
         {
             var resourceName = logsRoot.GetResourceName();
+
+            if (resource != "all" && resourceName != resource)
+            {
+                continue;
+            }
+
             foreach (var resourceLog in logsRoot.ResourceLogs)
             {
                 foreach (var scopeLog in resourceLog.ScopeLogs)
                 {
                     foreach (var logRecord in scopeLog.LogRecords)
                     {
-                        logs.Add((resourceName, logRecord.SeverityText,
-                            DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).DateTime,
-                            logRecord.Body.StringValue, logRecord.TraceId));
+                        if (severity != "all" && logRecord.SeverityText != severity)
+                        {
+                            continue;
+                        }
+
+                        if (filterString != null 
+                            && !logRecord.Body.StringValue.ToLower().Contains(filterString.ToLower()))
+                        {
+                            continue;
+                        }
+
+                        DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).AddHours(timeOffset).DateTime;
+
+                        if (timestamp != null && dateTime.Date != timestamp.Value.Date)
+                        {
+                            continue;
+                        }
+
+                        logs.Add((resourceName, logRecord.SeverityText, dateTime, logRecord.Body.StringValue, logRecord.TraceId));
                     }
                 }
             }
         }
         return logs;
+    }
+
+    public static List<string> GetResources(this List<LogsRoot> logsRoots)
+    {
+        var resources = new List<string>();
+        foreach (var logsRoot in logsRoots)
+        {
+            if (!resources.Contains(logsRoot.GetResourceName()))
+                resources.Add(logsRoot.GetResourceName());
+        }
+        return resources;
     }
 }

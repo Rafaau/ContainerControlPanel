@@ -262,7 +262,7 @@
     <value>Choose resource...</value>
   </data>
   <data name="NoLogsFound" xml:space="preserve">
-    <value>There are no logs for the selected parameters</value>
+    <value>No logs found</value>
   </data>
   <data name="NoMetricsFound" xml:space="preserve">
     <value>No metrics found</value>
@@ -314,5 +314,11 @@
   </data>
   <data name="Trace" xml:space="preserve">
     <value>Trace</value>
+  </data>
+  <data name="ChooseSeverity" xml:space="preserve">
+    <value>Choose severity...</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter...</value>
   </data>
 </root>

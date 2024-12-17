@@ -8,9 +8,26 @@
 
 <div class="flex">
 	<div class="select">
-		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
-			<MudSelectItem T="string" Value="@(null)">(@Localizer[Locales.Resource.All])</MudSelectItem>
-
+		<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
+			<MudSelectItem T="string" Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			@foreach (var resource in logsRoot.GetResources())
+			{
+				<MudSelectItem T="string" Value="@resource">@resource</MudSelectItem>
+			}
+		</MudSelect>
+	</div>
+	<div class="select">
+		<MudTextField Immediate="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" @bind-Value="filterString" Label="@Localizer[Locales.Resource.Filter]" Variant="Variant.Text"></MudTextField>
+	</div>
+	<div class="select">
+		<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="timestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
+	</div>
+	<div class="select">
+		<MudSelect Label="@Localizer[Locales.Resource.ChooseSeverity]" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseSeverity]" TransformOrigin="Origin.TopCenter" @bind-Value="currentSeverity">
+			<MudSelectItem T="string" Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			<MudSelectItem T="string" Value="@("Information")">Information</MudSelectItem>
+			<MudSelectItem T="string" Value="@("Warning")">Warning</MudSelectItem>
+			<MudSelectItem T="string" Value="@("Error")">Error</MudSelectItem>
 		</MudSelect>
 	</div>
 </div>
@@ -33,24 +50,35 @@
 			@Localizer[Locales.Resource.Trace]
 		</div>
 	</div>
-	@foreach (var log in logsRoot.GetStructuredLogs())
+	@{
+		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentResource, currentSeverity, timestamp, filterString);
+	}
+	@foreach (var log in logs)
 	{
 		<div class="data-grid-row data">
-			<div class="data-grid-cell">
+			<div class="data-grid-cell text-overflow">
+				<div class="resource-badge" style="background-color: #@(GetHexString(log.ResourceName));"></div>
 				@log.ResourceName
 			</div>
 			<div class="data-grid-cell">
 				@log.Severity
 			</div>
 			<div class="data-grid-cell">
-				@log.Timestamp
+				@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")
 			</div>
-			<div class="data-grid-cell">
-				@log.Message
+			<div class="data-grid-cell text-overflow">
+				<MudHighlighter Text="@log.Message" HighlightedText="@filterString"
+								Style="padding: 0;" />
 			</div>
 			<div class="data-grid-cell">
 				@log.TraceId
 			</div>
+		</div>
+	}
+	@if (logs.Count == 0)
+	{
+		<div class="not-found">
+			@Localizer[Locales.Resource.NoLogsFound].
 		</div>
 	}
 </div>

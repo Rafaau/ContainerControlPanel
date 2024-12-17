@@ -4,9 +4,19 @@
 }
 
 .flex {
+	display: flex;
 	margin-inline: 24px;
 	margin-bottom: 24px;
 }
+
+	.flex .select:nth-child(2) {
+		margin-left: auto;
+		margin-right: 24px;
+	}
+
+	.flex .select:nth-child(3) {
+		margin-right: 24px;
+	}
 
 .select {
 	width: 200px;
@@ -25,7 +35,7 @@
 
 .data-grid-row {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	grid-template-columns: 1fr 0.5fr 0.6fr 2fr 0.8fr;
 	border-bottom: 1px solid #484848;
 }
 
@@ -39,6 +49,7 @@
 
 .header .data-grid-cell {
 	border-right: 1px solid #484848;
+	font-weight: 400;
 }
 
 .data-grid-cell {
@@ -63,7 +74,23 @@
 .text-overflow {
 	width: 100%;
 	overflow: hidden;
-	display: inline-block;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.resource-badge {
+	width: 7px;
+	margin-right: 8px;
+	filter: saturate(2000%);
+}
+
+.not-found {
+	text-align: center;
+	padding-top: 16px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid #484848;
+}
+
+::deep .mud-theme-primary {
+	background-color: red !important;
 }

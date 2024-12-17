@@ -132,6 +132,7 @@
 	display: flex;
 	padding-left: 24px;
 	font-weight: 200;
+	padding-right: 10px;
 }
 
 .details-container:first-child {

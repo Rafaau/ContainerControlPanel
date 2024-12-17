@@ -76,7 +76,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
         var duration = spanEnd - spanStart;
         var totalDuration = end - start;
 
-        var width = (duration.TotalMilliseconds / totalDuration.TotalMilliseconds) * 401;
+        var width = (duration.TotalMilliseconds / totalDuration.TotalMilliseconds) * 400;
 
         return $"{width}%";
     }
@@ -85,7 +85,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
     {
         var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
         var totalDuration = end - start;
-        var left = (spanStart - start).TotalMilliseconds / totalDuration.TotalMilliseconds * 100;
+        var left = (spanStart - start).TotalMilliseconds / totalDuration.TotalMilliseconds * 400;
         return $"{left}%";
     }
 
@@ -97,8 +97,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
         var duration = spanEnd - spanStart;
         var totalDuration = end - start;
 
-        var width = (duration.TotalMilliseconds / totalDuration.TotalMilliseconds) * 401;
-        var left = (spanStart - start).TotalMilliseconds / totalDuration.TotalMilliseconds * 100;
+        var width = (duration.TotalMilliseconds / totalDuration.TotalMilliseconds) * 400;
+        var left = (spanStart - start).TotalMilliseconds / totalDuration.TotalMilliseconds * 400;
 
         return $"{left + width}%";
     }

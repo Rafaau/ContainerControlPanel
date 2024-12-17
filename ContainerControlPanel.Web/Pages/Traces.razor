@@ -14,7 +14,7 @@
 {
 	<div class="flex">
 		<div style="margin-left: 26px; margin-bottom: 24px; width: 200px;">
-			<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
+			<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
 				<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
 				@foreach (var resource in allTraces.GetResources())
 				{

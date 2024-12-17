@@ -151,6 +151,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wybierz poziom....
+        /// </summary>
+        public static string ChooseSeverity {
+            get {
+                return ResourceManager.GetString("ChooseSeverity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wybierz czas....
         /// </summary>
         public static string ChooseTimestamp {
@@ -264,6 +273,15 @@ namespace Locales {
         public static string Examples {
             get {
                 return ResourceManager.GetString("Examples", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filtruj....
+        /// </summary>
+        public static string Filter {
+            get {
+                return ResourceManager.GetString("Filter", resourceCulture);
             }
         }
         
@@ -394,7 +412,7 @@ namespace Locales {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Nie znaleziono logów dla podanych parametrów.
+        ///   Looks up a localized string similar to Nie wykryto żadnych logów.
         /// </summary>
         public static string NoLogsFound {
             get {

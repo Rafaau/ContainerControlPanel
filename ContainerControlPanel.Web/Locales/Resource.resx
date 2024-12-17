@@ -262,7 +262,7 @@
     <value>Wybierz zasób...</value>
   </data>
   <data name="NoLogsFound" xml:space="preserve">
-    <value>Nie znaleziono logów dla podanych parametrów</value>
+    <value>Nie wykryto żadnych logów</value>
   </data>
   <data name="NoMetricsFound" xml:space="preserve">
     <value>Nie wykryto żadnych metryk</value>
@@ -314,5 +314,11 @@
   </data>
   <data name="Trace" xml:space="preserve">
     <value>Ślad</value>
+  </data>
+  <data name="ChooseSeverity" xml:space="preserve">
+    <value>Wybierz poziom...</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtruj...</value>
   </data>
 </root>

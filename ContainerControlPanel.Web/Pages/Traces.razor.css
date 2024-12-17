@@ -30,6 +30,7 @@
 
 .header .data-grid-cell {
 	border-right: 1px solid #484848;
+	font-weight: 400;
 }
 
 .data-grid-cell {
@@ -80,6 +81,7 @@
 
 .flex {
 	display: flex;
+	margin-left: -2px;
 }
 
 .switch {
@@ -90,7 +92,7 @@
 	position: absolute;
 	overflow: auto;
 	bottom: 35px;
-	top: 212px;
+	top: 230px;
 	left: 0;
 	right: 0;
 }

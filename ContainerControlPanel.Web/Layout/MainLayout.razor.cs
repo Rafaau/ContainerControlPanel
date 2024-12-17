@@ -27,7 +27,7 @@ public partial class MainLayout
     {
         PaletteDark = new()
         {
-            Primary = "#ffffff",
+            Primary = "#00B577",
             TextPrimary = "#ffffff",
             Dark = "#1e1e1e",
             DarkDarken = "#1c1c1c",
