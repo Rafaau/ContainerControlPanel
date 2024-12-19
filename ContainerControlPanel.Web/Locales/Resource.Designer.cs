@@ -151,6 +151,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wybierz zasób, aby wyświetlić logi.
+        /// </summary>
+        public static string ChooseResourceTo1 {
+            get {
+                return ResourceManager.GetString("ChooseResourceTo1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wybierz poziom....
         /// </summary>
         public static string ChooseSeverity {
@@ -345,6 +354,15 @@ namespace Locales {
         public static string Just {
             get {
                 return ResourceManager.GetString("Just", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Szczegóły logu.
+        /// </summary>
+        public static string LogDetails {
+            get {
+                return ResourceManager.GetString("LogDetails", resourceCulture);
             }
         }
         

@@ -62,6 +62,31 @@ public class ScopeLog
     public List<LogRecord> LogRecords { get; set; }
 }
 
+public class LogView
+{
+    public string? ResourceName { get; set; }
+    public string? Severity { get; set; }
+    public DateTime? Timestamp { get; set; }
+    public string? Message { get; set; }
+    public string? TraceId { get; set; }
+}
+
+public class LogDetailsView
+{
+    public string? ResourceName { get; set; }
+    public string? Severity { get; set; }
+    public DateTime? Timestamp { get; set; }
+    public string? Message { get; set; }
+    public string? TraceId { get; set; }
+    public string? ServiceInstanceId { get; set; }
+    public string? ScopeName { get; set; }
+    public string? SpanId { get; set; }
+    public int? Flags { get; set; }
+    public string? TelemetrySdkName { get; set; }
+    public string? TelemetrySdkVersion { get; set; }
+    public string? TelemetrySdkLanguage { get; set; }
+}
+
 public static class LogsExtensions
 {
     public static string GetTraceId(this LogsRoot logsRoot)
@@ -70,20 +95,15 @@ public static class LogsExtensions
     public static string GetResourceName(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].Resource.GetResourceName();
 
-    public static List<(
-        string ResourceName,
-        string Severity,
-        DateTime Timestamp,
-        string Message,
-        string TraceId)> GetStructuredLogs(
-            this List<LogsRoot> logsRoots, 
-            int timeOffset, 
-            string? resource, 
-            string? severity, 
+    public static List<LogView> GetStructuredLogs(
+            this List<LogsRoot> logsRoots,
+            int timeOffset,
+            string? resource,
+            string? severity,
             DateTime? timestamp,
             string? filterString)
     {
-        var logs = new List<(string ResourceName, string Severity, DateTime Timestamp, string Message, string TraceId)>();
+        var logs = new List<LogView>();
         foreach (var logsRoot in logsRoots)
         {
             var resourceName = logsRoot.GetResourceName();
@@ -121,7 +141,14 @@ public static class LogsExtensions
                             continue;
                         }
 
-                        logs.Add((resourceName, logRecord.SeverityText, dateTime, logRecord.Body.StringValue, logRecord.TraceId));
+                        logs.Add(new LogView
+                        {
+                            ResourceName = resourceName,
+                            Severity = logRecord.SeverityText,
+                            Timestamp = dateTime,
+                            Message = logRecord.Body.StringValue,
+                            TraceId = logRecord.TraceId
+                        });
                     }
                 }
             }
@@ -156,5 +183,30 @@ public static class LogsExtensions
         }
 
         return null;
+    }
+
+    public static string GetAttributeValue(this Resource resource, string key)
+    {
+        return resource.Attributes.Find(x => x.Key.Equals(key)).Value.StringValue;
+    }
+
+    public static LogDetailsView GetLogDetails(this List<LogsRoot> logsRoot, LogView logView)
+    {
+        var logRecord = logsRoot[0].ResourceLogs[0].ScopeLogs[0].LogRecords.Find(x => x.TraceId == logView.TraceId);
+        return new LogDetailsView
+        {
+            ResourceName = logView.ResourceName ?? null,
+            Severity = logView.Severity ?? null,
+            Timestamp = logView.Timestamp ?? null,
+            Message = logView.Message ?? null,
+            TraceId = logView.TraceId ?? null,
+            ServiceInstanceId = logsRoot[0].ResourceLogs[0].Resource.GetAttributeValue("service.instance.id") ?? null,
+            ScopeName = logsRoot[0].ResourceLogs[0].ScopeLogs[0].Scope.Name ?? null,
+            SpanId = logRecord?.SpanId ?? null,
+            Flags = logRecord?.Flags,
+            TelemetrySdkName = logsRoot[0].ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.name") ?? null,
+            TelemetrySdkVersion = logsRoot[0].ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.version") ?? null,
+            TelemetrySdkLanguage = logsRoot[0].ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.language") ?? null
+        };
     }
 }

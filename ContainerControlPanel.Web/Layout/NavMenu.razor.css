@@ -29,6 +29,7 @@
     text-align: center;
     position: relative;
     height: 60px;
+    user-select: none;
 }
 
 .nav-item:hover {

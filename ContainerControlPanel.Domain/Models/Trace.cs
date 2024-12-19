@@ -124,11 +124,8 @@ public static class TracesExtensions
 
     public static TimeSpan GetDuration(this ResourceSpan resourceSpan)
     {
-        var startTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].StartTimeUnixNano);
-        var endTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].EndTimeUnixNano);
-        long startTimeMilliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        long endTimeMilliseconds = Convert.ToInt64(Math.Round(endTime / 1000000));
-        return TimeSpan.FromMilliseconds(endTimeMilliseconds - startTimeMilliseconds);
+        var span = resourceSpan.ScopeSpans.Select(x => x.Spans[0]).OrderByDescending(s => s.GetDuration()).ToList();
+        return span[0].GetDuration();
     }
 
     public static TimeSpan GetDuration(this Span span)

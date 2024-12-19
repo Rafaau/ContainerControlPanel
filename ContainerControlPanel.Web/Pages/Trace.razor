@@ -58,7 +58,7 @@
 		</span>	
 		@Localizer[Locales.Resource.Duration]:
 		<span class="details-span">
-			<b>@((spans[0].GetDuration().TotalMicroseconds / 1000).ToString()) ms</b>
+			<b>@(spans[0].GetDuration().FormatDuration())</b>
 		</span>
 		@Localizer[Locales.Resource.Resources]:
 		<span class="details-span">
@@ -124,7 +124,7 @@
 							   left: @(GetMarkerLeft(span));">
 					</div>
 					<div class="duration-span" style="left: @(GetDurationSpanLeft(span));">
-						@((span.GetDuration().TotalMicroseconds / 1000).ToString()) ms
+						@(span.GetDuration().FormatDuration())
 					</div>
 				</div>
 				<div class="data-grid-cell">

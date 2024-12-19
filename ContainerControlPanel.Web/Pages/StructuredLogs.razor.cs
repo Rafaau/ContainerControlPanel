@@ -30,6 +30,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI)
 
     private string? filterString { get; set; } = null;
 
+    private bool detailsDrawer { get; set; } = false;
+
+    private LogDetailsView currentLog { get; set; } = null;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadLogs();

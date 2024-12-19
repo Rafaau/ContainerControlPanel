@@ -20,12 +20,9 @@
 	border-bottom: 1px solid #484848;
 }
 
-	.data-grid-row.header {
-		font-weight: 100;
-	}
-
 .header .data-grid-cell {
 	border-right: 1px solid #484848;
+	font-weight: 400;
 }
 
 .data-grid-cell {
@@ -41,6 +38,7 @@
 	padding-top: 6px;
 	padding-bottom: 6px;
 	cursor: pointer;
+	font-weight: 200;
 }
 
 .data-grid-cell:last-child {
@@ -62,6 +60,7 @@
 .label {
 	display: flex;
 	margin: 24px;
+	user-select: none;
 }
 
 	.label svg {

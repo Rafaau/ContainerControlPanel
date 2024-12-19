@@ -94,11 +94,11 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
         start = spans[0].GetStartDate(int.Parse(Configuration["TimeOffset"]));
         end = spans[0].GetEndDate(int.Parse(Configuration["TimeOffset"]));
 
-        intervals[0] = "0ms";
-        intervals[1] = $"{(spans[0].GetDuration().TotalMicroseconds / 1000 * 0.25).ToString("0.00")}ms";
-        intervals[2] = $"{(spans[0].GetDuration().TotalMicroseconds / 1000 * 0.50).ToString("0.00")}ms";
-        intervals[3] = $"{(spans[0].GetDuration().TotalMicroseconds / 1000 * 0.75).ToString("0.00")}ms";
-        intervals[4] = $"{(spans[0].GetDuration().TotalMicroseconds / 1000).ToString("0.00")}ms";
+        intervals[0] = new TimeSpan(0).FormatDuration();
+        intervals[1] = (spans[0].GetDuration() * 0.25).FormatDuration();
+        intervals[2] = (spans[0].GetDuration() * 0.50).FormatDuration();
+        intervals[3] = (spans[0].GetDuration() * 0.75).FormatDuration();
+        intervals[4] = spans[0].GetDuration().FormatDuration();
     }
 
     private string GetHexString(string text)
@@ -156,4 +156,20 @@ public enum RequestTab
     Headers,
     Params,
     Body
+}
+
+public static class TraceExtensions
+{
+    public static string FormatDuration(this TimeSpan duration, bool format = true)
+    {
+        if (duration == TimeSpan.Zero) return "0";
+
+        return duration.TotalMilliseconds switch
+        {
+            < 1000 => $"{duration.TotalMilliseconds.ToString(format ? "0.000" : "0")}ms",
+            < 60000 => $"{duration.TotalSeconds.ToString(format ? "0.00" : "0")}s",
+            < 3600000 => $"{duration.TotalMinutes.ToString(format ? "0.00" : "0")}m",
+            _ => $"{duration.TotalHours.ToString(format ? "0.00" : "0")}h"
+        };
+    }
 }

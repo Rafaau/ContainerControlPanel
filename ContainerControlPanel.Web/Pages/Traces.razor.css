@@ -1,6 +1,7 @@
 ﻿.label {
 	display: flex;
 	margin: 24px;
+	user-select: none;
 }
 
 .data-grid {
@@ -19,10 +20,6 @@
 	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 	border-bottom: 1px solid #484848;
 }
-
-	.data-grid-row.header {
-		font-weight: 100;
-	}
 
 	.data:hover {
 		background-color: rgba(255,255,255,0.1);
@@ -46,6 +43,7 @@
 	padding-top: 6px;
 	padding-bottom: 6px;
 	cursor: pointer;
+	font-weight: 200;
 }
 
 .data-grid-cell:last-child {
@@ -82,6 +80,7 @@
 .flex {
 	display: flex;
 	margin-left: -2px;
+	user-select: none;
 }
 
 .switch {

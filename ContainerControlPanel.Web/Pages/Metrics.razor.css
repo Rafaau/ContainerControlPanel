@@ -1,12 +1,17 @@
 ﻿.label {
 	display: flex;
 	margin: 24px;
+	user-select: none;
 }
 
 .not-found {
 	text-align: center;
 	margin-top: 32px;
 	user-select: none;
+}
+
+.not-found svg {
+	margin-right: 6px;
 }
 
 .flex {

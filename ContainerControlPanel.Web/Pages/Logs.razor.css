@@ -1,6 +1,7 @@
 ﻿.label {
 	display: flex;
 	margin: 24px;
+	user-select: none;
 }
 
 	.label svg {
@@ -32,7 +33,7 @@
 	padding: 6px;
 	font-size: 16px;
 	font-family: Consolas;
-	height: 550px;
+	height: 510px;
 	width: 88vw;
 	overflow-y: scroll;
 	overflow-x: scroll;
@@ -75,10 +76,17 @@
 }
 
 .not-found {
-	text-align: center;
-	margin-top: 32px;
+	margin-top: 52px;
 	user-select: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
+
+	.not-found svg {
+		margin-right: 8px;
+		margin-bottom: 1px;
+	}
 
 .switch {
 	margin-left: auto;

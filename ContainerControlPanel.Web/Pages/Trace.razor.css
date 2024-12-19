@@ -8,6 +8,7 @@
 .label {
 	font-size: 32px;
 	font-weight: 500;
+	user-select: none;
 }
 
 .trace-id {

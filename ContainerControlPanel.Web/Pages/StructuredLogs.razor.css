@@ -1,6 +1,7 @@
 ﻿.label {
 	display: flex;
 	margin: 24px;
+	user-select: none;
 }
 
 .flex {
@@ -39,10 +40,6 @@
 	border-bottom: 1px solid #484848;
 }
 
-	.data-grid-row.header {
-		font-weight: 100;
-	}
-
 .data:hover {
 	background-color: rgba(255,255,255,0.1);
 }
@@ -65,6 +62,7 @@
 	padding-top: 6px;
 	padding-bottom: 6px;
 	cursor: pointer;
+	font-weight: 200;
 }
 
 .data-grid-cell:last-child {
@@ -76,6 +74,11 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	display: inline-block;
+}
+
+.text-overflow:first-child {
+	display: flex;
 }
 
 .resource-badge {
@@ -93,4 +96,63 @@
 
 ::deep .mud-theme-primary {
 	background-color: red !important;
+}
+
+.drawer-label {
+	display: inline-flex;
+	align-items: center;
+	margin: 6px;
+	margin-left: 22px;
+	font-size: 22px;
+	user-select: none;
+}
+
+.log-details-container {
+	background-color: #2B2B2B;
+	height: 100%;
+}
+
+.drawer-flex {
+	padding: 12px;
+	padding-left: 22px;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	width: 100%;
+	margin-bottom: 32px;
+	font-weight: 200;
+}
+
+.details-row {
+	display: flex;
+	align-items: center;
+	border-top: 1px solid #484848;
+}
+
+	.details-row:last-child {
+		border-bottom: 1px solid #484848;
+	}
+
+.details-key {
+	padding: 8px;
+	padding-left: 22px;
+	width: 40%;
+}
+
+.details-value {
+	padding: 8px;
+	padding-inline: 22px;
+	max-width: 60%;
+	border-left: 1px solid #484848;
+	min-height: 36px;
+	font-weight: 200;
+}
+
+.data-container {
+	position: absolute;
+	overflow: auto;
+	bottom: 0;
+	top: 213px;
+	left: 0;
+	right: 0;
 }

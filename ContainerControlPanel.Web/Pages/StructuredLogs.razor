@@ -53,9 +53,10 @@
 	@{
 		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentResource, currentSeverity, timestamp, filterString);
 	}
+		<div class="data-container">
 	@foreach (var log in logs)
 	{
-		<div class="data-grid-row data">
+		<div @onclick="() => { detailsDrawer = true; currentLog = logsRoot.GetLogDetails(log); }" class="data-grid-row data">
 			<div class="data-grid-cell text-overflow">
 				<div class="resource-badge" style="background-color: #@(GetHexString(log.ResourceName));"></div>
 				@log.ResourceName
@@ -64,17 +65,18 @@
 				@log.Severity
 			</div>
 			<div class="data-grid-cell">
-				@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")
+				@log.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")
 			</div>
 			<div class="data-grid-cell text-overflow">
 				<MudHighlighter Text="@log.Message" HighlightedText="@filterString"
-								Style="padding: 0;" />
+								Style="padding: 0;"/>
 			</div>
 			<div class="data-grid-cell">
 				@log.TraceId
 			</div>
 		</div>
 	}
+	</div>
 	@if (logs.Count == 0)
 	{
 		<div class="not-found">
@@ -82,3 +84,76 @@
 		</div>
 	}
 </div>
+
+
+
+<MudDrawer 
+	@bind-Open="@detailsDrawer" 
+	OverlayAutoClose="true"
+	Anchor="Anchor.End" 
+	Elevation="5" 
+	Variant="@DrawerVariant.Temporary" 
+	Color="Color.Dark"
+	Width="680px"
+	Height="100%">
+	@if (currentLog != null) 
+	{
+		<div class="drawer-label">
+			@Localizer[Locales.Resource.LogDetails]
+			<div style="margin-left: auto;">
+				<MudIconButton @onclick="_ => detailsDrawer = false" Icon="@Icons.Material.Outlined.Close" Color="Color.Primary" aria-label="close" />
+			</div>
+		</div>
+		<div class="log-details-container">
+			<div class="drawer-flex">
+				@Localizer[Locales.Resource._Resource]
+				<b>@currentLog.ResourceName</b>
+				<div style="margin-left: auto;">
+					<b>@currentLog.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")</b>
+				</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Scope</div>
+				<div class="details-value text-overflow">@currentLog.ScopeName</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Service instance</div>
+				<div class="details-value text-overflow">@currentLog.ServiceInstanceId</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Trace Id</div>
+				<div class="details-value text-overflow">@currentLog.TraceId</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Span Id</div>
+				<div class="details-value text-overflow">@currentLog.SpanId</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Flags</div>
+				<div class="details-value text-overflow">@currentLog.Flags</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Severity</div>
+				<div class="details-value text-overflow">@currentLog.Severity</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Message</div>
+				<div class="details-value" style="font-family: Consolas; color: #CE9178;">
+					@currentLog.Message
+				</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Telemetry SDK Name</div>
+				<div class="details-value text-overflow">@currentLog.TelemetrySdkName</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Telemetry SDK Language</div>
+				<div class="details-value text-overflow">@currentLog.TelemetrySdkLanguage</div>
+			</div>
+			<div class="details-row">
+				<div class="details-key">Telemetry SDK Version</div>
+				<div class="details-value text-overflow">@currentLog.TelemetrySdkVersion</div>
+			</div>
+		</div>
+	}	
+</MudDrawer>

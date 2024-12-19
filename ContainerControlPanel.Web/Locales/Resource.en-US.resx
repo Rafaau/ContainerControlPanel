@@ -327,4 +327,10 @@
   <data name="Copied" xml:space="preserve">
     <value>Copied to clipboard</value>
   </data>
+  <data name="LogDetails" xml:space="preserve">
+    <value>Log details</value>
+  </data>
+  <data name="ChooseResourceTo1" xml:space="preserve">
+    <value>Choose resource to show logs</value>
+  </data>
 </root>
