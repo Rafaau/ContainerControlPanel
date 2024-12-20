@@ -1,7 +1,10 @@
+using Blazored.SessionStorage;
 using ContainerControlPanel.Web;
+using ContainerControlPanel.Web.Authentication;
 using ContainerControlPanel.Web.Interfaces;
 using ContainerControlPanel.Web.Services;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
@@ -32,6 +35,10 @@ builder.Services.AddSingleton<WebSocketService>();
 builder.Services.AddMudServices();
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Locales");
 
+builder.Services.AddAuthorizationCore();
+builder.Services.AddBlazoredSessionStorage();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
 var host = builder.Build();
 
 const string defaultCulture = "en-US";
@@ -39,6 +46,13 @@ const string defaultCulture = "en-US";
 var js = host.Services.GetRequiredService<IJSRuntime>();
 var result = await js.InvokeAsync<string>("blazorCulture.get");
 var culture = CultureInfo.GetCultureInfo(result ?? defaultCulture);
+
+var configuration = host.Services.GetRequiredService<IConfiguration>();
+
+if (configuration["AppName"] != null)
+{
+    await js.InvokeVoidAsync("title.set", configuration["AppName"]);
+}
 
 if (result == null)
 {

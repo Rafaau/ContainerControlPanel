@@ -349,6 +349,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nieprawidłowy token.
+        /// </summary>
+        public static string InvalidToken {
+            get {
+                return ResourceManager.GetString("InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tylko.
         /// </summary>
         public static string Just {
@@ -363,6 +372,15 @@ namespace Locales {
         public static string LogDetails {
             get {
                 return ResourceManager.GetString("LogDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zaloguj.
+        /// </summary>
+        public static string Login {
+            get {
+                return ResourceManager.GetString("Login", resourceCulture);
             }
         }
         

@@ -67,6 +67,33 @@ a, .btn-link {
         content: "An error has occurred."
     }
 
+    #app {
+        background-color: #2b2b2b;
+    }
+
+.loading {
+    background-color: #2b2b2b;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 5px solid #00B577;
+    border-right: 5px solid transparent;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
 .loading-progress {
     position: relative;
     display: block;

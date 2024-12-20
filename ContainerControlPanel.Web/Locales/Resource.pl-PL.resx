@@ -333,4 +333,10 @@
   <data name="ChooseResourceTo1" xml:space="preserve">
     <value>Wybierz zasób, aby wyświetlić logi</value>
   </data>
+  <data name="Login" xml:space="preserve">
+    <value>Zaloguj</value>
+  </data>
+  <data name="InvalidToken" xml:space="preserve">
+    <value>Nieprawidłowy token</value>
+  </data>
 </root>

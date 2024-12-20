@@ -45,7 +45,7 @@ public partial class Containers(IContainerAPI containerAPI)
                 while (true)
                 {
                     await LoadContainers(true);
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                 }
             });
         }   
