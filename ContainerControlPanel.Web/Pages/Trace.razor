@@ -54,7 +54,7 @@
 	<div class="flex">
 		@Localizer[Locales.Resource.TraceDetails]:
 		<span class="details-span">
-			<b>@trace.ResourceSpans[0].GetTimestamp(int.Parse(Configuration["TimeOffset"])).ToString("MM.dd.yyyy HH:mm:ss")</b>
+			<b>@trace.ResourceSpans[0].GetTimestamp(int.Parse(Configuration["TimeOffset"])).ToString("dd.MM.yyyy HH:mm:ss")</b>
 		</span>	
 		@Localizer[Locales.Resource.Duration]:
 		<span class="details-span">

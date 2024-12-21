@@ -7,7 +7,7 @@ using Microsoft.Extensions.Localization;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Metrics(ITelemetryAPI telemetryAPI)
+public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 {
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
@@ -22,8 +22,6 @@ public partial class Metrics(ITelemetryAPI telemetryAPI)
     private Metric? currentMetric { get; set; } = null;
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
-
-    
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,5 +58,11 @@ public partial class Metrics(ITelemetryAPI telemetryAPI)
 
             this.StateHasChanged();
         }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        WebSocketService.MetricsUpdated -= OnMetricsUpdated;
+        return ValueTask.CompletedTask;
     }
 }

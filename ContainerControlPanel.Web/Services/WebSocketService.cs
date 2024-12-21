@@ -13,12 +13,14 @@ public class WebSocketService
 
     public event Action<MetricsRoot>? MetricsUpdated;
 
+    public event Action<LogsRoot>? LogsUpdated;
+
     public async Task ConnectAsync(string uri)
     {
         _webSocket = new ClientWebSocket();
         await _webSocket.ConnectAsync(new Uri(uri), CancellationToken.None);
 
-        _ = ReceiveMessagesAsync(); // Rozpocznij odbieranie wiadomości
+        _ = ReceiveMessagesAsync();
     }
 
     private async Task ReceiveMessagesAsync()
@@ -42,6 +44,11 @@ public class WebSocketService
                 case Domain.Models.WebSocketMessageType.Metrics:
                     var metrics = JsonSerializer.Deserialize<MetricsRoot>(message.Data.ToString());
                     MetricsUpdated?.Invoke(metrics);
+                    break;
+
+                case Domain.Models.WebSocketMessageType.Logs:
+                    var logs = JsonSerializer.Deserialize<LogsRoot>(message.Data.ToString());
+                    LogsUpdated?.Invoke(logs);
                     break;
             }
         }

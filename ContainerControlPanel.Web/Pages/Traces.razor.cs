@@ -2,12 +2,13 @@ using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Interfaces;
 using ContainerControlPanel.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 using System.Text;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Traces(ITelemetryAPI telemetryAPI)
+public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 {
     [Inject]
     WebSocketService WebSocketService { get; set; }
@@ -24,6 +25,9 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
     [Inject]
     NavigationManager NavigationManager { get; set; }
 
+    [Inject]
+    IMemoryCache MemoryCache { get; set; }
+
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
     private List<TracesRoot> allTraces { get; set; } = new();
@@ -32,13 +36,39 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
 
     private bool routesOnly { get; set; } = false;
 
+    private DateTime? timestamp { get; set; } = DateTime.Now;
+
     protected override async Task OnInitializedAsync()
     {
-        allTraces = await telemetryAPI.GetTraces();
-        this.StateHasChanged();
+        await LoadTraces();
 
         WebSocketService.TracesUpdated += OnTracesUpdated;
         await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+    }
+
+    private async Task LoadTraces()
+    {
+        if (MemoryCache.TryGetValue("traces", out List<TracesRoot> cachedTraces))
+        {
+            allTraces = cachedTraces;
+            this.StateHasChanged();
+
+            var result = await telemetryAPI.GetTraces();
+
+            if (result.Count != allTraces.Count)
+            {
+                MemoryCache.Set("traces", result);
+                allTraces = result;
+                this.StateHasChanged();
+            }
+        }
+        else
+        {
+            var result = await telemetryAPI.GetTraces();
+            MemoryCache.Set("traces", result);
+            allTraces = result;
+            this.StateHasChanged();
+        }
     }
 
     private void OnTracesUpdated(TracesRoot traces)
@@ -46,6 +76,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
         if (traces != null)
         {
             allTraces.Add(traces);
+            MemoryCache.Set("traces", allTraces);
             this.StateHasChanged();
         }
     }
@@ -59,5 +90,11 @@ public partial class Traces(ITelemetryAPI telemetryAPI)
     private void LoadTrace(string traceId)
     {
         NavigationManager.NavigateTo($"/trace/{traceId}");
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        WebSocketService.TracesUpdated -= OnTracesUpdated;
+        return WebSocketService.DisposeAsync();
     }
 }

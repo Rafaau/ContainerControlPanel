@@ -3,13 +3,13 @@ using ContainerControlPanel.Web.Components;
 using ContainerControlPanel.Web.Enums;
 using ContainerControlPanel.Web.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 using MudBlazor;
-using System.Net.Http.Json;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Containers(IContainerAPI containerAPI)
+public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
 {
     [Inject]
     IServiceProvider ServiceProvider { get; set; }
@@ -25,6 +25,9 @@ public partial class Containers(IContainerAPI containerAPI)
 
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
+
+    [Inject]
+    IMemoryCache MemoryCache { get; set; }
 
     private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
@@ -53,8 +56,27 @@ public partial class Containers(IContainerAPI containerAPI)
 
     private async Task LoadContainers(bool force)
     {
-        containers = await containerAPI.GetContainers(force, liveFilter);
-        this.StateHasChanged();
+        if (MemoryCache.TryGetValue("containers", out List<Container> cachedContainers) && !force)
+        {
+            containers = cachedContainers;
+            this.StateHasChanged();
+
+            var result = await containerAPI.GetContainers(force, liveFilter);
+
+            if (result.Count != containers.Count)
+            {
+                MemoryCache.Set("containers", result);
+                containers = result;
+                this.StateHasChanged();
+            }
+        }
+        else
+        {
+            var result = await containerAPI.GetContainers(force, liveFilter);
+            MemoryCache.Set("containers", result);
+            containers = result;
+            this.StateHasChanged();
+        }
     }
 
     private async Task StopContainer(string containerId)
@@ -137,5 +159,10 @@ public partial class Containers(IContainerAPI containerAPI)
     private void ViewLogs(string containerId)
     {
         NavigationManager.NavigateTo($"/logs/{containerId}");
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
     }
 }

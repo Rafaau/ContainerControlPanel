@@ -655,6 +655,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dzisiaj.
+        /// </summary>
+        public static string Today {
+            get {
+                return ResourceManager.GetString("Today", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Łączna liczba znalezionych wyników.
         /// </summary>
         public static string TotalNumberOfFoundTraces {

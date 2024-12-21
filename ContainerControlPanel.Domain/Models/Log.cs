@@ -101,7 +101,8 @@ public static class LogsExtensions
             string? resource,
             string? severity,
             DateTime? timestamp,
-            string? filterString)
+            string? filterString,
+            bool orderDesc = true)
     {
         var logs = new List<LogView>();
         foreach (var logsRoot in logsRoots)
@@ -153,7 +154,10 @@ public static class LogsExtensions
                 }
             }
         }
-        return logs;
+
+        return orderDesc 
+            ? logs.OrderByDescending(x => x.Timestamp).ToList() 
+            : logs.OrderBy(x => x.Timestamp).ToList();
     }
 
     public static List<string> GetResources(this List<LogsRoot> logsRoots)

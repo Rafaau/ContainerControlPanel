@@ -11,6 +11,7 @@ using Microsoft.JSInterop;
 using MudBlazor.Services;
 using Refit;
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -38,6 +39,8 @@ builder.Services.AddLocalization(opt => opt.ResourcesPath = "Locales");
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+builder.Services.AddMemoryCache();
 
 var host = builder.Build();
 

@@ -339,4 +339,7 @@
   <data name="InvalidToken" xml:space="preserve">
     <value>Nieprawidłowy token</value>
   </data>
+  <data name="Today" xml:space="preserve">
+    <value>Dzisiaj</value>
+  </data>
 </root>

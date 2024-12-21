@@ -51,7 +51,7 @@
 		</div>
 	</div>
 	@{
-		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentResource, currentSeverity, timestamp, filterString);
+		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentResource, currentSeverity, timestamp, filterString, true);
 	}
 		<div class="data-container">
 	@foreach (var log in logs)

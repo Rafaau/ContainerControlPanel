@@ -7,13 +7,18 @@
 </div>
 
 @{
-	List<ResourceSpan> traces = allTraces.GetTracesList(filter: currentResource, routesOnly: routesOnly);
+	List<ResourceSpan> traces = allTraces.GetTracesList(
+		filter: currentResource, 
+		routesOnly: routesOnly, 
+		timestamp: timestamp,
+		timeOffset: int.Parse(Configuration["TimeOffset"])
+	);
 }
 
 @if (allTraces.Count > 0) 
 {
 	<div class="flex">
-		<div style="margin-left: 26px; margin-bottom: 24px; width: 200px;">
+		<div class="resource-select">
 			<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
 				<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
 				@foreach (var resource in allTraces.GetResources())
@@ -21,6 +26,9 @@
 					<MudSelectItem Value="@(resource)">@resource</MudSelectItem>
 				}
 			</MudSelect>
+		</div>
+		<div class="picker">
+			<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="timestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
 		</div>
 		<div class="switch">
 			<MudSwitch @bind-Value="routesOnly" Label="@Localizer[Locales.Resource.RoutesOnly]" Color="Color.Success" />
@@ -42,9 +50,6 @@
 		<div class="data-grid-cell">
 			@Localizer[Locales.Resource.Duration]
 		</div>
-		<div class="data-grid-cell">
-			@Localizer[Locales.Resource.Action]
-		</div>
 	</div>
 	@if (traces.Count < 1)
 	{
@@ -61,6 +66,12 @@
 					<div class="data-grid-cell">
 						@{
 							DateTime timestamp = trace.GetTimestamp(int.Parse(Configuration["TimeOffset"]));
+						}
+						@if (timestamp.Date == DateTime.Now.Date)
+						{
+							<span class="timestamp-span">
+								@Localizer[Locales.Resource.Today]
+							</span>
 						}
 						@if (timestamp.Date == DateTime.Now.AddDays(-1).Date) 
 						{
@@ -96,8 +107,6 @@
 					</div>
 					<div class="data-grid-cell">
 						@trace.GetDuration().FormatDuration(false)
-					</div>
-					<div class="data-grid-cell">
 					</div>
 				</div>
 			}
