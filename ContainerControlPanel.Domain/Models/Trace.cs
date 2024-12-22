@@ -174,7 +174,7 @@ public static class TracesExtensions
 
     public static string GetAttributeValue(this Span span, string key)
         => span.Attributes.Find(x => x.Key.Equals(key))?.Value?.StringValue
-            ?? (key == "http.route" ? "Browser Link" : string.Empty);
+            ?? (key == "http.route" ? "External" : string.Empty);
 
     public static List<(string Key, string Value)> GetAttributes(this Span span)
         => span.Attributes.Select(attr => (attr.Key, attr.Value.StringValue ?? attr.Value.IntValue)).ToList();

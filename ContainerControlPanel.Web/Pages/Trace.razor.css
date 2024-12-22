@@ -89,6 +89,8 @@
 	margin-left: 5px;
 	color: #808080;
 	text-align: center;
+	z-index: 2;
+	background-color: #2B2B2B;
 }
 
 .pad {
