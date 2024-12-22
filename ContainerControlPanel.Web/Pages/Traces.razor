@@ -1,4 +1,8 @@
 ﻿@page "/traces"
+@page "/traces/{ResourceParameter}"
+@page "/traces/{ResourceParameter}/{TimestampParameter}"
+@page "/traces/{ResourceParameter}/{TimestampParameter}/{RoutesOnlyParameter}"
+
 @using ContainerControlPanel.Domain.Models
 @using MudBlazor
 
@@ -10,7 +14,7 @@
 	List<ResourceSpan> traces = allTraces.GetTracesList(
 		filter: currentResource, 
 		routesOnly: routesOnly, 
-		timestamp: timestamp,
+		timestamp: currentTimestamp,
 		timeOffset: int.Parse(Configuration["TimeOffset"])
 	);
 }
@@ -28,7 +32,7 @@
 			</MudSelect>
 		</div>
 		<div class="picker">
-			<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="timestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
+			<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="currentTimestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
 		</div>
 		<div class="switch">
 			<MudSwitch @bind-Value="routesOnly" Label="@Localizer[Locales.Resource.RoutesOnly]" Color="Color.Success" />

@@ -28,18 +28,59 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
     [Inject]
     IMemoryCache MemoryCache { get; set; }
 
+    [Parameter]
+    public string? ResourceParameter { get; set; }
+
+    [Parameter]
+    public string? TimestampParameter { get; set; }
+
+    [Parameter]
+    public string? RoutesOnlyParameter { get; set; }
+
+    private string? currentRoute
+    => $"/traces/{currentResource}" +
+    $"/{currentTimestamp?.ToString("yyyy-MM-dd") ?? "null"}" +
+    $"/{routesOnly}";
+
+    private string currentResource
+    {
+        get => ResourceParameter ?? "all";
+        set
+        {
+            ResourceParameter = value;
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
+
+    private bool routesOnly
+    {
+        get => bool.Parse(RoutesOnlyParameter ?? "false");
+        set
+        {
+            RoutesOnlyParameter = value.ToString();
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
+
+    private DateTime? currentTimestamp
+    {
+        get => TimestampParameter != null && TimestampParameter != "null" 
+            ? DateTime.Parse(TimestampParameter) 
+            : null;
+        set
+        {
+            TimestampParameter = value?.ToString("yyyy-MM-dd");
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
+
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
     private List<TracesRoot> allTraces { get; set; } = new();
 
-    private string currentResource { get; set; } = "all";
-
-    private bool routesOnly { get; set; } = false;
-
-    private DateTime? timestamp { get; set; } = DateTime.Now;
-
     protected override async Task OnInitializedAsync()
     {
+        TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
         await LoadTraces();
 
         WebSocketService.TracesUpdated += OnTracesUpdated;

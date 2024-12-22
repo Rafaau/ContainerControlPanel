@@ -1,4 +1,9 @@
 ﻿@page "/structuredlogs"
+@page "/structuredlogs/{ResourceParameter}"
+@page "/structuredlogs/{ResourceParameter}/{TimestampParameter}"
+@page "/structuredlogs/{ResourceParameter}/{TimestampParameter}/{SeverityParameter}"
+@page "/structuredlogs/{ResourceParameter}/{TimestampParameter}/{SeverityParameter}/{FilterParameter}"
+
 @using MudBlazor
 @using ContainerControlPanel.Domain.Models
 
@@ -17,10 +22,10 @@
 		</MudSelect>
 	</div>
 	<div class="select">
-		<MudTextField Immediate="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" @bind-Value="filterString" Label="@Localizer[Locales.Resource.Filter]" Variant="Variant.Text"></MudTextField>
+		<MudTextField Immediate="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" @bind-Value="currentFilter" Label="@Localizer[Locales.Resource.Filter]" Variant="Variant.Text"></MudTextField>
 	</div>
 	<div class="select">
-		<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="timestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
+		<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="currentTimestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
 	</div>
 	<div class="select">
 		<MudSelect Label="@Localizer[Locales.Resource.ChooseSeverity]" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseSeverity]" TransformOrigin="Origin.TopCenter" @bind-Value="currentSeverity">
@@ -51,7 +56,7 @@
 		</div>
 	</div>
 	@{
-		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentResource, currentSeverity, timestamp, filterString, true);
+		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentResource, currentSeverity, currentTimestamp, currentFilter, true);
 	}
 		<div class="data-container">
 	@foreach (var log in logs)
@@ -68,7 +73,7 @@
 				@log.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")
 			</div>
 			<div class="data-grid-cell text-overflow">
-				<MudHighlighter Text="@log.Message" HighlightedText="@filterString"
+				<MudHighlighter Text="@log.Message" HighlightedText="@currentFilter"
 								Style="padding: 0;"/>
 			</div>
 			<div class="data-grid-cell">

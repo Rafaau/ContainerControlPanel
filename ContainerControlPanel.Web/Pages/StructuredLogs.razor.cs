@@ -22,17 +22,72 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
     [Inject]
     IMemoryCache MemoryCache { get; set; }
 
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+
+    [Parameter]
+    public string? ResourceParameter { get; set; }
+
+    [Parameter]
+    public string? SeverityParameter { get; set; }
+
+    [Parameter]
+    public string? FilterParameter { get; set; }
+
+    [Parameter]
+    public string? TimestampParameter { get; set; }
+
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
     private List<LogsRoot> logsRoot { get; set; } = new();
 
-    private string currentResource { get; set; } = "all";
+    private string? currentRoute =>
+        $"/structuredlogs/{currentResource}" +
+        $"/{currentTimestamp?.ToString("yyyy-MM-dd") ?? "null"}" +
+        $"/{currentSeverity}" +
+        $"/{currentFilter}";
 
-    private string currentSeverity { get; set; } = "all";
+    private string? currentResource
+    {
+        get => ResourceParameter ?? "all";
+        set
+        {
+            ResourceParameter = value;
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
 
-    private DateTime? timestamp { get; set; } = DateTime.Now;
+    private string? currentSeverity
+    {
+        get => SeverityParameter ?? "all";
+        set
+        {
+            SeverityParameter = value;
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
 
-    private string? filterString { get; set; } = null;
+    private string? currentFilter
+    {
+        get => FilterParameter ?? string.Empty;
+        set
+        {
+            FilterParameter = value;
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
+
+    private DateTime? currentTimestamp
+    {
+        get => TimestampParameter != null && TimestampParameter != "null" 
+            ? DateTime.Parse(TimestampParameter) 
+            : null;
+        set
+        {
+            TimestampParameter = value?.ToString("yyyy-MM-dd");
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
 
     private bool detailsDrawer { get; set; } = false;
 
@@ -40,6 +95,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     protected override async Task OnInitializedAsync()
     {
+        TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
         await LoadLogs();
 
         WebSocketService.LogsUpdated += OnLogsUpdated;

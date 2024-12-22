@@ -15,13 +15,49 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
     [Inject]
     WebSocketService WebSocketService { get; set; }
 
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+
     private List<MetricsRoot> allMetrics { get; set; } = new();
 
-    private string? currentResource { get; set; } = null;
-
-    private Metric? currentMetric { get; set; } = null;
-
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
+
+    [Parameter]
+    public string? ResourceParameter { get; set; }
+
+    [Parameter]
+    public string? MetricParameter { get; set; }
+
+    private string currentRoute
+        => $"/metrics/{currentResource}/{currentMetric?.Name.Replace(".", "-") ?? "null"}";
+
+    private string? currentResource
+    {
+        get => ResourceParameter ?? null;
+        set
+        {
+            ResourceParameter = value;
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
+
+    private Metric? currentMetric
+    {
+        get
+        {
+            if (MetricParameter == null || MetricParameter == "null")
+            {
+                return null;
+            }
+
+            return allMetrics.FirstOrDefault(x => x.GetResource().GetResourceName() == currentResource)?.GetMetrics(MetricParameter.Replace("-", "."))[0];
+        }
+        set
+        {
+            MetricParameter = value?.Name;
+            NavigationManager.NavigateTo(currentRoute);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
