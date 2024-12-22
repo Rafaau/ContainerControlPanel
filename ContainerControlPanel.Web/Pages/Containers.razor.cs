@@ -29,9 +29,21 @@ public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
     [Inject]
     IMemoryCache MemoryCache { get; set; }
 
+    [Parameter]
+    public string? LiveFilter { get; set; }
+
+    private bool liveFilter
+    {
+        get => bool.Parse(LiveFilter ?? "false");
+        set
+        {
+            LiveFilter = value.ToString();
+            NavigationManager.NavigateTo($"/{value}");
+        }
+    }
+
     private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
-    private bool liveFilter { get; set; } = true;
 
     private bool _open;
     private Anchor _anchor;
@@ -39,6 +51,7 @@ public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        LiveFilter ??= "true";
         await LoadContainers(false);
 
         if (bool.Parse(Configuration["Realtime"]))
