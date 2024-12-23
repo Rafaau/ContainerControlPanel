@@ -23,7 +23,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
     [Inject]
-    NavigationManager NavigationManager { get; set; }
+    NavigationManager NavigationManager { get; set; } 
 
     [Inject]
     IMemoryCache MemoryCache { get; set; }
@@ -49,6 +49,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             ResourceParameter = value;
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastTracesHref", currentRoute);
         }
     }
 
@@ -59,6 +60,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             RoutesOnlyParameter = value.ToString();
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastTracesHref", currentRoute);
         }
     }
 
@@ -71,6 +73,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             TimestampParameter = value?.ToString("yyyy-MM-dd");
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastTracesHref", currentRoute);
         }
     }
 
@@ -80,7 +83,14 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
+        if (MemoryCache.TryGetValue("lastTracesHref", out string cachedHref))
+        {
+            NavigationManager.NavigateTo(cachedHref);
+        }
+        else
+        {
+            TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
+        }
         await LoadTraces();
 
         WebSocketService.TracesUpdated += OnTracesUpdated;

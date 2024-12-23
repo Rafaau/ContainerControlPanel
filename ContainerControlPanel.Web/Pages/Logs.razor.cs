@@ -2,11 +2,12 @@ using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Interfaces;
 using Majorsoft.Blazor.Components.Common.JsInterop.Scroll;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Logs(IContainerAPI containerAPI)
+public partial class Logs(IContainerAPI containerAPI) : IDisposable
 {
     [Inject]
     IConfiguration configuration { get; set; }
@@ -15,10 +16,13 @@ public partial class Logs(IContainerAPI containerAPI)
     IScrollHandler scrollHandler { get; set; }
 
     [Inject]
-    NavigationManager navManager { get; set; }
+    NavigationManager NavigationManager { get; set; }
 
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
+
+    [Inject]
+    IMemoryCache MemoryCache { get; set; }
 
     [Parameter]
     public string? ContainerId { get; set; }
@@ -29,16 +33,23 @@ public partial class Logs(IContainerAPI containerAPI)
     [Parameter]
     public string? FilterDate { get; set; }
 
+    private string currentRoute
+        => $"/logs/{containerId ?? "null"}/{filterDate?.ToString("yyyy-MM-dd") ?? "null"}";
+
     private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
     private string logs = string.Empty;
-    private Container _container = null;
-    private Container container {
-        get => _container;
+
+    private string? containerId
+    {
+        get => ContainerId != null && ContainerId != "null"
+            ? ContainerId
+            : null;
         set
         {
-            _container = value;         
-            navManager.NavigateTo($"{navManager.BaseUri}logs/{value.ContainerId}/{filterDate.Value.ToString("yyyyMMdd")}");
+            ContainerId = value;
+            NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastLogsHref", currentRoute);
             firstScroll = false;
             LoadLogs();
         }
@@ -55,15 +66,16 @@ public partial class Logs(IContainerAPI containerAPI)
             LoadLogs();
         }
     }
-    private DateTime? _filterDate = DateTime.Now;
     private DateTime? filterDate
     {
-        get => _filterDate;
+        get => FilterDate != null && FilterDate != "null" 
+            ? DateTime.ParseExact(FilterDate, "yyyy-MM-dd", null) 
+            : null;
         set
         {
-            _filterDate = value;
-            if (ContainerId != null)
-                navManager.NavigateTo($"{navManager.BaseUri}logs/{ContainerId}/{value.Value.ToString("yyyyMMdd")}");
+            FilterDate = value?.ToString("yyyy-MM-dd");
+            NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastLogsHref", currentRoute);
             firstScroll = false;
             LoadLogs();
         }
@@ -93,29 +105,36 @@ public partial class Logs(IContainerAPI containerAPI)
     private bool firstScroll { get; set; } = false;
     private bool enableColors { get; set; } = false;
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
         await LoadContainers(false);
 
-        if (containers.Count > 0 && ContainerId != null)
+        if (MemoryCache.TryGetValue("lastLogsHref", out string cachedHref))
         {
-            container = containers.Find(c => c.ContainerId == ContainerId);
-
-            if (Timestamp != null)
-                timestamp = Timestamp;
-
-            if (FilterDate != null)
-                filterDate = DateTime.ParseExact(FilterDate, "yyyyMMdd", null);
+            NavigationManager.NavigateTo(cachedHref);
+        }
+        else
+        {
+            FilterDate ??= DateTime.Now.ToString("yyyy-MM-dd");
         }
 
         if (bool.Parse(configuration["Realtime"]))
         {
             _ = Task.Run(async () =>
             {
-                while (true)
-                {                    
-                    await LoadLogs();
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                while (_cts.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        await LoadContainers(true);
+                        await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                 }
             });
         }
@@ -123,12 +142,39 @@ public partial class Logs(IContainerAPI containerAPI)
 
     private async Task LoadContainers(bool force)
     {
-        containers = await containerAPI.GetContainers(force, true);
+        if (MemoryCache.TryGetValue("containers", out List<Container> cachedContainers) && !force)
+        {
+            containers = cachedContainers;
+            this.StateHasChanged();
+
+            var result = await containerAPI.GetContainers(force, true);
+
+            if (result.Count != containers.Count)
+            {
+                MemoryCache.Set("containers", result);
+                containers = result;
+                this.StateHasChanged();
+            }
+        }
+        else
+        {
+            var result = await containerAPI.GetContainers(force, true);
+            MemoryCache.Set("containers", result);
+            containers = result;
+            this.StateHasChanged();
+        }
     }
 
     private async Task LoadLogs()
     {
-        if (string.IsNullOrWhiteSpace(container?.ContainerId))
+        if (logs.Count() == 0
+            && MemoryCache.TryGetValue("logs", out string cachedLogs))
+        {
+            logs = cachedLogs;
+            this.StateHasChanged();
+        }
+
+        if (string.IsNullOrWhiteSpace(containerId))
         {
             return;
         }
@@ -144,13 +190,21 @@ public partial class Logs(IContainerAPI containerAPI)
             filterString += $"&date={filterDate.Value.ToShortDateString()}&timeFrom={timeFrom.ToString()}&timeTo={timeTo.ToString()}";
         }
 
-        logs = await containerAPI.GetContainerLogs(container.ContainerId, timestamp, filterDate, timeFrom.ToString(), timeTo.ToString());
+        logs = await containerAPI.GetContainerLogs(containerId, timestamp, filterDate, timeFrom.ToString(), timeTo.ToString());
         this.StateHasChanged();
-     
+
+        MemoryCache.Set("logs", logs);
+
         if (!firstScroll)
         {
             await scrollHandler.ScrollToElementByIdAsync("logs-bottom");
             firstScroll = true;
         }   
+    }
+
+    public void Dispose()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
     }
 }

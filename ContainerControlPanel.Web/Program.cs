@@ -11,7 +11,6 @@ using Microsoft.JSInterop;
 using MudBlazor.Services;
 using Refit;
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

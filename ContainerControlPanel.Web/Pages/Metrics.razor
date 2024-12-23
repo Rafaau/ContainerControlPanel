@@ -13,7 +13,6 @@
 <div class="flex">
 	<div style="margin-left: 26px; margin-bottom: 24px; width: 200px;">
 		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
-			<MudSelectItem T="string" Value="@(null)">(None)</MudSelectItem>
 			@if (allMetrics.Count > 0)
 			{
 				@foreach (var resource in allMetrics.GetResources().GetResourceNames())
@@ -53,7 +52,7 @@
 						{
 							<MudListItem>
 								<span @onclick="() => { currentMetric = metric; }">
-									@metric
+									@metric.Name
 								</span>							
 							</MudListItem>
 						}				

@@ -1,8 +1,8 @@
 using ContainerControlPanel.Domain.Models;
-using ContainerControlPanel.Web.Components.Metrics;
 using ContainerControlPanel.Web.Interfaces;
 using ContainerControlPanel.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
 
 namespace ContainerControlPanel.Web.Pages;
@@ -17,6 +17,9 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     [Inject]
     NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    IMemoryCache MemoryCache { get; set; }
 
     private List<MetricsRoot> allMetrics { get; set; } = new();
 
@@ -38,6 +41,7 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             ResourceParameter = value;
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastMetricsHref", currentRoute);
         }
     }
 
@@ -56,11 +60,17 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             MetricParameter = value?.Name;
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastMetricsHref", currentRoute);
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
+        if (MemoryCache.TryGetValue("lastMetricsHref", out string cachedHref))
+        {
+            NavigationManager.NavigateTo(cachedHref);
+        }
+
         allMetrics = await telemetryAPI.GetMetrics();
         this.StateHasChanged();
 

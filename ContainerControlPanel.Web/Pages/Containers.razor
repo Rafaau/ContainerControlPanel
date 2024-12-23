@@ -1,5 +1,6 @@
 ﻿@page "/"
-@page "/{LiveFilter}"
+@page "/containers"
+@page "/containers/{LiveFilter}"
 
 @using MudBlazor
 @using Locales
@@ -14,7 +15,7 @@
 		</svg>
 	}
 	<div style="margin-left: auto; width: 200px;">
-		<MudSelect T="bool" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="liveFilter">		
+		<MudSelect Immediate="true" T="bool" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="liveFilter">		
 			<MudSelectItem Value="true">@Localizer[Resource.Running]</MudSelectItem>
 			<MudSelectItem Value="false">@Localizer[Resource.All]</MudSelectItem>
 		</MudSelect>

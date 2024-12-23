@@ -54,6 +54,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         {
             ResourceParameter = value;
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastStructuredLogsHref", currentRoute);
         }
     }
 
@@ -64,6 +65,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         {
             SeverityParameter = value;
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastStructuredLogsHref", currentRoute);
         }
     }
 
@@ -74,6 +76,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         {
             FilterParameter = value;
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastStructuredLogsHref", currentRoute);
         }
     }
 
@@ -86,6 +89,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         {
             TimestampParameter = value?.ToString("yyyy-MM-dd");
             NavigationManager.NavigateTo(currentRoute);
+            MemoryCache.Set("lastStructuredLogsHref", currentRoute);
         }
     }
 
@@ -95,7 +99,15 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     protected override async Task OnInitializedAsync()
     {
-        TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
+        if (MemoryCache.TryGetValue("lastStructuredLogsHref", out string cachedHref))
+        {
+            NavigationManager.NavigateTo(cachedHref);
+        }
+        else
+        {
+            TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
+        }
+        
         await LoadLogs();
 
         WebSocketService.LogsUpdated += OnLogsUpdated;
@@ -104,7 +116,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private async Task LoadLogs()
     {
-        if (MemoryCache.TryGetValue("logs", out List<LogsRoot> cachedLogs))
+        if (MemoryCache.TryGetValue("structuredlogs", out List<LogsRoot> cachedLogs))
         {
             logsRoot = cachedLogs;
             this.StateHasChanged();
@@ -113,7 +125,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
             if (result.Count != logsRoot.Count)
             {
-                MemoryCache.Set("logs", result);
+                MemoryCache.Set("structuredlogs", result);
                 logsRoot = result;
                 this.StateHasChanged();
             }
@@ -121,7 +133,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         else
         {
             var result = await telemetryAPI.GetLogs();
-            MemoryCache.Set("logs", result);
+            MemoryCache.Set("structuredlogs", result);
             logsRoot = result;
             this.StateHasChanged();
         }
@@ -132,7 +144,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         if (log != null)
         {
             logsRoot.Add(log);
-            MemoryCache.Set("logs", logsRoot);
+            MemoryCache.Set("structuredlogs", logsRoot);
             this.StateHasChanged();
         }
     }

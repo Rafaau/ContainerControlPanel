@@ -9,7 +9,7 @@ using MudBlazor;
 
 namespace ContainerControlPanel.Web.Pages;
 
-public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
+public partial class Containers(IContainerAPI containerAPI) : IDisposable
 {
     [Inject]
     IServiceProvider ServiceProvider { get; set; }
@@ -38,7 +38,8 @@ public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
         set
         {
             LiveFilter = value.ToString();
-            NavigationManager.NavigateTo($"/{value}");
+            NavigationManager.NavigateTo($"/containers/{value}");
+            MemoryCache.Set("lastContainersHref", $"/containers/{value}");
         }
     }
 
@@ -49,19 +50,36 @@ public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
     private Anchor _anchor;
     private string _width, _height;
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
-        LiveFilter ??= "true";
-        await LoadContainers(false);
+        if (MemoryCache.TryGetValue("lastContainersHref", out string cachedHref))
+        {
+            NavigationManager.NavigateTo(cachedHref);
+        }
+        else
+        {
+            LiveFilter ??= "true";
+        }
+
+        await LoadContainers(true);
 
         if (bool.Parse(Configuration["Realtime"]))
         {
             _ = Task.Run(async () =>
             {
-                while (true)
+                while (!_cts.Token.IsCancellationRequested)
                 {
-                    await LoadContainers(true);
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    try
+                    {
+                        await LoadContainers(true);
+                        await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                 }
             });
         }   
@@ -69,19 +87,11 @@ public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
 
     private async Task LoadContainers(bool force)
     {
-        if (MemoryCache.TryGetValue("containers", out List<Container> cachedContainers) && !force)
+        if (containers.Count() == 0
+            && MemoryCache.TryGetValue("containers", out List<Container> cachedContainers))
         {
             containers = cachedContainers;
             this.StateHasChanged();
-
-            var result = await containerAPI.GetContainers(force, liveFilter);
-
-            if (result.Count != containers.Count)
-            {
-                MemoryCache.Set("containers", result);
-                containers = result;
-                this.StateHasChanged();
-            }
         }
         else
         {
@@ -174,8 +184,9 @@ public partial class Containers(IContainerAPI containerAPI) : IAsyncDisposable
         NavigationManager.NavigateTo($"/logs/{containerId}");
     }
 
-    public ValueTask DisposeAsync()
+    public void Dispose()
     {
-        return ValueTask.CompletedTask;
+        _cts.Cancel();
+        _cts.Dispose();
     }
 }

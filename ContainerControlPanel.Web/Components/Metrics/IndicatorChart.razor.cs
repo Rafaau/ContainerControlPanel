@@ -44,7 +44,7 @@ public partial class IndicatorChart
         if (Value != 0 && Range != null)
         {
             data.First().As<Indicator>().Gauge.Bar.Color =
-            Value < (decimal)Range[1] / 2
+            Value < (decimal)Range[1] / 1.8m
                 ? "#009c1e"
                 : Value > (decimal)Range[1] / 1.5m
                     ? "#b00000"
