@@ -124,11 +124,11 @@ public partial class Logs(IContainerAPI containerAPI) : IDisposable
         {
             _ = Task.Run(async () =>
             {
-                while (_cts.Token.IsCancellationRequested)
+                while (!_cts.Token.IsCancellationRequested)
                 {
                     try
                     {
-                        await LoadContainers(true);
+                        await LoadLogs();
                         await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
                     }
                     catch (TaskCanceledException)
