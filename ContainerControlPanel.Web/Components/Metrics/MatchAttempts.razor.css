@@ -1,0 +1,17 @@
+﻿.chart-container {
+	position: relative;
+}
+
+.timestamp-select {
+	position: absolute;
+	left: 663px;
+	top: 85px;
+	width: 180px;
+}
+
+.current-route {
+	position: absolute;
+	left: 730px;
+	top: 93px;
+	z-index: 2;
+}

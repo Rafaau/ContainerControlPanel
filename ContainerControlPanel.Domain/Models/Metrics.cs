@@ -141,7 +141,7 @@ public static class MetricsExtensions
                        .ToList();
 
     public static string GetRouteName(this DataPoint dataPoint)
-        => dataPoint.Attributes?.FirstOrDefault(a => a.Key == "http.route")?.Value?.StringValue ?? string.Empty;
+        => dataPoint?.Attributes?.FirstOrDefault(a => a.Key == "http.route")?.Value?.StringValue ?? string.Empty;
 
     public static string CalculateP50Seconds(this DataPoint dataPoint)
         => CalculatePercentile(dataPoint, 50).ToString("0.000");
@@ -193,4 +193,9 @@ public static class MetricsExtensions
         string formatted = value.ToString("0.###"); // Ucinanie do trzech miejsc dziesiętnych
         return double.Parse(formatted);
     }
+
+    private static DateTime GetDataPointTimestamp(this DataPoint dataPoint, int timeOffset)
+        => DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(Math.Round(decimal.Parse(dataPoint.StartTimeUnixNano) / 1000000)))
+                         .AddHours(timeOffset)
+                         .DateTime;
 }

@@ -64,6 +64,12 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         }
     }
 
+    private readonly List<string> compatibleMetrics = new()
+    {
+        "http.server.request.duration",
+        "aspnetcore.routing.match_attempts",
+    };
+
     protected override async Task OnInitializedAsync()
     {
         if (MemoryCache.TryGetValue("lastMetricsHref", out string cachedHref))
@@ -90,11 +96,6 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
                 {
                     allMetrics.Remove(current);
                     allMetrics.Add(metricsRoot);
-
-                    if (currentResource == metricsRoot.GetResource().GetResourceName())
-                    {
-                        currentMetric = metricsRoot.GetMetrics("http.server.request.duration")[0];
-                    }
                 }
             }
             else
