@@ -99,22 +99,24 @@
 						@container.Created.ToString("dd/MM/yyyy")
 					</div>
 					<div class="data-grid-cell">
-						@if (!container.Status.Contains("Exited"))
-						{
-							<MudTooltip Text="@Localizer[Resource.Stop]">
-								<MudIconButton @onclick="async () => { await StopContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Stop"/>
-							</MudTooltip>
-							<MudTooltip Text="@Localizer[Resource.Restart]">
-								<MudIconButton @onclick="async () => { await RestartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
-							</MudTooltip>
-						}
-						else
-						{
-							<MudTooltip Text="@Localizer[Resource.Start]">
-								<MudIconButton @onclick="async () => { await StartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.PlayArrow" />
-							</MudTooltip>
-						}
-						<MudDivider Vertical="true" FlexItem="true" Class="opacity-100 mx-2"/>
+						<AuthorizeView Roles="Administrator">
+							@if (!container.Status.Contains("Exited"))
+							{
+								<MudTooltip Text="@Localizer[Resource.Stop]">
+									<MudIconButton @onclick="async () => { await StopContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Stop"/>
+								</MudTooltip>
+								<MudTooltip Text="@Localizer[Resource.Restart]">
+									<MudIconButton @onclick="async () => { await RestartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+								</MudTooltip>
+							}
+							else
+							{
+								<MudTooltip Text="@Localizer[Resource.Start]">
+									<MudIconButton @onclick="async () => { await StartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.PlayArrow" />
+								</MudTooltip>
+							}
+							<MudDivider Vertical="true" FlexItem="true" Class="opacity-100 mx-2"/>
+						</AuthorizeView>
 						<MudMenu AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Color="Color.Dark">
 							<ActivatorContent>
 								<MudTooltip Text="@Localizer[Resource.More]">

@@ -53,7 +53,8 @@ public partial class MainLayout
 
     protected override async Task OnInitializedAsync()
     {
-        if (Configuration["Token"] == null)
+        if (Configuration["UserToken"] == null
+            && Configuration["AdminToken"] == null)
         {
             token = null;
             await Authenticate(reload: false);
@@ -70,14 +71,15 @@ public partial class MainLayout
     {
         if (keyboardEventArgs != null && keyboardEventArgs.Code != "Enter") return;
 
-        if (token == Configuration["Token"])
+        if (token == Configuration["UserToken"] 
+            || token == Configuration["AdminToken"])
         {
             invalidToken = false;
             var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
             await customAuthStateProvider.UpdateAuthenticationState(new UserSession
             {
-                UserName = "Admin",
-                Role = "Admin",
+                UserName = token == Configuration["UserToken"] ? "User" : "Admin",
+                Role = token == Configuration["UserToken"] ? "User" : "Administrator",
                 Token = token,
                 ExpiresIn = 30
             });
