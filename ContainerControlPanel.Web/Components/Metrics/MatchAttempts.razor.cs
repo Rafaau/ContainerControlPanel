@@ -33,7 +33,25 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
 
     ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private DataPoint? currentDataPoint { get; set; } = null;
+    private List<ResourceSpan> traces { get; set; }
+
+    private string? currentDataPoint { get; set; } = "all";
+
+    private List<ResourceSpan> filteredTraces
+    {
+        get
+        {
+            if (currentDataPoint == "all")
+            {
+                return traces;
+            }
+            return traces.Where(x => x.ContainsRoute(currentDataPoint)).ToList();
+        }
+    }
+
+    private int timestamp = 5;
+    private decimal averageDuration;
+    private List<object> minMaxDuration;
 
     PlotlyChart chart;
     Plotly.Blazor.Config config;
@@ -42,10 +60,6 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
     private CancellationTokenSource cancellationToken;
     private BlockingCollection<DataJob> queue;
     private event EventHandler<DataJob> DataEvent;
-    private int timestamp = 5;
-    private List<ResourceSpan> traces;
-    private decimal averageDuration;
-    private List<object> minMaxDuration;
     private IndicatorChart averageDurationIndicator;
 
     protected override async Task OnInitializedAsync()
@@ -154,17 +168,17 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
 
                 var may = new List<object>
                 {
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.9), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.8), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.7), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.6), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.5), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.4), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.3), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.2), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.1), int.Parse(Configuration["TimeOffset"])) ?? 0,
-                    traces?.Count() ?? 0
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.9), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.8), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.7), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.6), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.5), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.4), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.3), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.2), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.GetMatchAttemptsByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.1), int.Parse(Configuration["TimeOffset"])) ?? 0,
+                    filteredTraces?.Count() ?? 0
                 };
 
                 DataEvent?.Invoke(this, new DataJob(new DataEventArgs(max, may, 0), chart, data));

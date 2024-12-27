@@ -163,6 +163,7 @@
 	align-items: center;
 	cursor: pointer;
 	padding-top: 15px;
+	user-select: none;
 }
 
 	.tab:nth-child(2) {
@@ -207,3 +208,12 @@
 	right: 20px;
 	cursor: pointer;
 }
+
+.disabled {
+	color: #484848;
+	cursor: auto;
+}
+
+	.disabled:hover {
+		background-color: #2B2B2B;
+	}

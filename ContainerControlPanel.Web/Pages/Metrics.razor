@@ -34,11 +34,11 @@
 	</div>
 }
 
-@if (currentResource != null)
+@if (currentResource != null && allMetrics.Count > 0)
 {
 	<div class="metrics-list">
 		<MudList T="string">
-		@foreach (var scopeMetric in allMetrics.GetScopeMetricsByResource(currentResource))
+		@foreach (var scopeMetric in allMetrics[0].GetScopeMetricsByResource(currentResource))
 		{
 			<div class="position-relative">
 				<span class="expand-icon">

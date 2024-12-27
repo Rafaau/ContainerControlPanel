@@ -81,3 +81,17 @@
 	top: 143px;
 	left: 650px;
 }
+
+::deep .xgrid {
+	stroke: #484848 !important;
+	stroke-width: 0.5px !important;
+}
+
+::deep .crisp {
+	stroke: #484848 !important;
+}
+
+::deep .xangularaxistick {
+	stroke: white !important;
+	stroke-width: 0.1px !important;
+}

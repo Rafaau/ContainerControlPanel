@@ -153,8 +153,14 @@
 .data-container {
 	position: absolute;
 	overflow: auto;
-	bottom: 0;
+	bottom: 35px;
 	top: 229px;
 	left: 0;
 	right: 0;
+}
+
+.footer {
+	position: absolute;
+	bottom: 6px;
+	left: 22px;
 }

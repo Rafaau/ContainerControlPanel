@@ -342,4 +342,7 @@
   <data name="Today" xml:space="preserve">
     <value>Dzisiaj</value>
   </data>
+  <data name="TotalNumberOfFoundLogs" xml:space="preserve">
+    <value>Łączna liczba znalezionych wyników</value>
+  </data>
 </root>

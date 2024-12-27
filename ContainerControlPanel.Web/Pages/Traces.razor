@@ -57,66 +57,78 @@
 	</div>
 	@if (traces.Count < 1)
 	{
-		<div class="data-grid-row data" style="text-align: center;">
+		<div class="not-found">
 			@Localizer[Locales.Resource.NoTracesFound].
 		</div>
 	}
 	else 
 	{
-		<div class="data-container">
-			@foreach (var trace in traces)
+		<div class="data-container">			
+			@{
+				var groupedTraces = traces.GroupTraces(int.Parse(Configuration["TimeOffset"]));
+			}
+			@foreach (var trace in groupedTraces)
 			{
-				<div @onclick="() => { LoadTrace(trace.GetTraceId()); }" class="data-grid-row data">
+				<div @onclick="() => { LoadTrace(trace.TraceId); }" class="data-grid-row data">
 					<div class="data-grid-cell">
-						@{
-							DateTime timestamp = trace.GetTimestamp(int.Parse(Configuration["TimeOffset"]));
-						}
-						@if (timestamp.Date == DateTime.Now.Date)
+						@if (trace.Timestamp.Date == DateTime.Now.Date)
 						{
 							<span class="timestamp-span">
 								@Localizer[Locales.Resource.Today]
 							</span>
 						}
-						@if (timestamp.Date == DateTime.Now.AddDays(-1).Date) 
+						@if (trace.Timestamp.Date == DateTime.Now.AddDays(-1).Date)
 						{
 							<span class="timestamp-span">
 								@Localizer[Locales.Resource.Yesterday]
 							</span>
 						}
-						else if (timestamp.Date == DateTime.Now.AddDays(-2).Date)
+						else if (trace.Timestamp.Date == DateTime.Now.AddDays(-2).Date)
 						{
 							<span class="timestamp-span">
 								@Localizer[Locales.Resource._2DaysAgo]
 							</span>
 						}
-						else if (timestamp.Date != DateTime.Now.Date)
+						else if (trace.Timestamp.Date != DateTime.Now.Date)
 						{
 							<span class="timestamp-span">
-								@timestamp.ToString("dd MMMM")
+								@trace.Timestamp.ToString("dd MMMM")
 							</span>
 						}
-						@timestamp.ToString("HH:mm:ss")
+						@trace.Timestamp.ToString("HH:mm:ss")
 					</div>
 					<div class="data-grid-cell">
-						@trace.GetTraceName()
+						<div class="text-overflow">@trace.Request</div>
 						<div class="trace-id">
-							@trace.GetTraceId()
+							@trace.TraceId
 						</div>
 					</div>
 					<div class="data-grid-cell">
-						<div class="service-name-container">
-							<div class="service-name-badge" style="background-color: #@(GetHexString(@trace.GetServiceName()))"></div>
-							@trace.GetServiceName()
-						</div>
+						@{
+							var groupedSources = trace.Source
+								.GroupBy(x => x)
+								.Select(group => new { Name = group.Key, Count = group.Count() })
+								.OrderByDescending(group => group.Count)
+								.ToList();
+						}
+						@foreach (var group in groupedSources)
+						{
+							<div class="service-name-container">
+								<div class="service-name-badge" style="background-color: #@(GetHexString(group.Name))">									
+								</div>
+								@group.Name (@group.Count)
+							</div>
+						}
+
 					</div>
 					<div class="data-grid-cell">
-						@trace.GetDuration().FormatDuration(false)
+						@trace.Duration.FormatDuration(false)
 					</div>
-				</div>
+				</div>				
 			}
-		</div>	
+		</div>
+		<div class="footer">
+			@Localizer[Locales.Resource.TotalNumberOfFoundTraces]: <b>@groupedTraces.Count</b>
+		</div>
 	}
-</div>
-<div class="footer">
-	@Localizer[Locales.Resource.TotalNumberOfFoundTraces]: <b>@traces.Count</b>
 </div>

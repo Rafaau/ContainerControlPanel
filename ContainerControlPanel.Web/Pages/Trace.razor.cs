@@ -26,7 +26,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private TracesRoot trace { get; set; }
+    private List<TracesRoot> traceRoots { get; set; } = new();
 
     private List<Span> spans { get; set; }
 
@@ -56,7 +56,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private async Task LoadTrace()
     {
-        trace = await telemetryAPI.GetTrace(TraceId);
+        traceRoots = await telemetryAPI.GetTrace(TraceId);
         LoadSpans();
     }
 
@@ -68,13 +68,13 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
         {
             requestResponse = result.Content;
 
-            if (requestResponse.Request.Body != null)
+            if (requestResponse?.Request?.Body != null)
             {
                 var json = JsonSerializer.Serialize(requestResponse.Request.Body, new JsonSerializerOptions { WriteIndented = true });
                 formattedRequestJson = await JS.InvokeAsync<string>("colorizeJson", json);
             }
             
-            if (requestResponse.Response != null)
+            if (requestResponse?.Response != null)
             {
                 var preJson = JsonObject.Parse(requestResponse.Response);
                 var json = JsonSerializer.Serialize(preJson, new JsonSerializerOptions { WriteIndented = true });
@@ -85,8 +85,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private void LoadSpans()
     {
-        spans = trace.ResourceSpans
-            .SelectMany(x => x.ScopeSpans.Select(x => x.Spans[0]))
+        spans = traceRoots
+            .SelectMany(x => x.ResourceSpans.SelectMany(x => x.ScopeSpans.Select(x => x.Spans[0])))
             .OrderByDescending(s => s.GetDuration())
             .ToList();
 

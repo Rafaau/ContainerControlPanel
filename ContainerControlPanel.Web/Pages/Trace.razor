@@ -41,20 +41,20 @@
 	}
 </script>
 
-@if (trace != null) 
+@if (traceRoots.Count > 0) 
 {
 	<div class="flex">
 		<div class="label">
-			@trace.ResourceSpans[0].GetServiceName(): @trace.ResourceSpans[0].GetTraceName()
+			@traceRoots[0].ResourceSpans[0].GetServiceName(): @traceRoots[0].ResourceSpans[0].GetTraceName()
 		</div>
 		<div class="trace-id">
-			@trace.GetTraceId()
+			@traceRoots[0].GetTraceId()
 		</div>
 	</div>
 	<div class="flex">
 		@Localizer[Locales.Resource.TraceDetails]:
 		<span class="details-span">
-			<b>@trace.ResourceSpans[0].GetTimestamp(int.Parse(Configuration["TimeOffset"])).ToString("dd.MM.yyyy HH:mm:ss")</b>
+			<b>@traceRoots[0].ResourceSpans[0].GetTimestamp(int.Parse(Configuration["TimeOffset"])).ToString("dd.MM.yyyy HH:mm:ss")</b>
 		</span>	
 		@Localizer[Locales.Resource.Duration]:
 		<span class="details-span">
@@ -62,7 +62,7 @@
 		</span>
 		@Localizer[Locales.Resource.Resources]:
 		<span class="details-span">
-			<b>@trace.ResourceSpans.Count</b>
+			<b>@traceRoots[0].ResourceSpans.Count</b>
 		</span>
 		@Localizer[Locales.Resource.Depth]:
 		<span class="details-span">
@@ -98,7 +98,7 @@
 					@if (index == 0) 
 					{
 						<span>
-							<svg class="span-kind-icon" style="filter: saturate(2000%); width: 16px; margin-right: 6px; fill: @($"#{GetHexString(@trace.ResourceSpans[0].GetServiceName())}");" focusable="false" viewBox="0 0 16 16" aria-hidden="true">
+							<svg class="span-kind-icon" style="filter: saturate(2000%); width: 16px; margin-right: 6px; fill: @($"#{GetHexString(@traceRoots[0].ResourceSpans[0].GetServiceName())}");" focusable="false" viewBox="0 0 16 16" aria-hidden="true">
 								<path d="M11.41 1.59A2 2 0 0 0 10 1H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3a2 2 0 0 0-.59-1.41ZM9.85 12.85a.5.5 0 0 1-.35.15h-3a.5.5 0 1 1 0-1h3a.5.5 0 0 1 .35.85Zm0-2a.5.5 0 0 1-.35.15h-3a.5.5 0 1 1 0-1h3a.5.5 0 0 1 .35.85Zm0-6A.5.5 0 0 1 9.5 5h-3a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.85Z"></path>
 							</svg>
 						</span>
@@ -118,8 +118,8 @@
 				</div>
 				<div class="data-grid-cell">
 					<div 
-					class="duration-marker" 
-					style="background-color: @($"#{GetHexString(@trace.ResourceSpans[0].GetServiceName())}");
+					class="duration-marker"
+						style="background-color: @($"#{GetHexString(@traceRoots[0].ResourceSpans[0].GetServiceName())}");
 							   width: @(GetMarkerWidth(span));
 							   left: @(GetMarkerLeft(span));">
 					</div>
@@ -188,57 +188,60 @@
 			}
 			else 
 			{
-				<div class="details-label">@Localizer[Locales.Resource.Request]</div>
-				<div class="tabs">
-					<div @onclick="() => { requestTab = RequestTab.Headers; }" class="tab @(requestTab == RequestTab.Headers ? "active" : "")">Headers</div>
-					<div @onclick="() => { requestTab = RequestTab.Params; }" class="tab @(requestTab == RequestTab.Params ? "active" : "")">Params</div>
-					<div @onclick="() => { requestTab = RequestTab.Body; }" class="tab @(requestTab == RequestTab.Body ? "active" : "")">Body</div>
-				</div>
-				@switch (requestTab)
+				@if (requestResponse.Request != null) 
 				{
-					case RequestTab.Headers:
-						<div class="request-content">
-							@foreach (var header in requestResponse.Request.Headers.GetHeaders())
-							{
-								<div class="details-row">
-									<div>@header.Key</div>
-									<div class="text-overflow">@header.Value</div>
-								</div>
-							}
-						</div>
-						break;
-
-					case RequestTab.Params:
-						<div class="request-content">
-							@foreach (var param in requestResponse.Request.Query)
-							{
-								<div class="details-row">
-									<div>@param.Key</div>
-									<div class="text-overflow">@param.Value[0]</div>
-								</div>
-							}
-						</div>
-						break;
-
-					case RequestTab.Body:
-						<div class="request-content json">
-							<div class="copy">
-							<MudTooltip Text="Copy to clipboard">
-								<svg @onclick="() => { CopyToClipboard(requestResponse.Request.Body.ToString()); }" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
-									<path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
-								</svg>
-							</MudTooltip>
+					<div class="details-label">@Localizer[Locales.Resource.Request]</div>
+					<div class="tabs">
+						<div @onclick="() => { requestTab = RequestTab.Headers; }" class="tab @(requestTab == RequestTab.Headers ? "active" : "")">Headers</div>
+						<div @onclick="() => { requestTab = requestResponse.Request.Query.Count > 0 ? RequestTab.Params : requestTab; }" class="tab @(requestTab == RequestTab.Params ? "active" : "") @(requestResponse.Request.Query.Count < 1 ? "disabled" : "")">Params</div>
+						<div @onclick="() => { requestTab = requestResponse.Request.Body != null ? RequestTab.Body : requestTab; }" class="tab @(requestTab == RequestTab.Body ? "active" : "") @(requestResponse.Request.Body == null ? "disabled" : "")">Body</div>
+					</div>
+					@switch (requestTab)
+					{
+						case RequestTab.Headers:
+							<div class="request-content">
+								@foreach (var header in requestResponse.Request.Headers.GetHeaders())
+								{
+									<div class="details-row">
+										<div>@header.Key</div>
+										<div class="text-overflow">@header.Value</div>
+									</div>
+								}
 							</div>
-							<pre>
-								@((MarkupString)formattedRequestJson)
-							</pre>
-						</div>
-						break;
+							break;
 
-					default:
-						<div></div>
-						break;
-				}
+						case RequestTab.Params:
+							<div class="request-content">
+								@foreach (var param in requestResponse.Request.Query)
+								{
+									<div class="details-row">
+										<div>@param.Key</div>
+										<div class="text-overflow">@param.Value[0]</div>
+									</div>
+								}
+							</div>
+							break;
+
+						case RequestTab.Body:
+							<div class="request-content json">
+								<div class="copy">
+									<MudTooltip Text="Copy to clipboard">
+										<svg @onclick="() => { CopyToClipboard(requestResponse.Request.Body.ToString()); }" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+											<path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+										</svg>
+									</MudTooltip>
+								</div>
+								<pre>
+									@((MarkupString)formattedRequestJson)
+												</pre>
+							</div>
+							break;
+
+						default:
+							<div></div>
+							break;
+					}
+				}				
 				@if (requestResponse.Response != null)
 				{
 					<div class="details-label">@Localizer[Locales.Resource.Response]</div>

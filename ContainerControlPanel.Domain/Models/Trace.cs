@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
@@ -6,6 +8,14 @@ public class TracesRoot
 {
     [JsonPropertyName("resourceSpans")]
     public List<ResourceSpan> ResourceSpans { get; set; }
+
+    public TracesRoot Clone()
+    {
+        return new TracesRoot
+        {
+            ResourceSpans = new List<ResourceSpan>(ResourceSpans)
+        };
+    }
 }
 
 public class Attribute
@@ -80,6 +90,15 @@ public class Value
     public string IntValue { get; set; }
 }
 
+public class TraceListItemView
+{
+    public DateTime Timestamp { get; set; }
+    public string Request { get; set; }
+    public string TraceId { get; set; }
+    public List<string> Source { get; set; }
+    public TimeSpan Duration { get; set; }
+}
+
 public static class TracesExtensions
 {
     public static List<ResourceSpan> GetTracesList(
@@ -124,8 +143,7 @@ public static class TracesExtensions
             ?? resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue;
 
     public static string GetTraceName(this ResourceSpan resourceSpan)
-        => resourceSpan.ScopeSpans.Find(x => !x.Scope.Name.Equals("System.Net.Http")).Spans[0].Name
-            ?? resourceSpan.ScopeSpans[0].Spans[0].Name;
+        => resourceSpan.ScopeSpans[0].Spans[0].Name;
 
     public static TimeSpan GetDuration(this ResourceSpan resourceSpan)
     {
@@ -146,6 +164,13 @@ public static class TracesExtensions
     public static DateTime GetTimestamp(this ResourceSpan resourceSpan, int timeOffset)
     {
         var startTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].StartTimeUnixNano);
+        long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
+    }
+
+    public static DateTime GetTimestamp(this Span span, int timeOffset)
+    {
+        var startTime = decimal.Parse(span.StartTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
     }
@@ -183,5 +208,47 @@ public static class TracesExtensions
         => tracesRoot.ResourceSpans.Any(rs => rs.Resource.Attributes
             .Any(attr => attr.Key == "service.name"
                 && attr.Value?.StringValue == resource));
+
+    public static int GetMatchAttemptsByTimestamp(this List<ResourceSpan> resourceSpans, DateTime dateTime, int timeOffset)
+        => resourceSpans.Count(rs => rs.GetTimestamp(timeOffset) <= dateTime);
+
+    public static List<Span> GetSpans(this TracesRoot tracesRoot)
+        => tracesRoot.ResourceSpans[0].ScopeSpans.SelectMany(x => x.Spans).ToList();
+
+    public static bool ContainsRoute(this ResourceSpan resourceSpan, string route)
+        => resourceSpan.ScopeSpans.Any(x => x.Spans.Any(s => s.GetAttributeValue("http.route") == route));
+
+    public static List<TraceListItemView> GroupTraces(this List<ResourceSpan> resourceSpans, int timeOffset)
+    {
+        List<TraceListItemView> traceList = new();
+
+        foreach (var resourceSpan in resourceSpans)
+        {
+            var traceListItem = new TraceListItemView
+            {
+                Timestamp = resourceSpan.GetTimestamp(timeOffset),
+                Request = resourceSpan.ScopeSpans[0].Spans[0].Name,
+                TraceId = resourceSpan.GetTraceId(),
+                Source = new List<string> { resourceSpan.GetServiceName() },
+                Duration = resourceSpan.GetDuration()
+            };
+
+            if (traceList.Any(x => x.TraceId == traceListItem.TraceId))
+            {
+                var existingTrace = traceList.Find(x => x.TraceId == traceListItem.TraceId);
+                existingTrace?.Source.AddRange(traceListItem.Source);
+                if (existingTrace?.Duration < traceListItem.Duration)
+                {
+                    existingTrace.Duration = traceListItem.Duration;
+                }
+            }
+            else
+            {
+                traceList.Add(traceListItem);
+            }               
+        }
+
+        return traceList;
+    }
 }
 

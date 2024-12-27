@@ -666,6 +666,15 @@ namespace Locales {
         /// <summary>
         ///   Looks up a localized string similar to Łączna liczba znalezionych wyników.
         /// </summary>
+        public static string TotalNumberOfFoundLogs {
+            get {
+                return ResourceManager.GetString("TotalNumberOfFoundLogs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Łączna liczba znalezionych wyników.
+        /// </summary>
         public static string TotalNumberOfFoundTraces {
             get {
                 return ResourceManager.GetString("TotalNumberOfFoundTraces", resourceCulture);

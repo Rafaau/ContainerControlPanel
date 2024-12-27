@@ -4,8 +4,8 @@ namespace ContainerControlPanel.Domain.Models;
 
 public class RequestResponse
 {
-    public Request Request { get; set; }
-    public string Response { get; set; }
+    public Request? Request { get; set; }
+    public string? Response { get; set; }
 }
 
     public class Request

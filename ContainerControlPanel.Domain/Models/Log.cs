@@ -120,6 +120,11 @@ public static class LogsExtensions
                 {
                     foreach (var logRecord in scopeLog.LogRecords)
                     {
+                        if (logs.Any(l => l.TraceId == logRecord.TraceId))
+                        {
+                            continue;
+                        }
+
                         if (severity != "all" && logRecord.SeverityText != severity)
                         {
                             continue;
@@ -173,16 +178,18 @@ public static class LogsExtensions
 
     public static RequestResponse? GetRequestResponse(this LogsRoot logsRoot)
     {
-        var request = logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords.Find(x => x.Body.StringValue.Contains("[REQUEST]"));
-        var response = logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords.Find(x => x.Body.StringValue.Contains("[RESPONSE]"));
+        var request = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[REQUEST]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[REQUEST]"));
+        var response = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[RESPONSE]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[RESPONSE]"));
 
-        if (request != null && response != null)
+        if (request != null || response != null)
         {
-            var requestJson = JsonObject.Parse(request.Body.StringValue.Replace("[REQUEST]", ""));
+            var requestJson = request is null 
+                ? null 
+                : JsonObject.Parse(request.Body.StringValue.Replace("[REQUEST]", ""));
             return new RequestResponse
             {
-                Request = JsonSerializer.Deserialize<Request>(requestJson),
-                Response = response.Body.StringValue.Replace("[RESPONSE]", "")
+                Request = JsonSerializer.Deserialize<Request>(requestJson) ?? null,
+                Response = response.Body.StringValue.Replace("[RESPONSE]", "") ?? null
             };
         }
 
@@ -213,4 +220,7 @@ public static class LogsExtensions
             TelemetrySdkLanguage = logsRoot[0].ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.language") ?? null
         };
     }
+
+    public static List<LogRecord> GetLogRecords(this LogsRoot logsRoot)
+        => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords;
 }

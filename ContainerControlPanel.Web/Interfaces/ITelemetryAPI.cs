@@ -12,7 +12,7 @@ public interface ITelemetryAPI
     Task<List<MetricsRoot>> GetMetrics();
 
     [Get("/v1/getTrace?traceId={traceId}")]
-    Task<TracesRoot> GetTrace(string traceId);
+    Task<List<TracesRoot>> GetTrace(string traceId);
 
     [Get("/v1/getLogs")]
     Task<List<LogsRoot>> GetLogs();

@@ -2,9 +2,6 @@
 @using MudBlazor
 
 <div class="chart-container">
-	<div class="current-route">
-		@currentDataPoint.GetRouteName()
-	</div>
 	<PlotlyChart @bind-Config="config" @bind-Data="data" @ref="chart" @bind-Layout="layout" />
 	<div class="timestamp-select">
 		<MudSelect T="int" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="timestamp">
@@ -18,5 +15,20 @@
 			<MudSelectItem Value="@(720)">12 @Localizer[Locales.Resource.Hours]</MudSelectItem>
 		</MudSelect>
 	</div>
+	<div class="datapoint-select">
+		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentDataPoint">
+			<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			@foreach (var endpoint in Metric.Sum.DataPoints.Where(dp => dp.Attributes.Any(a => a.Key == "http.route")))
+			{
+				<MudSelectItem Value="@endpoint.GetRouteName()">@endpoint.GetRouteName()</MudSelectItem>
+			}
+		</MudSelect>
+	</div>
+	@if (filteredTraces != null)
+	{
+		<div class="total-span">
+			Total: <b>@filteredTraces.Count()</b>
+		</div>
+	}
 </div>
 

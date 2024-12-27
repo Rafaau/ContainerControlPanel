@@ -73,19 +73,30 @@ public class TelemetryController : ControllerBase
             MessageBindable<ExportTraceServiceRequest>? bindable = 
                 await MessageBindable<ExportTraceServiceRequest>.BindAsync(HttpContext, null);
 
-            var message = new WebSocketMessage
-            {
-                Type = WebSocketMessageType.Traces,
-                Data = bindable?.Message.ToString()
-            };
-
             TracesRoot tracesRoot = JsonSerializer.Deserialize<TracesRoot>(bindable?.Message.ToString());
-            string traceId = tracesRoot.GetTraceId();
 
-            string json = JsonSerializer.Serialize(message);
+            foreach (var span in tracesRoot.GetSpans())
+            {
+                tracesRoot.ResourceSpans[0].ScopeSpans.Clear();
+                tracesRoot.ResourceSpans[0].ScopeSpans.Add(new ScopeSpan
+                {
+                    Scope = new Scope { Name = "System.Net.Http" },
+                    Spans = new List<Span> { span }
+                });
 
-            await _redisService.SetValueAsync($"trace{traceId}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
-            await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+                var serializedData = JsonSerializer.Serialize(tracesRoot);
+
+                var message = new WebSocketMessage
+                {
+                    Type = WebSocketMessageType.Traces,
+                    Data = tracesRoot
+                };
+
+                string json = JsonSerializer.Serialize(message);
+                await _redisService.SetValueAsync($"trace{span.TraceId}{Guid.NewGuid().ToString()}", serializedData, TimeSpan.FromDays(14));      
+                await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+            }
+           
             return Ok();
         }
         catch (Exception ex)
@@ -109,11 +120,13 @@ public class TelemetryController : ControllerBase
             };
 
             LogsRoot logsRoot = JsonSerializer.Deserialize<LogsRoot>(bindable?.Message.ToString());
-            string traceId = logsRoot.GetTraceId();
+
+            foreach (var logRecord in logsRoot.GetLogRecords())
+            {
+                await _redisService.SetValueAsync($"log{logRecord.TraceId}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+            }
 
             string json = JsonSerializer.Serialize(message);
-
-            await _redisService.SetValueAsync($"log{traceId}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
             await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             return Ok();
         }
@@ -143,6 +156,7 @@ public class TelemetryController : ControllerBase
     [HttpGet("GetTrace")]
     public async Task<IActionResult> GetTrace(string traceId)
     {
+        List<TracesRoot> traces = new();
         var result = await _redisService.ScanKeysByPatternAsync($"trace{traceId}");
 
         if (result.Count == 0)
@@ -150,8 +164,13 @@ public class TelemetryController : ControllerBase
             return NotFound();
         }
 
-        var deserialized = JsonSerializer.Deserialize<TracesRoot>(result[0]);
-        return Ok(deserialized);
+        foreach (var item in result)
+        {
+            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
+            traces.Add(deserialized);
+        }
+
+        return Ok(traces);
     }
 
     [HttpGet("GetMetrics")]

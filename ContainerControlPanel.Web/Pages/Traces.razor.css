@@ -17,7 +17,7 @@
 
 .data-grid-row {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	grid-template-columns: 1fr 2.4fr 3fr 1fr;
 	border-bottom: 1px solid #484848;
 }
 
@@ -51,7 +51,7 @@
 }
 
 .text-overflow {
-	width: 100%;
+	width: 250px;
 	overflow: hidden;
 	display: inline-block;
 	text-overflow: ellipsis;
@@ -64,12 +64,15 @@
 	align-items:center;
 	padding-right: 8px;
 	background-color: #525252;
+	margin-right: 10px;
 }
 
 .service-name-badge {
 	width: 15px;
-	height: 26px;
+	height: 100%;
 	margin-right: 6px;
+	padding-top: 15px;
+	padding-bottom: 15px;
 	filter: saturate(2000%);
 }
 
@@ -100,7 +103,7 @@
 
 .trace-id {
 	margin-top: 2px;
-	margin-left: 14px;
+	margin-left: 24px;
 	width: 20%;
 	overflow: hidden;
 	display: inline-block;
@@ -125,4 +128,13 @@
 	margin-left: auto;
 	margin-right: 36px;
 	width: 200px;
+}
+
+.not-found {
+	text-align: center;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	border-bottom: 1px solid #484848;
+	font-weight: 200;
+	font-size: 12px;
 }

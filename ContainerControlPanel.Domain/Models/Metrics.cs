@@ -117,13 +117,11 @@ public static class MetricsExtensions
                       .Select(rm => rm.Resource)
                       .FirstOrDefault();
 
-    public static List<ScopeMetric> GetScopeMetricsByResource(this List<MetricsRoot> metricsRoots, string resource)
-        => metricsRoots.SelectMany(mr => mr.ResourceMetrics)
-                       .Where(rm => rm.Resource.Attributes
-                           .Any(a => a.Key == "service.name" && a.Value.StringValue == resource))
-                       .SelectMany(rm => rm.ScopeMetrics)
-                       .Distinct()
-                       .ToList();
+    public static List<ScopeMetric> GetScopeMetricsByResource(this MetricsRoot metricsRoot, string resource)
+        => metricsRoot.ResourceMetrics
+                      .Where(rm => rm.Resource.GetResourceName() == resource)
+                      .SelectMany(rm => rm.ScopeMetrics)
+                      .ToList();
 
     public static string? GetRouteName(this MetricsRoot metricsRoot)
         => metricsRoot?.ResourceMetrics?
