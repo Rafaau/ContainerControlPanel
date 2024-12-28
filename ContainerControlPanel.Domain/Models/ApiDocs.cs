@@ -142,6 +142,11 @@ public static class ApiDocsExtensions
     {
         string body = string.Empty;
 
+        if (genericArgument.Properties == null || !genericArgument.Properties.Any())
+        {
+            return $"\"{genericArgument.Type.ToLower()}\"";
+        }
+
         foreach (var property in genericArgument.Properties)
         {
             if (property.Structure != null && !IsPrimitiveType(property.Structure.Type))
@@ -189,7 +194,8 @@ public static class ApiDocsExtensions
             _ => "null"
         };
     }
-    private static bool IsPrimitiveType(string type)
+
+    public static bool IsPrimitiveType(this string type)
     {
         var primitiveTypes = new HashSet<string> { "String", "Int32", "Double", "Boolean", "DateTime", "DateOnly" };
         return primitiveTypes.Contains(type);

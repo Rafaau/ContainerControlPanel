@@ -12,7 +12,7 @@
 }
 
 .container-id {
-	margin-left: 16px;
+	margin-left: 24px;
 	margin-top: 5px;
 	color: #808080;
 	font-weight: 200;
@@ -81,6 +81,7 @@
 	margin: 12px;
 	padding: 12px;
 	border-radius: 5px;
+	font-family: Consolas;
 }
 
 pre {

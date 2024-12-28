@@ -1,4 +1,6 @@
-﻿@page "/apidocs/{containerId}"
+﻿@page "/apidocs"
+@page "/apidocs/{containerId}"
+
 @using ContainerControlPanel.Domain.Models
 @using MudBlazor
 
@@ -39,21 +41,27 @@
 	}
 </script>
 
-@if (containerDetails != null && controllers.Count > 0)
-{
-	<div class="flex">
-		<div class="label">
-			API Docs
-		</div>
-		<div class="container-id">
-			@containerDetails.Name.Substring(1)
-		</div>
+<div class="flex">
+	<div class="label">
+		@Localizer[Locales.Resource.ApiDocs]
 	</div>
+	<div class="container-id">
+		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseContainer]" TransformOrigin="Origin.TopCenter" @bind-Value="containerId">
+			@foreach (var container in containers)
+			{
+				<MudSelectItem Value="@container.ContainerId">@container.Names</MudSelectItem>
+			}
+		</MudSelect>
+	</div>
+</div>
+
+@if (controllers.Count > 0)
+{	
 	<div class="list-container">
 		<MudList T="string">
 			@foreach (var controller in controllers)
 			{
-				<MudListItem Text="@controller.Name" Expanded>
+				<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
 					<NestedList>
 						@foreach (var action in controller.Actions) 
 						{
@@ -95,15 +103,15 @@
 									</div>
 								</ChildContent>
 								<NestedList>
-									<div class="endpoint-details" style="border-color: @(primary);">
-										<div class="section">
-											<div class="section-label">
-												Parameters
-											</div>
-											<MudDivider Class="opacity-100"/>
-										</div>
+									<div class="endpoint-details" style="border-color: @(primary);">										
 										@foreach (var param in action.Parameters.Where(p => p.Source == "Unknown"))
 										{
+											<div class="section">
+												<div class="section-label">
+													Parameters
+												</div>
+												<MudDivider Class="opacity-100" />
+											</div>
 											<div class="param-row">
 												<div class="param-key">
 													<div class="param-name">@param.Name</div>
@@ -122,9 +130,16 @@
 												<MudDivider Class="opacity-100" />
 											</div>
 											<div class="body-container">
-												<pre>
-													@((MarkupString)action.RequestBodyFormatted)
-												</pre>
+												@if (!action.Parameters.Find(p => p.Source == "Body").Type.Structure.Properties.Any())
+												{
+													@($"\"{action.Parameters.Find(p => p.Source == "Body").Type.Name.ToLower()}\"")
+												}
+												else 
+												{
+													<pre>
+														@((MarkupString)action.RequestBodyFormatted)
+													</pre>
+												}											
 											</div>
 											<MudDivider Class="opacity-100" />											
 										}
@@ -136,11 +151,17 @@
 												</div>
 												<MudDivider Class="opacity-100" />
 											</div>
-											@if (action.ReturnType.Name == "IActionResult")
+											@if (action.ReturnType.Name == "IActionResult" || action.ReturnType.Name == "Void")
 											{
 												<div class="action-result-row">
 													<span class="status-code">200</span>
 													<span class="status-desc">Success</span>
+												</div>
+											}
+											else if (action.ReturnType.Name.IsPrimitiveType())
+											{
+												<div class="body-container">
+													@action.ReturnType.Name.ToLower()
 												</div>
 											}
 											else 

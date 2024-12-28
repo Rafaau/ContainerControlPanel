@@ -348,4 +348,7 @@
   <data name="ViewAPIDocs" xml:space="preserve">
     <value>Wyświetl API Docs</value>
   </data>
+  <data name="ApiDocs" xml:space="preserve">
+    <value>Dokumentacja API</value>
+  </data>
 </root>

@@ -59,13 +59,25 @@
         padding-top: 10px;
     }
 
-    .nav-item:nth-child(3) {
+        .nav-item:nth-child(1) svg {
+            margin-bottom: 2px;
+        }
+
+        .nav-item:nth-child(2) {
+            padding-top: 8px;
+        }
+
+    .nav-item:nth-child(4) {
         padding-top: 10px;
     }
 
-    .nav-item:nth-child(4) {
+    .nav-item:nth-child(5) {
         padding-top: 12px;
     }
+
+        .nav-item:nth-child(5) svg {
+            margin-bottom: 3px;
+        }
 
     .nav-item ::deep a:hover {
         color: #00B577;

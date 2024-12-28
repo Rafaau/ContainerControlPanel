@@ -97,6 +97,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dokumentacja API.
+        /// </summary>
+        public static string ApiDocs {
+            get {
+                return ResourceManager.GetString("ApiDocs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Atrybuty.
         /// </summary>
         public static string Attributes {
