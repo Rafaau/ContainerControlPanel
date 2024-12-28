@@ -100,6 +100,16 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             containers = result;
             this.StateHasChanged();
         }
+
+        foreach (var container in containers)
+        {
+            if (container.Status.Contains("Up") && !MemoryCache.TryGetValue($"containerDetails_{container.ContainerId}", out _))
+            {
+                ContainerDetails containerDetails = await containerAPI.GetContainerDetails(container.ContainerId);
+
+                MemoryCache.Set($"containerDetails_{container.ContainerId}", containerDetails);
+            }
+        }
     }
 
     private async Task StopContainer(string containerId)
@@ -153,13 +163,21 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
 
     private Task OpenDetailsDialogAsync(string containerId)
     {
+        ContainerDetails containerDetails = null;
+
+        if (MemoryCache.TryGetValue($"containerDetails_{containerId}", out ContainerDetails _containerDetails))
+        {
+            containerDetails = _containerDetails;
+        }
+
         var options = new DialogOptions { CloseOnEscapeKey = true };
 
         return DialogService.ShowAsync<ContainerDetailsDialog>(
             "", 
             new DialogParameters() 
             { 
-                { "ContainerId", containerId } 
+                { "ContainerId", containerId },
+                { "ContainerDetails", containerDetails }
             }, 
             options
         );
@@ -179,9 +197,26 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         );
     }
 
+    private bool IsASPNETCoreContainer(string containerId)
+    {
+        if (MemoryCache.TryGetValue($"containerDetails_{containerId}", out ContainerDetails containerDetails))
+        {
+            return containerDetails.Config.EnvironmentVariables.Any(x => x.Name.Contains("ASPNETCORE"));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     private void ViewLogs(string containerId)
     {
         NavigationManager.NavigateTo($"/logs/{containerId}");
+    }
+
+    private void ViewApiDocs(string containerId)
+    {
+        NavigationManager.NavigateTo($"/apidocs/{containerId}");
     }
 
     public void Dispose()

@@ -1,0 +1,164 @@
+﻿@page "/apidocs/{containerId}"
+@using ContainerControlPanel.Domain.Models
+@using MudBlazor
+
+<script>
+	function copyToClipboard(text) {
+	navigator.clipboard.writeText(text).then(function () {
+	}, function (err) {
+	console.error('Async: Could not copy text: ', err);
+	});
+	}
+
+	function colorizeJson(jsonString) {
+	try {
+	const json = JSON.parse(jsonString);
+	return syntaxHighlight(json);
+	} catch (e) {
+	console.error("Invalid JSON", e);
+	return jsonString;
+	}
+	}
+
+	function syntaxHighlight(json) {
+	if (typeof json !== 'string') {
+	json = JSON.stringify(json, undefined, 2);
+	}
+	json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*")(\s*:)?|(\b(true|false|null)\b)|(-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match, p1, p2, p3, p4, p5, p6) {
+	if (p3) {
+	return `<span style="color: #9CDCFE;">${p1}</span>${p3 || ''}`;
+	} else if (p4) {
+	return `<span style="color: #CE9178;">${match}</span>`;
+	} else if (p6) {
+	return `<span style="color: #A7CE89;">${match}</span>`;
+	} else {
+	return `<span style="color: #CE9178;">${match}</span>`;
+	}
+	});
+	}
+</script>
+
+@if (containerDetails != null && controllers.Count > 0)
+{
+	<div class="flex">
+		<div class="label">
+			API Docs
+		</div>
+		<div class="container-id">
+			@containerDetails.Name.Substring(1)
+		</div>
+	</div>
+	<div class="list-container">
+		<MudList T="string">
+			@foreach (var controller in controllers)
+			{
+				<MudListItem Text="@controller.Name" Expanded>
+					<NestedList>
+						@foreach (var action in controller.Actions) 
+						{
+							string primary = "";
+							string listItemStyle = "";
+							switch (action.HttpMethod)
+							{
+								case "Get":
+									primary = "#61AFFE";
+									listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
+									break;
+								case "Post":
+									primary = "#49CC90";
+									listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
+									break;
+								case "Put":
+									primary = "#FCA130";
+									listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
+									break;
+								case "Delete":
+									primary = "#F93E3E";
+									listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
+									break;
+								case "Patch":
+									primary = "#50E3C2";
+									listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
+									break;
+								default:
+									primary = "";
+									break;
+							}
+							<MudListItem Style="@(listItemStyle)">
+								<ChildContent>
+									<div class="endpoint-label">
+										<div class="endpoint-method" style="background-color: @(primary);">
+											@action.HttpMethod.ToUpper()
+										</div>
+										@action.Route
+									</div>
+								</ChildContent>
+								<NestedList>
+									<div class="endpoint-details" style="border-color: @(primary);">
+										<div class="section">
+											<div class="section-label">
+												Parameters
+											</div>
+											<MudDivider Class="opacity-100"/>
+										</div>
+										@foreach (var param in action.Parameters.Where(p => p.Source == "Unknown"))
+										{
+											<div class="param-row">
+												<div class="param-key">
+													<div class="param-name">@param.Name</div>
+													<div class="param-type">@param.Type.Name</div>
+													<div class="param-source">(query)</div>
+												</div>
+											</div>
+											<MudDivider Class="opacity-100" />
+										}
+										@if (action.Parameters.Any(p => p.Source == "Body")) 
+										{
+											<div class="section">
+												<div class="section-label">
+													Request Body
+												</div>
+												<MudDivider Class="opacity-100" />
+											</div>
+											<div class="body-container">
+												<pre>
+													@((MarkupString)action.RequestBodyFormatted)
+												</pre>
+											</div>
+											<MudDivider Class="opacity-100" />											
+										}
+										@if (action.ReturnType != null) 
+										{
+											<div class="section">
+												<div class="section-label">
+													Response Body
+												</div>
+												<MudDivider Class="opacity-100" />
+											</div>
+											@if (action.ReturnType.Name == "IActionResult")
+											{
+												<div class="action-result-row">
+													<span class="status-code">200</span>
+													<span class="status-desc">Success</span>
+												</div>
+											}
+											else 
+											{											
+												<div class="body-container">
+													<pre>
+														@((MarkupString)action.ResponseBodyFormatted)
+													</pre>
+												</div>
+											}											
+										} 
+									</div>
+								</NestedList>
+							</MudListItem>
+						}				
+					</NestedList>
+				</MudListItem>
+			}
+		</MudList>
+	</div>
+}

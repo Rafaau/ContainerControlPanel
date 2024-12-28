@@ -718,6 +718,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wyświetl API Docs.
+        /// </summary>
+        public static string ViewAPIDocs {
+            get {
+                return ResourceManager.GetString("ViewAPIDocs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wyświetl szczegóły.
         /// </summary>
         public static string ViewDetails {

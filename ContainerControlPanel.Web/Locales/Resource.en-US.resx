@@ -345,4 +345,7 @@
   <data name="TotalNumberOfFoundLogs" xml:space="preserve">
     <value>Total number of found logs</value>
   </data>
+  <data name="ViewAPIDocs" xml:space="preserve">
+    <value>View API Docs</value>
+  </data>
 </root>

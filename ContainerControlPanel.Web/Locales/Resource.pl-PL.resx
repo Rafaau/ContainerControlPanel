@@ -345,4 +345,7 @@
   <data name="TotalNumberOfFoundLogs" xml:space="preserve">
     <value>Łączna liczba znalezionych wyników</value>
   </data>
+  <data name="ViewAPIDocs" xml:space="preserve">
+    <value>Wyświetl API Docs</value>
+  </data>
 </root>

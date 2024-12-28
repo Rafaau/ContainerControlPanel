@@ -1,0 +1,101 @@
+﻿.flex {
+	display: flex;
+	align-items: center;
+	margin: 24px;
+	font-size: 16px;
+}
+
+.label {
+	font-size: 32px;
+	font-weight: 500;
+	user-select: none;
+}
+
+.container-id {
+	margin-left: 16px;
+	margin-top: 5px;
+	color: #808080;
+	font-weight: 200;
+	font-size: 14px;
+}
+
+.list-container {
+	margin-inline: 22px;
+}
+
+.endpoint-label {
+	display: flex;
+	justify-items: center;
+	gap: 10px;
+}
+
+::deep .mud-nested-list .mud-list-item {
+	margin: 5px;
+	padding: 5px;
+	padding-inline: 10px;
+	border-radius: 4px;
+}
+
+.endpoint-method {
+	width: 70px;
+	text-align: center;
+	font-weight: 400;
+	padding: 1px;
+	border-radius: 2px;
+	font-size: 14px;
+}
+
+.endpoint-details {
+	border: 2px solid;
+	border-top: none;
+	position: relative;
+	left: 5px;
+	top: -8px;
+	padding-top: 4px;
+}
+
+.section-label {
+	margin-top: 12px;
+	margin-bottom: 12px;
+	margin-inline: 12px;
+	font-weight: 500;
+	font-size: 16px;
+}
+
+.param-key {
+	margin: 12px;
+}
+
+.param-type {
+	color: #808080;
+	font-weight: 300;
+}
+
+.param-source {
+	color: #808080;
+	font-weight: 500;
+}
+
+.body-container {
+	background-color: black;
+	margin: 12px;
+	padding: 12px;
+	border-radius: 5px;
+}
+
+pre {
+	margin: 0;
+}
+
+.action-result-row {
+	margin: 12px;
+}
+
+.status-code {
+	color: #808080;
+	margin-right: 20px;
+}
+
+.status-desc {
+	font-weight: 300;
+}

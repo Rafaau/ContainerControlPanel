@@ -126,6 +126,10 @@
 							<ChildContent>
 								<MudMenuItem @onclick="() => { OpenDetailsDialogAsync(container.ContainerId); }">@Localizer[Resource.ViewDetails]</MudMenuItem>
 								<MudMenuItem @onclick="() => { ViewLogs(container.ContainerId); }">@Localizer[Resource.ViewLogs]</MudMenuItem>
+								@if (IsASPNETCoreContainer(container.ContainerId))
+								{
+									<MudMenuItem @onclick="() => { ViewApiDocs(container.ContainerId); }">@Localizer[Resource.ViewAPIDocs]</MudMenuItem>
+								}
 							</ChildContent>
 						</MudMenu>
 					</div>

@@ -20,7 +20,8 @@ public partial class ContainerDetailsDialog(IContainerAPI containerAPI)
 
     private IContainerAPI containerAPI { get; set; } = containerAPI;
 
-    private ContainerDetails containerDetails { get; set; }
+    [Parameter]
+    public ContainerDetails ContainerDetails { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,7 +30,10 @@ public partial class ContainerDetailsDialog(IContainerAPI containerAPI)
 
     private async Task LoadContainerDetails()
     {
-        containerDetails = await containerAPI.GetContainerDetails(ContainerId);
+        if (ContainerId == null)
+        {
+            ContainerDetails = await containerAPI.GetContainerDetails(ContainerId);
+        }
     }
 
     private void Ok() => MudDialog.Close(DialogResult.Ok(true));

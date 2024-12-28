@@ -236,7 +236,7 @@ public class TelemetryController : ControllerBase
 
         public TMessage? Message { get; private set; }
 
-        public static async ValueTask<MessageBindable<TMessage>?> BindAsync(HttpContext context, ParameterInfo parameter)
+        public static async ValueTask<MessageBindable<TMessage>?> BindAsync(HttpContext context, System.Reflection.ParameterInfo parameter)
         {
             switch (GetKnownContentType(context.Request.ContentType, out var charSet))
             {
