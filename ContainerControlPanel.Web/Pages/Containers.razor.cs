@@ -54,6 +54,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        if (NavigationManager.Uri.Split('/').Last() == "")
+        {
+            NavigationManager.NavigateTo("/containers");
+        }
+
         if (MemoryCache.TryGetValue("lastContainersHref", out string cachedHref))
         {
             NavigationManager.NavigateTo(cachedHref);
