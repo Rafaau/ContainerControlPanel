@@ -17,6 +17,7 @@
 	color: #808080;
 	font-weight: 200;
 	font-size: 14px;
+	min-width: 150px;
 }
 
 .list-container {
@@ -54,6 +55,18 @@
 	padding-top: 4px;
 }
 
+.section {
+	display: flex;
+	justify-items: center;
+	height: 60px;
+	align-items: center;
+}
+
+.section-button {
+	margin-left: auto;
+	margin-right: 12px;
+}
+
 .section-label {
 	margin-top: 12px;
 	margin-bottom: 12px;
@@ -62,8 +75,34 @@
 	font-size: 16px;
 }
 
+.param-row {
+	display: flex;
+}
+
+.param-input {
+	min-width: 200px;
+	margin-top: 10px;
+}
+
+::deep .mud-input-label-outlined {
+	background-color: #2B2B2B;
+}
+
+::deep .mud-input-control > .mud-input-control-input-container > .mud-input-label-outlined.mud-input-label-inputcontrol {
+	line-height: 16px;
+}
+
+::deep .mud-input-label-outlined {
+	transform: translate(12px, 16px) scale(1);
+}
+
+::deep .mud-input-slot.mud-input-root-outlined {
+	padding: 14px;
+}
+
 .param-key {
 	margin: 12px;
+	min-width: 100px;
 }
 
 .param-type {
@@ -99,4 +138,39 @@ pre {
 
 .status-desc {
 	font-weight: 300;
+}
+
+.not-found {
+	margin-top: 52px;
+	user-select: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+::deep .choose-braces {
+	margin: 0;
+	height: 24px;
+	color: #00B577;
+	margin-right: 8px;
+	margin-top: 3px;
+}
+
+.execute-button {
+	margin: 12px;
+}
+
+::deep textarea {
+	font-size: 12px !important;
+	font-family: Consolas !important;
+	margin: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+.response-container {
+	display: flex;
+}
+
+.response-container div:nth-child(2) {
+	width: 100%;
 }

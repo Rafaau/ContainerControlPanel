@@ -106,6 +106,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wybrany kontener nie posiada implementacji API Docs.
+        /// </summary>
+        public static string ApiDocsNotImplemented {
+            get {
+                return ResourceManager.GetString("ApiDocsNotImplemented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Atrybuty.
         /// </summary>
         public static string Attributes {
@@ -129,6 +138,15 @@ namespace Locales {
         public static string ChooseContainer {
             get {
                 return ResourceManager.GetString("ChooseContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wybierz kontener, aby wyświetlić dokumentację API.
+        /// </summary>
+        public static string ChooseContainerTo {
+            get {
+                return ResourceManager.GetString("ChooseContainerTo", resourceCulture);
             }
         }
         

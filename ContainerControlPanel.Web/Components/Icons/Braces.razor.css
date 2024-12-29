@@ -1,6 +1,14 @@
-﻿svg {
+﻿.nav {
 	display: block;
 	margin: auto;
 	position: relative;
 	top: -2px;
+}
+
+.not-found {
+	margin: 0;
+	height: 24px;
+	color: #00B577;
+	margin-right: 8px;
+	margin-top: 3px;
 }

@@ -2,6 +2,7 @@
 @page "/apidocs/{containerId}"
 
 @using ContainerControlPanel.Domain.Models
+@using ContainerControlPanel.Web.Components.Icons
 @using MudBlazor
 
 <script>
@@ -60,41 +61,41 @@
 	<div class="list-container">
 		<MudList T="string">
 			@foreach (var controller in controllers)
-			{
-				<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
-					<NestedList>
-						@foreach (var action in controller.Actions) 
+		{
+			<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
+				<NestedList>
+					@foreach (var action in controller.Actions)
+					{
+						string primary = "";
+						string listItemStyle = "";
+						switch (action.HttpMethod)
 						{
-							string primary = "";
-							string listItemStyle = "";
-							switch (action.HttpMethod)
-							{
-								case "Get":
-									primary = "#61AFFE";
-									listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
-									break;
-								case "Post":
-									primary = "#49CC90";
-									listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
-									break;
-								case "Put":
-									primary = "#FCA130";
-									listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
-									break;
-								case "Delete":
-									primary = "#F93E3E";
-									listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
-									break;
-								case "Patch":
-									primary = "#50E3C2";
-									listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
-									break;
-								default:
-									primary = "";
-									break;
-							}
-							<MudListItem Style="@(listItemStyle)">
-								<ChildContent>
+							case "Get":
+								primary = "#61AFFE";
+								listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
+								break;
+							case "Post":
+								primary = "#49CC90";
+								listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
+								break;
+							case "Put":
+								primary = "#FCA130";
+								listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
+								break;
+							case "Delete":
+								primary = "#F93E3E";
+								listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
+								break;
+							case "Patch":
+								primary = "#50E3C2";
+								listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
+								break;
+							default:
+								primary = "";
+								break;
+						}
+						<MudListItem Style="@(listItemStyle)">
+							<ChildContent>
 									<div class="endpoint-label">
 										<div class="endpoint-method" style="background-color: @(primary);">
 											@action.HttpMethod.ToUpper()
@@ -103,75 +104,122 @@
 									</div>
 								</ChildContent>
 								<NestedList>
-									<div class="endpoint-details" style="border-color: @(primary);">										
-										@foreach (var param in action.Parameters.Where(p => p.Source == "Unknown"))
-										{
-											<div class="section">
-												<div class="section-label">
-													Parameters
-												</div>
-												<MudDivider Class="opacity-100" />
+									<div class="endpoint-details" style="border-color: @(primary);">
+										<div class="section">
+											<div class="section-label">
+												Parameters
 											</div>
+											<div class="section-button">
+												<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? "Cancel" : "Try it out")</MudButton>
+											</div>
+										</div>
+										<MudDivider Class="opacity-100" />
+										@if (action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1) 
+										{
+											<div class="param-key">No parameters</div>
+										}
+										@foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
+										{									
 											<div class="param-row">
 												<div class="param-key">
 													<div class="param-name">@param.Name</div>
 													<div class="param-type">@param.Type.Name</div>
 													<div class="param-source">(query)</div>
 												</div>
+												<div class="param-input">
+													<MudTextField Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+												</div>
 											</div>
-											<MudDivider Class="opacity-100" />
 										}
 										@if (action.Parameters.Any(p => p.Source == "Body")) 
 										{
+											<MudDivider Class="opacity-100" />
 											<div class="section">
 												<div class="section-label">
 													Request Body
 												</div>
-												<MudDivider Class="opacity-100" />
 											</div>
+											<MudDivider Class="opacity-100" />
 											<div class="body-container">
-												@if (!action.Parameters.Find(p => p.Source == "Body").Type.Structure.Properties.Any())
+												@if (action.TryOut) 
 												{
-													@($"\"{action.Parameters.Find(p => p.Source == "Body").Type.Name.ToLower()}\"")
+													<MudTextField AutoGrow T="string" Variant="Variant.Outlined" @bind-Value="action.TestRequestBody"></MudTextField>
 												}
 												else 
 												{
-													<pre>
-														@((MarkupString)action.RequestBodyFormatted)
-													</pre>
-												}											
-											</div>
-											<MudDivider Class="opacity-100" />											
+													@if (!action.Parameters.Find(p => p.Source == "Body").Type.Structure.Properties.Any())
+													{
+														@($"\"{action.Parameters.Find(p => p.Source == "Body").Type.Name.ToLower()}\"")
+													}
+													else
+													{
+														<pre>
+															@((MarkupString)action.RequestBodyFormatted)
+														</pre>
+													}
+												}																							
+											</div>																				
 										}
+										@if (action.TryOut) 
+										{
+											<div class="execute-button">
+												<MudButton @onclick="async () => { await ExecuteAction(action); }" FullWidth="true" Color="Color.Primary" Variant="Variant.Filled">Execute</MudButton>
+											</div>
+										}										
+										<MudDivider Class="opacity-100" />
 										@if (action.ReturnType != null) 
 										{
 											<div class="section">
 												<div class="section-label">
 													Response Body
 												</div>
-												<MudDivider Class="opacity-100" />
 											</div>
-											@if (action.ReturnType.Name == "IActionResult" || action.ReturnType.Name == "Void")
+											<MudDivider Class="opacity-100" />
+											@if (!string.IsNullOrEmpty(action.TestResponseStatusCode)) 
 											{
 												<div class="action-result-row">
-													<span class="status-code">200</span>
-													<span class="status-desc">Success</span>
+													<span class="status-code">@action.TestResponseStatusCode</span>
+													<span class="status-desc">@action.TestResponseStatusDescription</span>
 												</div>
 											}
-											else if (action.ReturnType.Name.IsPrimitiveType())
+											if (!string.IsNullOrEmpty(action.TestResponseBody))
 											{
 												<div class="body-container">
-													@action.ReturnType.Name.ToLower()
-												</div>
-											}
-											else 
-											{											
-												<div class="body-container">
 													<pre>
-														@((MarkupString)action.ResponseBodyFormatted)
+														@((MarkupString)action.TestResponseBody)
 													</pre>
 												</div>
-											}											
+
+												<div class="body-container">
+													<pre>
+														@((MarkupString)action.TestResponseHeaders)
+													</pre>
+												</div>		
+											}
+											else if (string.IsNullOrEmpty(action.TestResponseStatusCode))
+											{
+												@if (action.ReturnType.Name == "IActionResult" || action.ReturnType.Name == "Void")
+												{
+													<div class="action-result-row">
+														<span class="status-code">200</span>
+														<span class="status-desc">Success</span>
+													</div>
+												}
+												else if (action.ReturnType.Name.IsPrimitiveType())
+												{
+													<div class="body-container">
+														@action.ReturnType.Name.ToLower()
+													</div>
+												}
+												else 
+												{											
+													<div class="body-container">
+														<pre>
+															@((MarkupString)action.ResponseBodyFormatted)
+														</pre>
+													</div>
+												}							
+											}
 										} 
 									</div>
 								</NestedList>
@@ -181,5 +229,21 @@
 				</MudListItem>
 			}
 		</MudList>
+	</div>
+}
+
+@if (containerId == null) 
+{
+	<div class="not-found">
+		<Braces Class="not-found"/>
+		@Localizer[Locales.Resource.ChooseContainerTo].
+	</div>
+}
+
+@if (apiDocsNotImplemented)
+{
+	<div class="not-found">
+		<NotFound />
+		@Localizer[Locales.Resource.ApiDocsNotImplemented].
 	</div>
 }

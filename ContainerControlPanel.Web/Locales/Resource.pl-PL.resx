@@ -351,4 +351,10 @@
   <data name="ApiDocs" xml:space="preserve">
     <value>Dokumentacja API</value>
   </data>
+  <data name="ChooseContainerTo" xml:space="preserve">
+    <value>Wybierz kontener, aby wyświetlić dokumentację API</value>
+  </data>
+  <data name="ApiDocsNotImplemented" xml:space="preserve">
+    <value>Wybrany kontener nie posiada implementacji API Docs</value>
+  </data>
 </root>

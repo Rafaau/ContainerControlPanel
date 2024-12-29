@@ -58,6 +58,12 @@ public class ActionView
     public List<ParameterView> Parameters { get; set; } = new();
     public string RequestBodyFormatted { get; set; } = string.Empty;
     public string ResponseBodyFormatted { get; set; } = string.Empty;
+    public bool TryOut { get; set; } = false;
+    public string TestRequestBody { get; set; } = string.Empty;
+    public string TestResponseBody { get; set; } = string.Empty;
+    public string TestResponseHeaders { get; set; } = string.Empty;
+    public string TestResponseStatusCode { get; set; } = string.Empty;
+    public string TestResponseStatusDescription { get; set; } = string.Empty;
 }
 
 public class ParameterView
@@ -65,6 +71,7 @@ public class ParameterView
     public string Name { get; set; }
     public Type Type { get; set; }
     public string Source { get; set; }
+    public string TestValue { get; set; }
 }
 
 public static class ApiDocsExtensions

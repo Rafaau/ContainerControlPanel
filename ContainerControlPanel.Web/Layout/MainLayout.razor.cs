@@ -43,7 +43,8 @@ public partial class MainLayout
             Divider = "#484848",
             Success = "#00B577",
             Error = "#ff0000",
-            Info = "#ffffff"
+            Info = "#ffffff",
+            Warning = "#FF6060"
         }
     };
 
