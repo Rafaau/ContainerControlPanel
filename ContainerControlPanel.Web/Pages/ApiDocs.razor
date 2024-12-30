@@ -105,12 +105,19 @@
 								</ChildContent>
 								<NestedList>
 									<div class="endpoint-details" style="border-color: @(primary);">
+										@if (!string.IsNullOrEmpty(action.Summary))
+										{
+											<div class="summary">
+												@action.Summary
+											</div>
+											<MudDivider Class="opacity-100" />
+										}									
 										<div class="section">
 											<div class="section-label">
 												Parameters
 											</div>
 											<div class="section-button">
-												<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? "Cancel" : "Try it out")</MudButton>
+												<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? @Localizer[Locales.Resource.Cancel] : @Localizer[Locales.Resource.TryItOut])</MudButton>
 											</div>
 										</div>
 										<MudDivider Class="opacity-100" />
@@ -127,7 +134,7 @@
 													<div class="param-source">(query)</div>
 												</div>
 												<div class="param-input">
-													<MudTextField Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+													<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
 												</div>
 											</div>
 										}
@@ -163,7 +170,13 @@
 										@if (action.TryOut) 
 										{
 											<div class="execute-button">
-												<MudButton @onclick="async () => { await ExecuteAction(action); }" FullWidth="true" Color="Color.Primary" Variant="Variant.Filled">Execute</MudButton>
+											<MudButton @onclick="async () => { await ExecuteAction(action); }" FullWidth="true" Color="Color.Primary" Variant="Variant.Filled">@Localizer[Locales.Resource.Execute]</MudButton>
+												@if (action.Loading)
+												{
+													<div class="spinner">
+														<MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+													</div>
+												}
 											</div>
 										}										
 										<MudDivider Class="opacity-100" />
@@ -177,6 +190,11 @@
 											<MudDivider Class="opacity-100" />
 											@if (!string.IsNullOrEmpty(action.TestResponseStatusCode)) 
 											{
+												<div class="body-container">
+													<pre>
+														@action.TestRequestCurl
+													</pre>
+												</div>
 												<div class="action-result-row">
 													<span class="status-code">@action.TestResponseStatusCode</span>
 													<span class="status-desc">@action.TestResponseStatusDescription</span>

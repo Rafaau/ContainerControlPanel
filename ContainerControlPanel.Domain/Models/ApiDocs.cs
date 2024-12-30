@@ -8,6 +8,7 @@ public class EndpointInfo
     public string Route { get; set; }
     public Type ReturnType { get; set; }
     public List<ParameterInfo> Parameters { get; set; } = new();
+    public string Summary { get; set; }
 }
 
 public class ParameterInfo
@@ -56,14 +57,17 @@ public class ActionView
     public string Route { get; set; }
     public Type ReturnType { get; set; }
     public List<ParameterView> Parameters { get; set; } = new();
+    public string Summary { get; set; }
     public string RequestBodyFormatted { get; set; } = string.Empty;
     public string ResponseBodyFormatted { get; set; } = string.Empty;
     public bool TryOut { get; set; } = false;
+    public bool Loading { get; set; } = false;
     public string TestRequestBody { get; set; } = string.Empty;
     public string TestResponseBody { get; set; } = string.Empty;
     public string TestResponseHeaders { get; set; } = string.Empty;
     public string TestResponseStatusCode { get; set; } = string.Empty;
     public string TestResponseStatusDescription { get; set; } = string.Empty;
+    public string TestRequestCurl { get; set; } = string.Empty;
 }
 
 public class ParameterView
@@ -71,7 +75,8 @@ public class ParameterView
     public string Name { get; set; }
     public Type Type { get; set; }
     public string Source { get; set; }
-    public string TestValue { get; set; }
+    public string TestValue { get; set; } = string.Empty;
+    public bool Error { get; set; } = false;
 }
 
 public static class ApiDocsExtensions
@@ -101,7 +106,8 @@ public static class ApiDocsExtensions
                         Name = x.Name,
                         Type = x.Type,
                         Source = x.Source
-                    }).ToList()
+                    }).ToList(),
+                    Summary = action.Summary
                 };
                 controllerView.Actions.Add(actionView);
             }

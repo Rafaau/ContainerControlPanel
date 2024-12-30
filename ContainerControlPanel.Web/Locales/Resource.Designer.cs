@@ -322,6 +322,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wykonaj.
+        /// </summary>
+        public static string Execute {
+            get {
+                return ResourceManager.GetString("Execute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filtruj....
         /// </summary>
         public static string Filter {
@@ -538,6 +547,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wymagane.
+        /// </summary>
+        public static string Required {
+            get {
+                return ResourceManager.GetString("Required", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Zasoby.
         /// </summary>
         public static string Resources {
@@ -732,6 +750,15 @@ namespace Locales {
         public static string Traces {
             get {
                 return ResourceManager.GetString("Traces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wypróbuj.
+        /// </summary>
+        public static string TryItOut {
+            get {
+                return ResourceManager.GetString("TryItOut", resourceCulture);
             }
         }
         

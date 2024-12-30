@@ -186,6 +186,21 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private async Task ExecuteAction(ActionView action)
     {
+        foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
+        {
+            if (string.IsNullOrEmpty(param.TestValue))
+            {
+                param.Error = true;
+                return;
+            }
+            else
+            {
+                param.Error = false;
+            }
+        }
+
+        action.Loading = true;
+
         switch (action.HttpMethod)
         {
             case "Get":
@@ -206,6 +221,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
             default:
                 break;
         }
+
+        action.Loading = false;
     }
 
     private async Task ExecuteGetAction(ActionView action)
@@ -284,6 +301,22 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         return route;
     }
 
+    private string GetRequestCurlString(ActionView action)
+    {
+        string curl = $"curl -X {action.HttpMethod.ToUpper()} \\\n" +
+            $" '{httpClient.BaseAddress}{GetRouteString(action).Substring(1)}' \\\n";
+
+        curl += " -H 'Accept: text/plain' \\\n";
+
+        if (action.TestRequestBody != string.Empty)
+        {
+            curl += " -H 'Content-Type: application/json' \\\n";
+            curl += $" -d '{action.TestRequestBody}'";
+        }
+
+        return curl;
+    }
+
     private async Task ReadResponse(HttpResponseMessage response, ActionView action)
     {
         var responseBody = await response.Content.ReadAsStringAsync();
@@ -301,12 +334,14 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         }
         else
         {
-            action.TestResponseBody = $"Error: {response.StatusCode}";
+            action.TestResponseBody = $"Error: {response.StatusCode} \n" +
+                $"{responseBody.ToString()}";
         }
 
         action.TestResponseHeaders = response.Content.Headers.ToString();
         action.TestResponseStatusCode = response.ToString().Substring(ToString().IndexOf("StatusCode: ") + 13, 3);
         action.TestResponseStatusDescription = response.ReasonPhrase;
+        action.TestRequestCurl = GetRequestCurlString(action);
     }
 
     private void TryOut(ActionView action)

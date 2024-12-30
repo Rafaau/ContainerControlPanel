@@ -357,4 +357,13 @@
   <data name="ApiDocsNotImplemented" xml:space="preserve">
     <value>The chosen container has no API Docs implemented</value>
   </data>
+  <data name="Required" xml:space="preserve">
+    <value>Required</value>
+  </data>
+  <data name="TryItOut" xml:space="preserve">
+    <value>Try it out</value>
+  </data>
+  <data name="Execute" xml:space="preserve">
+    <value>Execute</value>
+  </data>
 </root>

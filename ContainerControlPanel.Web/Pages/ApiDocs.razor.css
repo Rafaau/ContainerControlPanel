@@ -160,6 +160,12 @@ pre {
 	margin: 12px;
 }
 
+.spinner {
+	margin: auto;
+	width: 40px;
+	margin-top: 16px;
+}
+
 ::deep textarea {
 	font-size: 12px !important;
 	font-family: Consolas !important;
@@ -173,4 +179,11 @@ pre {
 
 .response-container div:nth-child(2) {
 	width: 100%;
+}
+
+.summary {
+	margin: 5px;
+	margin-left: 12px;
+	font-weight: 300;
+	color: #808080;
 }
