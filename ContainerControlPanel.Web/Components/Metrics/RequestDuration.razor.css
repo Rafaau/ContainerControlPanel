@@ -95,3 +95,9 @@
 	stroke: white !important;
 	stroke-width: 0.1px !important;
 }
+
+.refresh {
+	position: absolute;
+	left: 930px;
+	top: 48px;
+}

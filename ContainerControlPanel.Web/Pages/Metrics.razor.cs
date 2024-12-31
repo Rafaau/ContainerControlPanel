@@ -21,6 +21,9 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
     [Inject]
     IMemoryCache MemoryCache { get; set; }
 
+    [Inject]
+    IConfiguration Configuration { get; set; }
+
     private List<MetricsRoot> allMetrics { get; set; } = new();
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
@@ -70,6 +73,8 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         "aspnetcore.routing.match_attempts",
     };
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
         if (MemoryCache.TryGetValue("lastMetricsHref", out string cachedHref))
@@ -80,8 +85,24 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         allMetrics = await telemetryAPI.GetMetrics();
         this.StateHasChanged();
 
-        WebSocketService.MetricsUpdated += OnMetricsUpdated;
-        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            _ = Task.Run(async () =>
+            {
+                while (!_cts.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        WebSocketService.MetricsUpdated += OnMetricsUpdated;
+                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                }
+            });
+        }
     }
 
     private void OnMetricsUpdated(MetricsRoot metricsRoot)

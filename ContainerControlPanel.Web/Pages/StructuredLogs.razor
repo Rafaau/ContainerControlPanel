@@ -9,6 +9,12 @@
 
 <div class="label">
 	<h1>@Localizer[Locales.Resource.StructuredLogs]</h1>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div style="width: 100px;">
+			<MudIconButton @onclick="async () => { await LoadLogs(); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
 </div>
 
 <div class="flex">

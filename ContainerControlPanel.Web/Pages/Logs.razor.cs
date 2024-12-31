@@ -103,7 +103,6 @@ public partial class Logs(IContainerAPI containerAPI) : IDisposable
         }
     }
     private bool firstScroll { get; set; } = false;
-    private bool enableColors { get; set; } = false;
 
     private readonly CancellationTokenSource _cts = new();
 

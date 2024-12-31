@@ -57,6 +57,11 @@
 h2 {
 	font-size: 24px;
 	font-weight: 450;
+	user-select: none;
+}
+
+span {
+	user-select: none;
 }
 
 ::deep .mud-list-item .mud-icon-root.mud-svg-icon {

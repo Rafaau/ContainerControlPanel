@@ -38,3 +38,9 @@
 ::deep .crisp {
 	stroke: #484848 !important;
 }
+
+.refresh {
+	position: absolute;
+	left: 860px;
+	top: 43px;
+}

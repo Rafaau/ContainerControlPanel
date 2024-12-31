@@ -9,7 +9,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using ContainerControlPanel.Web.Interfaces;
-using MudBlazor.Extensions;
 using ContainerControlPanel.Web.Services;
 
 namespace ContainerControlPanel.Web.Components.Metrics;
@@ -62,6 +61,8 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
     private event EventHandler<DataJob> DataEvent;
     private IndicatorChart averageDurationIndicator;
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
         cancellationToken = new CancellationTokenSource();
@@ -69,8 +70,24 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
         InitializeChart();
         await GetTraces();
 
-        WebSocketService.TracesUpdated += OnTracesUpdated;
-        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            _ = Task.Run(async () =>
+            {
+                while (!_cts.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        WebSocketService.TracesUpdated += OnTracesUpdated;
+                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                }
+            });
+        }
 
         base.OnInitialized();
     }
@@ -91,7 +108,8 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
         config = new Plotly.Blazor.Config
         {
             DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False,
-            DisplayLogo = false
+            DisplayLogo = false,
+            ShowAxisDragHandles = false
         };
 
         layout = new Plotly.Blazor.Layout

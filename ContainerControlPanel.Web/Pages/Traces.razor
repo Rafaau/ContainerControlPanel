@@ -8,6 +8,12 @@
 
 <div class="label">
 	<h1>@Localizer[Locales.Resource.Traces]</h1>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div style="width: 100px;">
+			<MudIconButton @onclick="async () => { await LoadTraces(); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
 </div>
 
 @{

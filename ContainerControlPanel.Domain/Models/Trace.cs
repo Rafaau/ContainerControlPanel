@@ -139,8 +139,9 @@ public static class TracesExtensions
         => tracesRoot.ResourceSpans[0].ScopeSpans[0].Spans[0].TraceId;
 
     public static string GetTraceRoute(this ResourceSpan resourceSpan)
-        => resourceSpan.ScopeSpans.Find(x => !x.Scope.Name.Equals("System.Net.Http")).Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue
-            ?? resourceSpan.ScopeSpans[0].Spans[0].Attributes.Find(x => x.Key.Equals("url.path"))?.Value.StringValue;
+        => resourceSpan.ScopeSpans?.Find(x => !x.Scope.Name.Equals("System.Net.Http"))?.Spans[0]?.Attributes?.Find(x => x.Key.Equals("url.path"))?.Value?.StringValue
+            ?? resourceSpan.ScopeSpans?[0]?.Spans[0]?.Attributes?.Find(x => x.Key.Equals("url.path"))?.Value?.StringValue
+            ?? "Unknown";
 
     public static string GetTraceName(this ResourceSpan resourceSpan)
         => resourceSpan.ScopeSpans[0].Spans[0].Name;

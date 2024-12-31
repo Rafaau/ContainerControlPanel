@@ -69,6 +69,12 @@
 			<MudSelectItem Value="@(720)">12 @Localizer[Locales.Resource.Hours]</MudSelectItem>
 		</MudSelect>
 	</div>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div class="refresh">
+			<MudIconButton @onclick="async () => { await GetTraces(); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
 	<div class="indicator-container">
 		<IndicatorChart 
 			Value="@averageDuration" 

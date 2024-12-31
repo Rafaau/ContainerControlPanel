@@ -81,6 +81,8 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private List<TracesRoot> allTraces { get; set; } = new();
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
         if (MemoryCache.TryGetValue("lastTracesHref", out string cachedHref))
@@ -91,10 +93,27 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
         }
+
         await LoadTraces();
 
-        WebSocketService.TracesUpdated += OnTracesUpdated;
-        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            _ = Task.Run(async () =>
+            {
+                while (!_cts.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        WebSocketService.TracesUpdated += OnTracesUpdated;
+                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                }
+            });
+        }
     }
 
     private async Task LoadTraces()

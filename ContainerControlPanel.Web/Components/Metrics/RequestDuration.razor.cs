@@ -48,6 +48,8 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
     private List<object> minMaxDuration;
     private IndicatorChart averageDurationIndicator;
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
         currentDataPoint = Metric.Histogram.DataPoints.Find(dp => dp.Attributes.Any(a => a.Key == "http.route"));
@@ -58,8 +60,24 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
         await GetTraces();
         CalculateAverageDuration();
 
-        WebSocketService.TracesUpdated += OnTracesUpdated;
-        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            _ = Task.Run(async () =>
+            {
+                while (!_cts.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        WebSocketService.TracesUpdated += OnTracesUpdated;
+                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                }
+            });
+        }
 
         base.OnInitialized();
     }
@@ -80,7 +98,8 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
         config = new Plotly.Blazor.Config
         {
             DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False,
-            DisplayLogo = false
+            DisplayLogo = false,
+            ShowAxisDragHandles = false
         };
 
         layout = new Plotly.Blazor.Layout

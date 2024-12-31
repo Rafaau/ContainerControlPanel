@@ -97,6 +97,8 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private LogDetailsView currentLog { get; set; } = null;
 
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task OnInitializedAsync()
     {
         if (MemoryCache.TryGetValue("lastStructuredLogsHref", out string cachedHref))
@@ -110,8 +112,24 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         
         await LoadLogs();
 
-        WebSocketService.LogsUpdated += OnLogsUpdated;
-        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            _ = Task.Run(async () =>
+            {
+                while (!_cts.Token.IsCancellationRequested)
+                {
+                    try
+                    {
+                        WebSocketService.LogsUpdated += OnLogsUpdated;
+                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                }
+            });
+        }      
     }
 
     private async Task LoadLogs()

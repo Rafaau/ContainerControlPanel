@@ -2,6 +2,11 @@
 	display: flex;
 	margin: 24px;
 	user-select: none;
+	align-items: center;
+}
+
+h1 {
+	margin-right: 8px;
 }
 
 .data-grid {

@@ -24,6 +24,12 @@
 			}
 		</MudSelect>
 	</div>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div class="refresh">
+			<MudIconButton @onclick="async () => { await GetTraces(); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
 	@if (filteredTraces != null)
 	{
 		<div class="total-span">
