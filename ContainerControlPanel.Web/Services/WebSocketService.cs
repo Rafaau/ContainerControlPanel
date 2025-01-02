@@ -56,7 +56,7 @@ public class WebSocketService
 
     public async ValueTask DisposeAsync()
     {
-        if (_webSocket != null)
+        if (_webSocket != null && _webSocket.State == WebSocketState.Open)
         {
             await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
             _webSocket.Dispose();

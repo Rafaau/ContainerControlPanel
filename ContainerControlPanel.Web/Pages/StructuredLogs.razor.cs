@@ -114,21 +114,8 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
         if (bool.Parse(Configuration["Realtime"]))
         {
-            _ = Task.Run(async () =>
-            {
-                while (!_cts.Token.IsCancellationRequested)
-                {
-                    try
-                    {
-                        WebSocketService.LogsUpdated += OnLogsUpdated;
-                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        break;
-                    }
-                }
-            });
+            WebSocketService.LogsUpdated += OnLogsUpdated;
+            await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
         }      
     }
 

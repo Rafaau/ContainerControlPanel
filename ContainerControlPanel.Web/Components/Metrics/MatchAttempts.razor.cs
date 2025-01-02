@@ -72,21 +72,8 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
 
         if (bool.Parse(Configuration["Realtime"]))
         {
-            _ = Task.Run(async () =>
-            {
-                while (!_cts.Token.IsCancellationRequested)
-                {
-                    try
-                    {
-                        WebSocketService.TracesUpdated += OnTracesUpdated;
-                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        break;
-                    }
-                }
-            });
+            WebSocketService.TracesUpdated += OnTracesUpdated;
+            await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
         }
 
         base.OnInitialized();

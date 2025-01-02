@@ -62,21 +62,8 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
 
         if (bool.Parse(Configuration["Realtime"]))
         {
-            _ = Task.Run(async () =>
-            {
-                while (!_cts.Token.IsCancellationRequested)
-                {
-                    try
-                    {
-                        WebSocketService.TracesUpdated += OnTracesUpdated;
-                        await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        break;
-                    }
-                }
-            });
+            WebSocketService.TracesUpdated += OnTracesUpdated;
+            await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
         }
 
         base.OnInitialized();
@@ -366,7 +353,9 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
 
     private void CalculateAverageDuration()
     {
-        var d = traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()));
+        if (traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName())).Count() == 0) 
+            return;
+
         var avg = (decimal)traces.Where(t => t.GetTraceRoute().Contains(currentDataPoint.GetRouteName()))
             .Select(t => t.GetDuration().Milliseconds)
             .Average();

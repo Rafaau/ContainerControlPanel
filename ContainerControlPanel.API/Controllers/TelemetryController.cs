@@ -77,6 +77,9 @@ public class TelemetryController : ControllerBase
 
             foreach (var span in tracesRoot.GetSpans())
             {
+                if (span.Name == "GET /docs")
+                    continue;
+
                 tracesRoot.ResourceSpans[0].ScopeSpans.Clear();
                 tracesRoot.ResourceSpans[0].ScopeSpans.Add(new ScopeSpan
                 {
