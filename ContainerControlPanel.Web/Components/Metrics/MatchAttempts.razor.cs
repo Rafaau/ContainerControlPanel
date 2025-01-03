@@ -220,7 +220,8 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
 
     private async Task GetTraces()
     {
-        var result = await telemetryAPI.GetTraces(ResourceName);
+        var result = await telemetryAPI
+            .GetTraces(int.Parse(Configuration["TimeOffset"]), ResourceName);
         traces = result.GetTracesList(routesOnly: true);
     }
     

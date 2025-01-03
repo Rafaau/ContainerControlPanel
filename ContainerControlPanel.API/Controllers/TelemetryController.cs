@@ -140,7 +140,7 @@ public class TelemetryController : ControllerBase
     }
 
     [HttpGet("GetTraces")]
-    public async Task<IActionResult> GetTraces(string? resource)
+    public async Task<IActionResult> GetTraces(int timeOffset, string? resource, string? timestamp)
     {
         List<TracesRoot> traces = new();
         var result = await _redisService.ScanKeysByPatternAsync("trace");
@@ -149,7 +149,8 @@ public class TelemetryController : ControllerBase
         {
             var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
 
-            if (string.IsNullOrEmpty(resource) || deserialized.HasResource(resource))
+            if ((resource == "all" || deserialized.HasResource(resource))
+                && (string.IsNullOrEmpty(timestamp) || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
                 traces.Add(deserialized);
         }
 
@@ -190,14 +191,17 @@ public class TelemetryController : ControllerBase
     }
 
     [HttpGet("GetLogs")]
-    public async Task<IActionResult> GetLogs()
+    public async Task<IActionResult> GetLogs(int timeOffset, string? timestamp, string? resource)
     {
         List<LogsRoot> logs = new();
         var result = await _redisService.ScanKeysByPatternAsync("log");
         foreach (var item in result)
         {
             var deserialized = JsonSerializer.Deserialize<LogsRoot>(item);
-            logs.Add(deserialized);
+
+            if ((resource == "all" || resource == deserialized.GetResourceName())
+                && (timestamp == "null" || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
+                logs.Add(deserialized);
         }
         return Ok(logs);
     }

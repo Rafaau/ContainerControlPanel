@@ -104,30 +104,23 @@ public static class TracesExtensions
     public static List<ResourceSpan> GetTracesList(
         this List<TracesRoot> rootsList,
         bool orderDesc = true,
-        string filter = "all",
         bool routesOnly = false,
-        DateTime? timestamp = null,
         int timeOffset = 0)
     {
         return rootsList
             .SelectMany(x => x.ResourceSpans)
             .Where(rs =>
-                filter == "all" ||
-                rs.Resource.Attributes
-                    .Any(attr => attr.Key == "service.name"
-                        && attr.Value?.StringValue == filter))
-            .Where(rs =>
                 !routesOnly ||
                 rs.ScopeSpans[0].Spans[0].Attributes.Any(a => a.Key == "url.path"))
-            .Where(rs =>
-                timestamp == null ||
-                rs.GetTimestamp(timeOffset).Date == timestamp.Value.Date)
             .OrderByDescending(rs => rs.ScopeSpans
                 .SelectMany(ss => ss.Spans)
                 .Min(span => long.Parse(span.StartTimeUnixNano)))
             .ToList();
 
     }
+
+    public static DateTime GetTimestamp(this TracesRoot tracesRoot, int timeOffset)
+        => tracesRoot.ResourceSpans[0].ScopeSpans[0].Spans[0].GetStartDate(timeOffset);
 
     public static string GetServiceName(this ResourceSpan resourceSpan)
         => resourceSpan.Resource.Attributes.Find(x => x.Key.Equals("service.name")).Value.StringValue;

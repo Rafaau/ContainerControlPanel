@@ -50,6 +50,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             ResourceParameter = value;
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastTracesHref", currentRoute);
+            LoadTraces();
         }
     }
 
@@ -74,6 +75,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             TimestampParameter = value?.ToString("yyyy-MM-dd");
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastTracesHref", currentRoute);
+            LoadTraces();
         }
     }
 
@@ -88,13 +90,15 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         if (MemoryCache.TryGetValue("lastTracesHref", out string cachedHref))
         {
             NavigationManager.NavigateTo(cachedHref);
+
+            if (cachedHref.Split("/")[3] == "null")
+                await LoadTraces();
         }
         else
         {
             TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
+            await LoadTraces();
         }
-
-        await LoadTraces();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -110,7 +114,8 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             allTraces = cachedTraces;
             this.StateHasChanged();
 
-            var result = await telemetryAPI.GetTraces();
+            var result = await telemetryAPI
+                .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
 
             if (result.Count != allTraces.Count)
             {
@@ -121,7 +126,8 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         }
         else
         {
-            var result = await telemetryAPI.GetTraces();
+            var result = await telemetryAPI
+                .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
             MemoryCache.Set("traces", result);
             allTraces = result;
             this.StateHasChanged();

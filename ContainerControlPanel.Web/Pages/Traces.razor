@@ -18,33 +18,32 @@
 
 @{
 	List<ResourceSpan> traces = allTraces.GetTracesList(
-		filter: currentResource, 
 		routesOnly: routesOnly, 
-		timestamp: currentTimestamp,
 		timeOffset: int.Parse(Configuration["TimeOffset"])
 	);
 }
 
-@if (allTraces.Count > 0) 
-{
-	<div class="flex">
-		<div class="resource-select">
-			<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
-				<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+<div class="flex">
+	<div class="resource-select">	
+		<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
+			<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			@if (allTraces.Count > 0)
+			{
 				@foreach (var resource in allTraces.GetResources())
 				{
 					<MudSelectItem Value="@(resource)">@resource</MudSelectItem>
 				}
-			</MudSelect>
-		</div>
-		<div class="picker">
-			<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="currentTimestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
-		</div>
-		<div class="switch">
-			<MudSwitch @bind-Value="routesOnly" Label="@Localizer[Locales.Resource.RoutesOnly]" Color="Color.Success" />
-		</div>
+			}
+		</MudSelect>
 	</div>
-}
+	<div class="picker">
+		<MudDatePicker Label="@Localizer[Locales.Resource.ChooseTimestamp]" @bind-Date="currentTimestamp" Clearable="true" DateFormat="dd.MM.yyyy" />
+	</div>
+	<div class="switch">
+		<MudSwitch @bind-Value="routesOnly" Label="@Localizer[Locales.Resource.RoutesOnly]" Color="Color.Success" />
+	</div>
+</div>
+
 
 <div class="data-grid">
 	<div class="data-grid-row header">

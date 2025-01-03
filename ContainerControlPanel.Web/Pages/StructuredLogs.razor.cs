@@ -55,6 +55,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             ResourceParameter = value;
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastStructuredLogsHref", currentRoute);
+            LoadLogs();
         }
     }
 
@@ -87,9 +88,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             : null;
         set
         {
-            TimestampParameter = value?.ToString("yyyy-MM-dd");
+            TimestampParameter = value?.ToString("yyyy-MM-dd") ?? "null";
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastStructuredLogsHref", currentRoute);
+            LoadLogs();
         }
     }
 
@@ -104,14 +106,16 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         if (MemoryCache.TryGetValue("lastStructuredLogsHref", out string cachedHref))
         {
             NavigationManager.NavigateTo(cachedHref);
+
+            if (cachedHref.Split("/")[3] == "null")
+                await LoadLogs();
         }
         else
         {
             TimestampParameter ??= DateTime.Now.ToString("yyyy-MM-dd");
+            await LoadLogs();
         }
-        
-        await LoadLogs();
-
+      
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.LogsUpdated += OnLogsUpdated;
@@ -126,7 +130,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             logsRoot = cachedLogs;
             this.StateHasChanged();
 
-            var result = await telemetryAPI.GetLogs();
+            var s = currentTimestamp?.ToString() ?? "null";
+
+            var result = await telemetryAPI
+                .GetLogs(int.Parse(Configuration["TimeOffset"]), currentTimestamp?.ToString() ?? "null", currentResource);
 
             if (result.Count != logsRoot.Count)
             {
@@ -137,7 +144,8 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         }
         else
         {
-            var result = await telemetryAPI.GetLogs();
+            var result = await telemetryAPI
+                .GetLogs(int.Parse(Configuration["TimeOffset"]), currentTimestamp?.ToString() ?? "null", currentResource);
             MemoryCache.Set("structuredlogs", result);
             logsRoot = result;
             this.StateHasChanged();

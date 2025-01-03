@@ -95,12 +95,13 @@ public static class LogsExtensions
     public static string GetResourceName(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].Resource.GetResourceName();
 
+    public static DateTime GetTimestamp(this LogsRoot logsRoot, int timeOffset)
+        => DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords[0].TimeUnixNano) / 1000000).AddHours(timeOffset).DateTime;
+
     public static List<LogView> GetStructuredLogs(
             this List<LogsRoot> logsRoots,
             int timeOffset,
-            string? resource,
             string? severity,
-            DateTime? timestamp,
             string? filterString,
             bool orderDesc = true)
     {
@@ -108,11 +109,6 @@ public static class LogsExtensions
         foreach (var logsRoot in logsRoots)
         {
             var resourceName = logsRoot.GetResourceName();
-
-            if (resource != "all" && resourceName != resource)
-            {
-                continue;
-            }
 
             foreach (var resourceLog in logsRoot.ResourceLogs)
             {
@@ -141,11 +137,6 @@ public static class LogsExtensions
                         }
 
                         DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).AddHours(timeOffset).DateTime;
-
-                        if (timestamp != null && dateTime.Date != timestamp.Value.Date)
-                        {
-                            continue;
-                        }
 
                         logs.Add(new LogView
                         {
