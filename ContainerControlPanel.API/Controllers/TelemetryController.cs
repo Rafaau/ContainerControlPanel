@@ -1,35 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Google.Protobuf;
-using System.Reflection;
-using Microsoft.Extensions.Primitives;
-using System.Net.Http.Headers;
 using OpenTelemetry.Proto.Collector.Trace.V1;
-using System.Buffers;
-using System.IO.Pipelines;
 using ContainerControlPanel.Domain.Models;
-using System.Text;
-using System;
 using System.Text.Json;
 using OpenTelemetry.Proto.Collector.Metrics.V1;
 using OpenTelemetry.Proto.Collector.Logs.V1;
+using ContainerControlPanel.API.Models;
 
+/// <summary>
+/// Controller for handling telemetry data.
+/// </summary>
 [ApiController]
 [Route("/v1")]
 public class TelemetryController : ControllerBase
 {
-    private readonly ILogger<TelemetryController> _logger;
+    /// <summary>
+    /// Redis service 
+    /// </summary>
     private readonly RedisService _redisService;
 
-    public const string ProtobufContentType = "application/x-protobuf";
-    public const string JsonContentType = "application/json";
-    public const string CorsPolicyName = "OtlpHttpCors";
-
-    public TelemetryController(ILogger<TelemetryController> logger, RedisService redisService)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TelemetryController"/> class.
+    /// </summary>
+    /// <param name="redisService">Redis service</param>
+    public TelemetryController(RedisService redisService)
     {
-        _logger = logger;
         _redisService = redisService;
     }
 
+    /// <summary>
+    /// Collects OpenTelemetry metrics data.
+    /// </summary>
+    /// <returns>Returns an action result</returns>
     [HttpPost("metrics")]
     public async Task<IActionResult> CollectTelemetry()
     {
@@ -65,6 +66,10 @@ public class TelemetryController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Collects OpenTelemetry trace data.
+    /// </summary>
+    /// <returns>Returns an action result</returns>
     [HttpPost("traces")]
     public async Task<IActionResult> CollectTrace()
     {
@@ -108,6 +113,10 @@ public class TelemetryController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Collects OpenTelemetry logs data.
+    /// </summary>
+    /// <returns>Returns an action result</returns>
     [HttpPost("logs")]
     public async Task<IActionResult> CollectLogs()
     {
@@ -139,6 +148,13 @@ public class TelemetryController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Gets the stored traces.
+    /// </summary>
+    /// <param name="timeOffset">Time offset</param>
+    /// <param name="resource">Resource name</param>
+    /// <param name="timestamp">Timestamp</param>
+    /// <returns>Returns the stored traces</returns>
     [HttpGet("GetTraces")]
     public async Task<IActionResult> GetTraces(int timeOffset, string? resource, string? timestamp)
     {
@@ -157,6 +173,11 @@ public class TelemetryController : ControllerBase
         return Ok(traces);
     }
 
+    /// <summary>
+    /// Gets the stored trace.
+    /// </summary>
+    /// <param name="traceId">Trace ID</param>
+    /// <returns>Returns the stored trace</returns>
     [HttpGet("GetTrace")]
     public async Task<IActionResult> GetTrace(string traceId)
     {
@@ -177,6 +198,10 @@ public class TelemetryController : ControllerBase
         return Ok(traces);
     }
 
+    /// <summary>
+    /// Gets the stored metrics.
+    /// </summary>
+    /// <returns>Returns the stored metrics</returns>
     [HttpGet("GetMetrics")]
     public async Task<IActionResult> GetMetrics()
     {
@@ -190,6 +215,13 @@ public class TelemetryController : ControllerBase
         return Ok(metrics);
     }
 
+    /// <summary>
+    /// Gets the stored logs.
+    /// </summary>
+    /// <param name="timeOffset">Time offset</param>
+    /// <param name="timestamp">Timestamp</param>
+    /// <param name="resource">Resource name</param>
+    /// <returns>Returns the stored logs</returns>
     [HttpGet("GetLogs")]
     public async Task<IActionResult> GetLogs(int timeOffset, string? timestamp, string? resource)
     {
@@ -206,6 +238,11 @@ public class TelemetryController : ControllerBase
         return Ok(logs);
     }
 
+    /// <summary>
+    /// Gets the stored log.
+    /// </summary>
+    /// <param name="traceId">Trace ID</param>
+    /// <returns>Returns the stored log</returns>
     [HttpGet("GetLog")]
     public async Task<IActionResult> GetLog(string traceId)
     {
@@ -218,6 +255,11 @@ public class TelemetryController : ControllerBase
         return Ok(deserialized);
     }
 
+    /// <summary>
+    /// Gets the request and response for a trace.
+    /// </summary>
+    /// <param name="traceId">Trace ID</param>
+    /// <returns>Returns the request and response for the trace</returns>
     [HttpGet("GetRequestAndResponse")]
     public async Task<IActionResult> GetRequestAndResponse(string traceId)
     {
@@ -235,113 +277,5 @@ public class TelemetryController : ControllerBase
         }
 
         return Ok(reqRes);
-    }
-
-    public sealed class MessageBindable<TMessage> : IBindableFromHttpContext<MessageBindable<TMessage>> where TMessage : IMessage<TMessage>, new()
-    {
-        public static readonly MessageBindable<TMessage> Empty = new MessageBindable<TMessage>();
-
-        public TMessage? Message { get; private set; }
-
-        public static async ValueTask<MessageBindable<TMessage>?> BindAsync(HttpContext context, System.Reflection.ParameterInfo parameter)
-        {
-            switch (GetKnownContentType(context.Request.ContentType, out var charSet))
-            {
-                case KnownContentType.Protobuf:
-                    try
-                    {
-                        var message = await ReadOtlpData(context, data =>
-                        {
-                            var message = new TMessage();
-                            message.MergeFrom(data);
-                            return message;
-                        }).ConfigureAwait(false);
-
-                        return new MessageBindable<TMessage> { Message = message };
-                    }
-                    catch (BadHttpRequestException ex)
-                    {
-                        context.Response.StatusCode = ex.StatusCode;
-                        return Empty;
-                    }
-                case KnownContentType.Json:
-                default:
-                    context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
-                    return Empty;
-            }
-        }
-
-        private static KnownContentType GetKnownContentType(string? contentType, out StringSegment charSet)
-        {
-            if (contentType != null && MediaTypeHeaderValue.TryParse(contentType, out var mt))
-            {
-                if (string.Equals(mt.MediaType, JsonContentType, StringComparison.OrdinalIgnoreCase))
-                {
-                    charSet = mt.CharSet;
-                    return KnownContentType.Json;
-                }
-
-                if (string.Equals(mt.MediaType, ProtobufContentType, StringComparison.OrdinalIgnoreCase))
-                {
-                    charSet = mt.CharSet;
-                    return KnownContentType.Protobuf;
-                }
-            }
-
-            charSet = default;
-            return KnownContentType.None;
-        }
-
-        private static async Task<T> ReadOtlpData<T>(HttpContext httpContext, Func<ReadOnlySequence<byte>, T> exporter)
-        {
-            const int MaxRequestSize = 1024 * 1024 * 4; // 4 MB. Matches default gRPC request limit.
-
-            ReadResult result = default;
-            try
-            {
-                do
-                {
-                    result = await httpContext.Request.BodyReader.ReadAsync().ConfigureAwait(false);
-
-                    if (result.IsCanceled)
-                    {
-                        throw new OperationCanceledException("Read call was canceled.");
-                    }
-
-                    if (result.Buffer.Length > MaxRequestSize)
-                    {
-                        // Too big!
-                        throw new BadHttpRequestException(
-                            $"The request body was larger than the max allowed of {MaxRequestSize} bytes.",
-                            StatusCodes.Status400BadRequest);
-                    }
-
-                    if (result.IsCompleted)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        httpContext.Request.BodyReader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
-                    }
-                } while (true);
-
-                return exporter(result.Buffer);
-            }
-            finally
-            {
-                if (!result.Equals(default(ReadResult)))
-                {
-                    httpContext.Request.BodyReader.AdvanceTo(result.Buffer.End);
-                }
-            }
-        }
-
-        private enum KnownContentType
-        {
-            None,
-            Protobuf,
-            Json
-        }
     }
 }

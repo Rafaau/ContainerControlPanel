@@ -1,10 +1,21 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 
+/// <summary>
+/// Handles WebSocket connections for telemetry data.
+/// </summary>
 public static class TelemetryWebSocketHandler
 {
+    /// <summary>
+    /// List of active WebSockets
+    /// </summary>
     private static readonly List<WebSocket> WebSockets = new();
 
+    /// <summary>
+    /// Handles a WebSocket connection.
+    /// </summary>
+    /// <param name="webSocket"></param>
+    /// <returns></returns>
     public static async Task HandleWebSocketConnectionAsync(WebSocket webSocket)
     {
         WebSockets.Add(webSocket);
@@ -37,6 +48,11 @@ public static class TelemetryWebSocketHandler
         }
     }
 
+    /// <summary>
+    /// Broadcasts a message to all connected WebSockets.
+    /// </summary>
+    /// <param name="message">Stringified message</param>
+    /// <returns>Returns a task</returns>
     public static async Task BroadcastMessageAsync(string message)
     {
         var buffer = Encoding.UTF8.GetBytes(message);
