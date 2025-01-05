@@ -4,100 +4,256 @@ using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
+/// <summary>
+/// Class to represent the logs output
+/// </summary>
 public class LogsRoot
 {
+    /// <summary>
+    /// Gets or sets the resource logs
+    /// </summary>
     [JsonPropertyName("resourceLogs")]
     public List<ResourceLog> ResourceLogs { get; set; }
 }
 
-
+/// <summary>
+/// Class to represent the body of a log
+/// </summary>
 public class Body
 {
+    /// <summary>
+    /// Gets or sets the string value
+    /// </summary>
     [JsonPropertyName("stringValue")]
     public string StringValue { get; set; }
 }
 
+/// <summary>
+/// Class to represent a log record
+/// </summary>
 public class LogRecord
 {
+    /// <summary>
+    /// Gets or sets the time in Unix nano format
+    /// </summary>
     [JsonPropertyName("timeUnixNano")]
     public string TimeUnixNano { get; set; }
 
+    /// <summary>
+    /// Gets or sets the severity number
+    /// </summary>
     [JsonPropertyName("severityNumber")]
     public string SeverityNumber { get; set; }
 
+    /// <summary>
+    /// Gets or sets the severity text
+    /// </summary>
     [JsonPropertyName("severityText")]
     public string SeverityText { get; set; }
 
+    /// <summary>
+    /// Gets or sets the body
+    /// </summary>
     [JsonPropertyName("body")]
     public Body Body { get; set; }
 
+    /// <summary>
+    /// Gets or sets the flags
+    /// </summary>
     [JsonPropertyName("flags")]
     public int Flags { get; set; }
 
+    /// <summary>
+    /// Gets or sets the trace ID
+    /// </summary>
     [JsonPropertyName("traceId")]
     public string TraceId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the span ID
+    /// </summary>
     [JsonPropertyName("spanId")]
     public string SpanId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the observed time in Unix nano format
+    /// </summary>
     [JsonPropertyName("observedTimeUnixNano")]
     public string ObservedTimeUnixNano { get; set; }
 }
 
+/// <summary>
+/// Class to represent a resource log
+/// </summary>
 public class ResourceLog
 {
+    /// <summary>
+    /// Gets or sets the resource
+    /// </summary>
     [JsonPropertyName("resource")]
     public Resource Resource { get; set; }
 
+    /// <summary>
+    /// Gets or sets the scope logs
+    /// </summary>
     [JsonPropertyName("scopeLogs")]
     public List<ScopeLog> ScopeLogs { get; set; }
 }
 
+/// <summary>
+/// Class to represent a scope log
+/// </summary>
 public class ScopeLog
 {
+    /// <summary>
+    /// Gets or sets the scope
+    /// </summary>
     [JsonPropertyName("scope")]
     public Scope Scope { get; set; }
 
+    /// <summary>
+    /// Gets or sets the log records
+    /// </summary>
     [JsonPropertyName("logRecords")]
     public List<LogRecord> LogRecords { get; set; }
 }
 
+/// <summary>
+/// Class to represent a log view
+/// </summary>
 public class LogView
 {
+    /// <summary>
+    /// Gets or sets the resource name
+    /// </summary>
     public string? ResourceName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the severity
+    /// </summary>
     public string? Severity { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timestamp
+    /// </summary>
     public DateTime? Timestamp { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message
+    /// </summary>
     public string? Message { get; set; }
+
+    /// <summary>
+    /// Gets or sets the trace ID
+    /// </summary>
     public string? TraceId { get; set; }
 }
 
+/// <summary>
+/// Class to represent the log details view
+/// </summary>
 public class LogDetailsView
 {
+    /// <summary>
+    /// Gets or sets the resource name
+    /// </summary>
     public string? ResourceName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the severity
+    /// </summary>
     public string? Severity { get; set; }
+
+    /// <summary>
+    /// Gets or sets the timestamp
+    /// </summary>
     public DateTime? Timestamp { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message
+    /// </summary>
     public string? Message { get; set; }
+
+    /// <summary>
+    /// Gets or sets the trace ID
+    /// </summary>
     public string? TraceId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the service instance ID
+    /// </summary>
     public string? ServiceInstanceId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the scope name
+    /// </summary>
     public string? ScopeName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the span ID
+    /// </summary>
     public string? SpanId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the flags
+    /// </summary>
     public int? Flags { get; set; }
+
+    /// <summary>
+    /// Gets or sets the telemetry SDK name
+    /// </summary>
     public string? TelemetrySdkName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the telemetry SDK version
+    /// </summary>
     public string? TelemetrySdkVersion { get; set; }
+
+    /// <summary>
+    /// Gets or sets the telemetry SDK language
+    /// </summary>
     public string? TelemetrySdkLanguage { get; set; }
 }
 
+/// <summary>
+/// Extension methods for <see cref="LogsRoot"/>
+/// </summary>
 public static class LogsExtensions
 {
+    /// <summary>
+    /// Gets the trace ID
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <returns>Returns the trace ID</returns>
     public static string GetTraceId(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords[0].TraceId;
 
+    /// <summary>
+    /// Gets the resource name
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <returns>Returns the resource name</returns>
     public static string GetResourceName(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].Resource.GetResourceName();
 
+    /// <summary>
+    /// Gets the resource name
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <param name="timeOffset">Time offset</param>
+    /// <returns>Returns the timestamp</returns>
     public static DateTime GetTimestamp(this LogsRoot logsRoot, int timeOffset)
         => DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords[0].TimeUnixNano) / 1000000).AddHours(timeOffset).DateTime;
 
+    /// <summary>
+    /// Gets the resource name
+    /// </summary>
+    /// <param name="logsRoots">Logs root objects</param>
+    /// <param name="timeOffset">Time offset</param>
+    /// <param name="severity">Severity</param>
+    /// <param name="filterString">Filter string</param>
+    /// <param name="orderDesc">Order descending</param>
+    /// <returns>Returns the structured logs</returns>
     public static List<LogView> GetStructuredLogs(
             this List<LogsRoot> logsRoots,
             int timeOffset,
@@ -156,6 +312,11 @@ public static class LogsExtensions
             : logs.OrderBy(x => x.Timestamp).ToList();
     }
 
+    /// <summary>
+    /// Gets the resources
+    /// </summary>
+    /// <param name="logsRoots">Logs root objects</param>
+    /// <returns>Returns the resources</returns>
     public static List<string> GetResources(this List<LogsRoot> logsRoots)
     {
         var resources = new List<string>();
@@ -167,6 +328,11 @@ public static class LogsExtensions
         return resources;
     }
 
+    /// <summary>
+    /// Gets the request response object
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <returns>Returns the request response object</returns>
     public static RequestResponse? GetRequestResponse(this LogsRoot logsRoot)
     {
         var request = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[REQUEST]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[REQUEST]"));
@@ -187,11 +353,23 @@ public static class LogsExtensions
         return null;
     }
 
+    /// <summary>
+    /// Gets the log details
+    /// </summary>
+    /// <param name="resource">Resource object</param>
+    /// <param name="key">Key</param>
+    /// <returns>Returns the attribute value</returns>
     public static string GetAttributeValue(this Resource resource, string key)
     {
         return resource.Attributes.Find(x => x.Key.Equals(key)).Value.StringValue;
     }
 
+    /// <summary>
+    /// Gets the log details
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <param name="logView">Log view object</param>
+    /// <returns>Returns the log details view</returns>
     public static LogDetailsView GetLogDetails(this List<LogsRoot> logsRoot, LogView logView)
     {
         var logRecord = logsRoot[0].ResourceLogs[0].ScopeLogs[0].LogRecords.Find(x => x.TraceId == logView.TraceId);
@@ -212,6 +390,11 @@ public static class LogsExtensions
         };
     }
 
+    /// <summary>
+    /// Gets the resource name
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <returns>Returns the resource name</returns>
     public static List<LogRecord> GetLogRecords(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords;
 }

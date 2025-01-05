@@ -1,12 +1,19 @@
 ﻿using System.Diagnostics;
-using System.Globalization;
 using ContainerControlPanel.Domain.Methods;
 using ContainerControlPanel.Domain.Models;
 
 namespace ContainerControlPanel.Domain.Services;
 
+/// <summary>
+/// Class to read information about containers
+/// </summary>
 public static class ContainerReader
 {
+    /// <summary>
+    /// Gets a list of containers
+    /// </summary>
+    /// <param name="liveFilter">Indicates whether to filter live containers</param>
+    /// <returns>Returns a list of <see cref="Container"/> objects</returns>
     public static async Task<List<Container>> GetContainersListAsync(bool liveFilter = false)
     {
         string argString = liveFilter 
@@ -32,6 +39,15 @@ public static class ContainerReader
         }
     }
 
+    /// <summary>
+    /// Gets the logs of a container
+    /// </summary>
+    /// <param name="containerId">Container ID</param>
+    /// <param name="timestamp">Timestamp</param>
+    /// <param name="date">Date</param>
+    /// <param name="timeFrom">Start time</param>
+    /// <param name="timeTo">End time</param>
+    /// <returns>Returns the logs of the container</returns>
     public static async Task<string> GetContainerLogsAsync(
         string containerId, 
         string timestamp = null, 
@@ -70,6 +86,11 @@ public static class ContainerReader
         }
     }
 
+    /// <summary>
+    /// Stops a container
+    /// </summary>
+    /// <param name="containerId">Container ID</param>
+    /// <returns>Returns the output of the command</returns>
     public static async Task<string> StopContainerAsync(string containerId)
     {
         ProcessStartInfo _stopContainerProcessStartInfo = new ProcessStartInfo
@@ -89,6 +110,11 @@ public static class ContainerReader
         }
     }
 
+    /// <summary>
+    /// Restarts a container
+    /// </summary>
+    /// <param name="containerId">Container ID</param>
+    /// <returns>Returns the output of the command</returns>
     public static async Task<string> RestartContainerAsync(string containerId)
     {
         ProcessStartInfo _restartContainerProcessStartInfo = new ProcessStartInfo
@@ -109,6 +135,11 @@ public static class ContainerReader
         }
     }
 
+    /// <summary>
+    /// Starts a container
+    /// </summary>
+    /// <param name="containerId">Container ID</param>
+    /// <returns>Returns the output of the command</returns>
     public static async Task<string> StartContainerAsync(string containerId)
     {
         ProcessStartInfo _startContainerProcessStartInfo = new ProcessStartInfo
@@ -128,6 +159,11 @@ public static class ContainerReader
         }
     }
 
+    /// <summary>
+    /// Gets the details of a container
+    /// </summary>
+    /// <param name="containerId">Container ID</param>
+    /// <returns>Returns a <see cref="ContainerDetails"/> object</returns>
     public static async Task<ContainerDetails> GetContainerDetailsAsync(string containerId)
     {
         ProcessStartInfo _containerEnvironmentVariablesProcessStartInfo = new ProcessStartInfo
