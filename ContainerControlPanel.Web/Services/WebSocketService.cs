@@ -5,16 +5,36 @@ using ContainerControlPanel.Domain.Models;
 
 namespace ContainerControlPanel.Web.Services;
 
+/// <summary>
+/// Class of WebSocket service.
+/// </summary>
 public class WebSocketService
 {
+    /// <summary>
+    /// WebSocket instance.
+    /// </summary>
     private ClientWebSocket _webSocket;
 
+    /// <summary>
+    /// Event for traces updated.
+    /// </summary>
     public event Action<TracesRoot>? TracesUpdated;
 
+    /// <summary>
+    /// Event for metrics updated.
+    /// </summary>
     public event Action<MetricsRoot>? MetricsUpdated;
 
+    /// <summary>
+    /// Event for logs updated.
+    /// </summary>
     public event Action<LogsRoot>? LogsUpdated;
 
+    /// <summary>
+    /// Connects to the WebSocket.
+    /// </summary>
+    /// <param name="uri">URI string.</param>
+    /// <returns>Returns a task.</returns>
     public async Task ConnectAsync(string uri)
     {
         _webSocket = new ClientWebSocket();
@@ -23,6 +43,10 @@ public class WebSocketService
         _ = ReceiveMessagesAsync();
     }
 
+    /// <summary>
+    /// Handles the received messages.
+    /// </summary>
+    /// <returns>Returns a task.</returns>
     private async Task ReceiveMessagesAsync()
     {
         var buffer = new byte[40960 * 4];
@@ -54,6 +78,10 @@ public class WebSocketService
         }
     }
 
+    /// <summary>
+    /// Disposes the WebSocket.
+    /// </summary>
+    /// <returns>Returns a task.</returns>
     public async ValueTask DisposeAsync()
     {
         if (_webSocket != null && _webSocket.State == WebSocketState.Open)

@@ -5,16 +5,34 @@ using System.Security.Claims;
 
 namespace ContainerControlPanel.Web.Authentication;
 
+/// <summary>
+/// Custom authentication state provider.
+/// </summary>
 public class CustomAuthenticationStateProvider : AuthenticationStateProvider
 {
+    /// <summary>
+    /// Session storage service instance.
+    /// </summary>
     private readonly ISessionStorageService _sessionStorage;
+
+    /// <summary>
+    /// Anonymous user principal.
+    /// </summary>
     private ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
 
+    /// <summary>
+    /// Constructor of the <see cref="CustomAuthenticationStateProvider"/> class.
+    /// </summary>
+    /// <param name="sessionStorage">Session storage service instance.</param>
     public CustomAuthenticationStateProvider(ISessionStorageService sessionStorage)
     {
         _sessionStorage = sessionStorage;
     }
 
+    /// <summary>
+    /// Get the current authentication state.
+    /// </summary>
+    /// <returns>Returns the current authentication state.</returns>
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         try
@@ -38,6 +56,11 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         }
     }
 
+    /// <summary>
+    /// Updates the authentication state.
+    /// </summary>
+    /// <param name="userSession">User session object.</param>
+    /// <returns>Returns the task object.</returns>
     public async Task UpdateAuthenticationState(UserSession? userSession)
     {
         ClaimsPrincipal claimsPrincipal;
@@ -61,6 +84,10 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
     }
 
+    /// <summary>
+    /// Gets the token.
+    /// </summary>
+    /// <returns>Returns the token.</returns>
     public async Task<string> GetToken()
     {
         var result = string.Empty;
