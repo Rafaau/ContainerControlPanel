@@ -5,7 +5,11 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
+{
+    config.AddEnvironmentVariables();
+    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+});
 
 builder.Services.AddCors(options =>
 {
@@ -21,11 +25,6 @@ builder.Services.AddMemoryCache();
 #pragma warning disable EXTEXP0018
 builder.Services.AddHybridCache();
 #pragma warning restore EXTEXP0018
-
-builder.Services.AddGrpc();
-builder.Services.AddOpenTelemetry()
-    .WithTracing(builder => builder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddConsoleExporter())
-    .WithMetrics(builder => builder.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddConsoleExporter());
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
 builder.Services.AddSingleton<RedisService>();
