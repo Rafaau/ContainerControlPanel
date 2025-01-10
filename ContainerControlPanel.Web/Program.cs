@@ -1,4 +1,4 @@
-using Blazored.SessionStorage;
+﻿using Blazored.SessionStorage;
 using ContainerControlPanel.Web;
 using ContainerControlPanel.Web.Authentication;
 using ContainerControlPanel.Web.Interfaces;
@@ -11,22 +11,38 @@ using Microsoft.JSInterop;
 using MudBlazor.Services;
 using Refit;
 using System.Globalization;
+using static System.Net.WebRequestMethods;
+using System.Text.Json;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+#if RELEASE
+using var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
+var configJson = await http.GetStringAsync("config.json");
+var configData = JsonSerializer.Deserialize<Dictionary<string, string>>(configJson);
+
+foreach (var keyValue in configData)
+{
+    if (string.IsNullOrWhiteSpace(keyValue.Value))
+        continue;
+
+    builder.Configuration[keyValue.Key] = keyValue.Value;
+}
+#endif
+
 builder.Services.AddScoped(sp => new HttpClient { 
-    BaseAddress = new Uri("http://localhost:5121")
+    BaseAddress = new Uri($"http://localhost:{builder.Configuration["WebAPI:Port"]}")
 });
 
 builder.Services
     .AddRefitClient<IContainerAPI>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://localhost:5121"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://localhost:{builder.Configuration["WebAPI:Port"]}"));
 
 builder.Services
     .AddRefitClient<ITelemetryAPI>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("http://localhost:5121"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://localhost:{builder.Configuration["WebAPI:Port"]}"));
 
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddTransient<IScrollHandler, ScrollHandler>();

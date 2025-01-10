@@ -24,6 +24,12 @@ public static class Parser
             string containerObj = $"{{{containerOutput}";
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(containerObj));
             Container container = await JsonSerializer.DeserializeAsync<Container>(stream);
+
+            if (container.Names.Contains("ccp-compose"))
+            {
+                continue;
+            }
+
             containers.Add(container);
         }
 

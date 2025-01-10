@@ -19,6 +19,14 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 COPY --from=build /app/publish/wwwroot .
 
+# Copy entrypoint.sh to the container
+COPY entrypoint.sh /entrypoint.sh
+
+# Fix entrypoint.sh line endings from CRLF to LF
+RUN sed -i 's/\r//' /entrypoint.sh
+
 # Expose port 80 to serve the Blazor app
 EXPOSE 80
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+# Start the application
+ENTRYPOINT ["bash", "/entrypoint.sh"]

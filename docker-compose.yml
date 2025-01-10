@@ -1,5 +1,7 @@
 version: '3'
 
+name: ccp-compose #UNECCESSARY
+
 services:
     ccp-backend:
         image: ccp-backend:latest
@@ -11,6 +13,7 @@ services:
             - ccp-network
         environment:
             - Redis__ConnectionString=redis:6379
+            - WebApp__Port=5069
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:rw
         privileged: true
@@ -23,13 +26,18 @@ services:
             - ccp-backend
         networks:
             - ccp-network
+        environment:
+            - UserToken=Profi123
+            - AdminToken=Profi2137
+            - AppName=ProfiAspire
+            - WebAPI__Port=5121
 
     redis:
         image: redis:latest
         ports:
             - "6379:6379"
         networks:
-            - ccp-network
+            - ccp-network     
 
 networks:
     ccp-network:

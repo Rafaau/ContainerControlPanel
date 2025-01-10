@@ -7,15 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
-    config.AddEnvironmentVariables();
     config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+    config.AddEnvironmentVariables();
 });
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient", policy =>
     {
-        policy.WithOrigins("http://localhost:5069") 
+        policy.WithOrigins($"http://localhost:{builder.Configuration["WebApp:Port"]}") 
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
