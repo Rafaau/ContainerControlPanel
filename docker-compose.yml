@@ -1,10 +1,10 @@
 version: '3'
 
-name: ccp-compose #UNECCESSARY
+name: ccp-compose #NECCESSARY
 
 services:
-    ccp-backend:
-        image: ccp-backend:latest
+    ccp-api:
+        image: rafaau/ccp-api:latest
         ports:
             - 5121:8080
         depends_on:
@@ -18,12 +18,12 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock:rw
         privileged: true
 
-    ccp-frontend:
-        image: ccp-frontend:latest
+    ccp-web:
+        image: rafaau/ccp-web:latest
         ports:
             - 5069:80
         depends_on:
-            - ccp-backend
+            - ccp-api
         networks:
             - ccp-network
         environment:
