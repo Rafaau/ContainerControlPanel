@@ -79,8 +79,8 @@ public partial class MainLayout
             var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
             await customAuthStateProvider.UpdateAuthenticationState(new UserSession
             {
-                UserName = token == Configuration["UserToken"] ? "User" : "Admin",
-                Role = token == Configuration["UserToken"] ? "User" : "Administrator",
+                UserName = token == Configuration["AdminToken"] ? "Admin" : "User",
+                Role = token == Configuration["AdminToken"] ? "Administrator" : "User",
                 Token = token,
                 ExpiresIn = 30
             });
