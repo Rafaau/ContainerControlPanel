@@ -193,6 +193,7 @@ You can configure your CCP stack by specifing following environment variables in
 | WebApp  | AdminToken              | String     | Specifies the token for the admin user.                         |
 | WebApp  | UserToken               | String     | Specifies the token for the regular user.                       |
 | WebApp  | WebAPI__Port            | Int        | Specifies the port number for the WebAPI service.               |
+| WebApp  | WebAPI__Host            | String     | Specifies the host of the WebAPI service.                       |
 | WebApp  | Realtime                | Boolean    | Specifies whether the application should use real-time updates. |
 | WebApp  | TimeOffset              | Int        | Specifies the time offset for the application.                  |
 
