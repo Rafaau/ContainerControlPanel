@@ -30,6 +30,7 @@ services:
             - UserToken=Profi123
             - AdminToken=Profi2137
             - AppName=ProfiAspire
+            - WebAPI__Host=localhost
             - WebAPI__Port=5121
 
     redis:
