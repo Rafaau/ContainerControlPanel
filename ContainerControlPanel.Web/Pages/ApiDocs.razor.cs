@@ -58,6 +58,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private bool apiDocsNotImplemented { get; set; } = false;
 
+    private List<Header> headers { get; set; } = new();
+
     protected override async Task OnInitializedAsync()
     {
         await LoadContainers();
@@ -229,7 +231,11 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         string route = GetRouteString(action);
 
-        var response = await httpClient.GetAsync(route);
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, route);
+        
+        AssignHeaders(action, request);
+
+        var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
     }
@@ -238,9 +244,13 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         string route = GetRouteString(action);
 
-        var response = await httpClient.PostAsync(
-            action.Route, 
-            new StringContent(action.TestRequestBody, encoding: Encoding.UTF8, "application/json"));
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, route);
+
+        request.Content = new StringContent(action.TestRequestBody, encoding: Encoding.UTF8, "application/json");
+
+        AssignHeaders(action, request);
+
+        var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
     }
@@ -249,9 +259,13 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         string route = GetRouteString(action);
 
-        var response = await httpClient.PutAsync(
-            action.Route,
-            new StringContent(action.TestRequestBody, encoding: Encoding.UTF8, "application/json"));
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, route);
+
+        request.Content = new StringContent(action.TestRequestBody, encoding: Encoding.UTF8, "application/json");
+
+        AssignHeaders(action, request);
+
+        var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
     }
@@ -260,7 +274,11 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         string route = GetRouteString(action);
 
-        var response = await httpClient.DeleteAsync(route);
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, route);
+
+        AssignHeaders(action, request);
+
+        var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
     }
@@ -269,9 +287,13 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         string route = GetRouteString(action);
 
-        var response = await httpClient.PatchAsync(
-            action.Route,
-            new StringContent(action.TestRequestBody, encoding: Encoding.UTF8, "application/json"));
+        HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), route);
+
+        request.Content = new StringContent(action.TestRequestBody, encoding: Encoding.UTF8, "application/json");
+
+        AssignHeaders(action, request);
+
+        var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
     }
@@ -366,4 +388,30 @@ public partial class ApiDocs(IContainerAPI containerAPI)
             return false;
         }
     }
+
+    private void AssignHeaders(ActionView action, HttpRequestMessage request)
+    {
+        foreach (var header in headers.Where(h => h.Action == action.Name))
+        {
+            if (string.IsNullOrEmpty(header.Key) || string.IsNullOrEmpty(header.Value))
+            {
+                header.Error = true;
+                return;
+            }
+            else
+            {
+                header.Error = false;
+            }
+
+            request.Headers.Add(header.Key, header.Value);
+        }
+    }
+}
+
+public class Header
+{
+    public string Action { get; set; }
+    public string Key { get; set; }
+    public string Value { get; set; }
+    public bool Error { get; set; } = false;
 }

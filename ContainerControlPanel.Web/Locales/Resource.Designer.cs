@@ -88,6 +88,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dodaj.
+        /// </summary>
+        public static string Add {
+            get {
+                return ResourceManager.GetString("Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wszystkie.
         /// </summary>
         public static string All {
@@ -534,6 +543,15 @@ namespace Locales {
         public static string ReinstallImageAnd {
             get {
                 return ResourceManager.GetString("ReinstallImageAnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usuń.
+        /// </summary>
+        public static string Remove {
+            get {
+                return ResourceManager.GetString("Remove", resourceCulture);
             }
         }
         

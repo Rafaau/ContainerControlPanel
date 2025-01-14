@@ -61,41 +61,41 @@
 	<div class="list-container">
 		<MudList T="string">
 			@foreach (var controller in controllers)
-		{
-			<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
-				<NestedList>
-					@foreach (var action in controller.Actions)
-					{
-						string primary = "";
-						string listItemStyle = "";
-						switch (action.HttpMethod)
+			{
+				<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
+					<NestedList>
+						@foreach (var action in controller.Actions)
 						{
-							case "Get":
-								primary = "#61AFFE";
-								listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
-								break;
-							case "Post":
-								primary = "#49CC90";
-								listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
-								break;
-							case "Put":
-								primary = "#FCA130";
-								listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
-								break;
-							case "Delete":
-								primary = "#F93E3E";
-								listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
-								break;
-							case "Patch":
-								primary = "#50E3C2";
-								listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
-								break;
-							default:
-								primary = "";
-								break;
-						}
-						<MudListItem Style="@(listItemStyle)">
-							<ChildContent>
+							string primary = "";
+							string listItemStyle = "";
+							switch (action.HttpMethod)
+							{
+								case "Get":
+									primary = "#61AFFE";
+									listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
+									break;
+								case "Post":
+									primary = "#49CC90";
+									listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
+									break;
+								case "Put":
+									primary = "#FCA130";
+									listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
+									break;
+								case "Delete":
+									primary = "#F93E3E";
+									listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
+									break;
+								case "Patch":
+									primary = "#50E3C2";
+									listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
+									break;
+								default:
+									primary = "";
+									break;
+							}
+							<MudListItem Style="@(listItemStyle)">
+								<ChildContent>
 									<div class="endpoint-label">
 										<div class="endpoint-method" style="background-color: @(primary);">
 											@action.HttpMethod.ToUpper()
@@ -106,38 +106,68 @@
 								<NestedList>
 									<div class="endpoint-details" style="border-color: @(primary);">
 										@if (!string.IsNullOrEmpty(action.Summary))
-										{
-											<div class="summary">
-												@action.Summary
-											</div>
-											<MudDivider Class="opacity-100" />
-										}									
-										<div class="section">
-											<div class="section-label">
-												Parameters
-											</div>
-											<div class="section-button">
-												<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? @Localizer[Locales.Resource.Cancel] : @Localizer[Locales.Resource.TryItOut])</MudButton>
-											</div>
+									{
+										<div class="summary">
+											@action.Summary
 										</div>
 										<MudDivider Class="opacity-100" />
-										@if (action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1) 
-										{
-											<div class="param-key">No parameters</div>
-										}
-										@foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
-										{									
-											<div class="param-row">
-												<div class="param-key">
-													<div class="param-name">@param.Name</div>
-													<div class="param-type">@param.Type.Name</div>
-													<div class="param-source">(query)</div>
+									}									
+									<div class="section">
+										<div class="section-label @(action.CurrentTabIndex == 0 ? "label-active": "label-inactive")" @onclick="() => { action.CurrentTabIndex = 0; }">
+											Parameters
+										</div>
+										<div class="section-label @(action.CurrentTabIndex == 1 ? "label-active" : "label-inactive")" @onclick ="() => { action.CurrentTabIndex = 1; }">
+											Headers
+										</div>
+										<div class="section-button">
+											<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? @Localizer[Locales.Resource.Cancel] : @Localizer[Locales.Resource.TryItOut])</MudButton>
+										</div>
+									</div>
+									<MudDivider Class="opacity-100" />
+									@switch (action.CurrentTabIndex)
+									{
+										case 0:
+											@if (action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1)
+											{
+												<div class="param-key">No parameters</div>
+											}
+											@foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
+											{
+												<div class="param-row">
+													<div class="param-key">
+														<div class="param-name">@param.Name</div>
+														<div class="param-type">@param.Type.Name</div>
+														<div class="param-source">(query)</div>
+													</div>
+													<div class="param-input">
+														<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+													</div>
 												</div>
-												<div class="param-input">
-													<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+											}
+											break;
+										case 1:
+											@if (headers.Count < 1)
+											{
+												<div class="param-key">No headers</div>
+											}
+											@foreach (var header in headers.Where(h => h.Action == action.Name))
+											{
+												<div class="header-row">
+													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
+													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
+													<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
+														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+													</MudTooltip>
 												</div>
+											}
+											<div class="add-btn">
+												<MudTooltip Text="@Localizer[Locales.Resource.Add]">
+													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = action.Name, Key = "", Value = "" }); })" />
+												</MudTooltip>
 											</div>
-										}
+											break;
+									}
+										
 										@if (action.Parameters.Any(p => p.Source == "Body")) 
 										{
 											<MudDivider Class="opacity-100" />

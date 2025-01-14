@@ -236,6 +236,11 @@ public class ActionView
     /// Gets or sets the test request curl
     /// </summary>
     public string TestRequestCurl { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the index of current tab
+    /// </summary>
+    public int CurrentTabIndex { get; set; } = 0;
 }
 
 /// <summary>

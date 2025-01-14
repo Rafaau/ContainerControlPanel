@@ -74,10 +74,22 @@
 	margin-inline: 12px;
 	font-weight: 500;
 	font-size: 16px;
+	cursor: pointer;
+}
+
+.label-inactive {
+	color: #808080;
 }
 
 .param-row {
 	display: flex;
+}
+
+.header-row {
+	display: flex;
+	margin: 12px;
+	gap: 12px;
+	align-items: center;
 }
 
 .param-input {
@@ -187,4 +199,9 @@ pre {
 	margin-left: 12px;
 	font-weight: 300;
 	color: #808080;
+}
+
+.add-btn {
+	margin-bottom: 10px;
+	margin-left: 10px;
 }

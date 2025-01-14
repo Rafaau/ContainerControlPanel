@@ -366,4 +366,10 @@
   <data name="Execute" xml:space="preserve">
     <value>Wykonaj</value>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>Dodaj</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
 </root>
