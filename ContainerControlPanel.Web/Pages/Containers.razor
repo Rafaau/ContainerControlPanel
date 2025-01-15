@@ -4,9 +4,10 @@
 
 @using MudBlazor
 @using Locales
+@using ContainerControlPanel.Domain.Models
 
 <div class="label">
-	<h1>@Localizer[Resource.Containers]</h1>
+	<h1>@Localizer[Locales.Resource.Containers]</h1>
 	@if (!bool.Parse(Configuration["Realtime"]))
 	{
 		<div style="width: 100px;">
@@ -15,8 +16,8 @@
 	}
 	<div style="margin-left: auto; width: 200px;">
 		<MudSelect Immediate="true" T="bool" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="liveFilter">		
-			<MudSelectItem Value="true">@Localizer[Resource.Running]</MudSelectItem>
-			<MudSelectItem Value="false">@Localizer[Resource.All]</MudSelectItem>
+			<MudSelectItem Value="true">@Localizer[Locales.Resource.Running]</MudSelectItem>
+			<MudSelectItem Value="false">@Localizer[Locales.Resource.All]</MudSelectItem>
 		</MudSelect>
 	</div>
 </div>
@@ -24,31 +25,31 @@
 <div class="data-grid">
 	<div class="data-grid-row header">
 		<div class="data-grid-cell">
-			@Localizer[Resource.ContainerId]
+			@Localizer[Locales.Resource.ContainerId]
 		</div>
 		<div class="data-grid-cell">
-			@Localizer[Resource.Name]
+			@Localizer[Locales.Resource.Name]
 		</div>
 		<div class="data-grid-cell">
-			@Localizer[Resource.Status]		
+			@Localizer[Locales.Resource.Status]
 		</div>
 		<div class="data-grid-cell">
-			@Localizer[Resource.Image]
+			@Localizer[Locales.Resource.Image]
 		</div>
 		<div class="data-grid-cell">
-			@Localizer[Resource.Ports]
+			@Localizer[Locales.Resource.Ports]
 		</div>
 		<div class="data-grid-cell">
-			@Localizer[Resource.CreatedAt]
+			@Localizer[Locales.Resource.CreatedAt]
 		</div>
 		<div class="data-grid-cell">
-			@Localizer[Resource.Action]
+			@Localizer[Locales.Resource.Action]
 		</div>
 	</div>
 	@if (containers.Count < 1)
 	{
 		<div class="not-found">
-			@Localizer[Resource.NoAliveContainers].
+			@Localizer[Locales.Resource.NoAliveContainers].
 		</div>
 	}	
 	else 
@@ -65,8 +66,8 @@
 					</div>
 					<div class="data-grid-cell">
 						@if (container.Status.StartsWith("Restarting")
-								|| container.Status.StartsWith("Stopping...")
-								|| container.Status.StartsWith("Starting..."))
+													|| container.Status.StartsWith("Stopping...")
+													|| container.Status.StartsWith("Starting..."))
 						{
 							<span class="loader"></span>
 						}
@@ -101,33 +102,40 @@
 						<AuthorizeView Roles="Administrator">
 							@if (!container.Status.Contains("Exited"))
 							{
-								<MudTooltip Text="@Localizer[Resource.Stop]">
+								<MudTooltip Text="@Localizer[Locales.Resource.Stop]">
 									<MudIconButton @onclick="async () => { await StopContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Stop"/>
 								</MudTooltip>
-								<MudTooltip Text="@Localizer[Resource.Restart]">
+								<MudTooltip Text="@Localizer[Locales.Resource.Restart]">
 									<MudIconButton @onclick="async () => { await RestartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
 								</MudTooltip>
 							}
 							else
 							{
-								<MudTooltip Text="@Localizer[Resource.Start]">
+								<MudTooltip Text="@Localizer[Locales.Resource.Start]">
 									<MudIconButton @onclick="async () => { await StartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.PlayArrow" />
 								</MudTooltip>
 							}
 							<MudDivider Vertical="true" FlexItem="true" Class="opacity-100 mx-2"/>
 						</AuthorizeView>
-						<MudMenu AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Color="Color.Dark">
+						<MudMenu AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight" Color="Color.Dark">
 							<ActivatorContent>
-								<MudTooltip Text="@Localizer[Resource.More]">
+								<MudTooltip Text="@Localizer[Locales.Resource.More]">
 									<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.MoreHoriz" />
 								</MudTooltip>
 							</ActivatorContent>
 							<ChildContent>
-								<MudMenuItem @onclick="() => { OpenDetailsDialogAsync(container.ContainerId); }">@Localizer[Resource.ViewDetails]</MudMenuItem>
-								<MudMenuItem @onclick="() => { ViewLogs(container.ContainerId); }">@Localizer[Resource.ViewLogs]</MudMenuItem>
+								<MudMenuItem @onclick="() => { OpenDetailsDialogAsync(container.ContainerId); }">@Localizer[Locales.Resource.ViewDetails]</MudMenuItem>
+								<MudMenuItem @onclick="() => { ViewLogs(container.ContainerId); }">@Localizer[Locales.Resource.ViewLogs]</MudMenuItem>
 								@if (IsASPNETCoreContainer(container.ContainerId))
 								{
-									<MudMenuItem @onclick="() => { ViewApiDocs(container.ContainerId); }">@Localizer[Resource.ViewAPIDocs]</MudMenuItem>
+									<MudMenuItem @onclick="() => { ViewApiDocs(container.ContainerId); }">@Localizer[Locales.Resource.ViewAPIDocs]</MudMenuItem>
+								}
+								@{
+									var composeFile = container.Names.TryGetComposeFile(composeFiles);
+								}
+								@if (composeFile != null) 
+								{
+									<MudMenuItem @onclick="() => { OpenComposeFileEditDialogAsync(composeFile); }">@Localizer[Locales.Resource.EditCompose]</MudMenuItem>
 								}
 							</ChildContent>
 						</MudMenu>
@@ -137,16 +145,5 @@
 		</div>
 	}
 </div>
-
-<MudDrawer @bind-Open="@_open" Width="@_width" Height="@_height" Anchor="@_anchor" Elevation="1" Variant="@DrawerVariant.Temporary">
-	<MudDrawerHeader>
-		<MudText Typo="Typo.h6">My App</MudText>
-	</MudDrawerHeader>
-	<MudNavMenu>
-		<MudNavLink Match="NavLinkMatch.All">Store</MudNavLink>
-		<MudNavLink Match="NavLinkMatch.All">Library</MudNavLink>
-		<MudNavLink Match="NavLinkMatch.All">Community</MudNavLink>
-	</MudNavMenu>
-</MudDrawer>
 
 

@@ -1,0 +1,20 @@
+﻿@using MudBlazor;
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        @Localizer[Locales.Resource.EditCompose]
+    </TitleContent>
+    <DialogContent>
+        <div class="details-content">
+            @if (!string.IsNullOrEmpty(ComposeFile.FileContent))
+            {
+                <MudTextField Style="font-family: Consolas;" spellcheck="false" T="string" Label="@ComposeFile.FileName" Variant="Variant.Outlined" @bind-Value="ComposeFile.FileContent" AutoGrow/>
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Save">@Localizer[Locales.Resource.Save]</MudButton>
+        <MudButton Color="Color.Default" OnClick="Cancel">@Localizer[Locales.Resource.Cancel]</MudButton>
+    </DialogActions>
+</MudDialog>

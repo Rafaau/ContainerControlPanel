@@ -304,6 +304,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edytuj plik Compose.
+        /// </summary>
+        public static string EditCompose {
+            get {
+                return ResourceManager.GetString("EditCompose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Włącz kolory.
         /// </summary>
         public static string EnableColors {
@@ -624,6 +633,33 @@ namespace Locales {
         public static string Running {
             get {
                 return ResourceManager.GetString("Running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zapisz.
+        /// </summary>
+        public static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nie udało się zapisać pliku.
+        /// </summary>
+        public static string SaveError {
+            get {
+                return ResourceManager.GetString("SaveError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pomyślnie zapisano plik.
+        /// </summary>
+        public static string SaveSuccessful {
+            get {
+                return ResourceManager.GetString("SaveSuccessful", resourceCulture);
             }
         }
         

@@ -1,0 +1,83 @@
+﻿.detail-label {
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.single-detail {
+	font-size: 12px;
+}
+
+.details-content {
+}
+
+.data-grid {
+	display: grid;
+	grid-template-rows: auto;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-top: 16px;
+	margin-inline: 16px;
+}
+
+.data-grid-header {
+	font-size: 12px;
+}
+
+.data-grid-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	border-bottom: 1px solid #484848;
+}
+
+	.data-grid-row.header {
+		font-weight: 100;
+	}
+
+.header .data-grid-cell {
+	border-right: 1px solid #484848;
+}
+
+.data-grid-cell {
+	padding: 8px;
+	display: inline-flex;
+	align-self: center;
+	position: relative;
+}
+
+.data {
+	font-size: 12px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.data-grid-cell:last-child {
+	border-right: none;
+	padding-left: 16px;
+}
+
+.text-overflow {
+	width: 100%;
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.env-value {
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	margin-right: 8px;
+}
+
+.show-hide {
+	margin-left: auto;
+	cursor: pointer;
+}
+
+.hide-value {
+	-webkit-text-security: disc;
+	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}

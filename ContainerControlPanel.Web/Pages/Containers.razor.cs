@@ -45,6 +45,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
 
     private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
+    private List<ComposeFile> composeFiles { get; set; } = new();
 
     private bool _open;
     private Anchor _anchor;
@@ -69,6 +70,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         }
 
         await LoadContainers(true);
+        await LoadComposeFiles();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -115,6 +117,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
                 MemoryCache.Set($"containerDetails_{container.ContainerId}", containerDetails);
             }
         }
+    }
+
+    private async Task LoadComposeFiles()
+    {
+        composeFiles = await containerAPI.SearchForComposes();
     }
 
     private async Task StopContainer(string containerId)
@@ -197,6 +204,25 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             {
                 { "ContainerId", containerId },
                 { "ActionType", actionType }
+            },
+            options
+        );
+    }
+
+    private Task OpenComposeFileEditDialogAsync(ComposeFile composeFile)
+    {
+        var options = new DialogOptions 
+        { 
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large          
+        };
+
+        return DialogService.ShowAsync<ContainerComposeEditDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "ComposeFile", composeFile }
             },
             options
         );

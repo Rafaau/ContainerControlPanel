@@ -372,4 +372,16 @@
   <data name="Remove" xml:space="preserve">
     <value>Usuń</value>
   </data>
+  <data name="EditCompose" xml:space="preserve">
+    <value>Edytuj plik Compose</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Zapisz</value>
+  </data>
+  <data name="SaveSuccessful" xml:space="preserve">
+    <value>Pomyślnie zapisano plik</value>
+  </data>
+  <data name="SaveError" xml:space="preserve">
+    <value>Nie udało się zapisać pliku</value>
+  </data>
 </root>

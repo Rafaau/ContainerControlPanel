@@ -13,6 +13,20 @@ namespace ContainerControlPanel.API.Controllers
     public class ContainerController : ControllerBase
     {
         /// <summary>
+        /// Configuration settings 
+        /// </summary>
+        private readonly IConfiguration _configuration;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContainerController"/> class.
+        /// </summary>
+        /// <param name="configuration">Configuration settings</param>
+        public ContainerController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        /// <summary>
         /// Get a list of containers
         /// </summary>
         /// <param name="memoryCache">Memory cache</param>
@@ -103,6 +117,30 @@ namespace ContainerControlPanel.API.Controllers
         {
             var result = await ContainerReader.GetContainerDetailsAsync(containerId);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Gets the Docker compose files in the specified directory
+        /// </summary>
+        /// <returns>Returns the Docker compose files</returns>
+        [HttpGet("SearchForComposes")]
+        public async Task<IActionResult> SearchForComposes()
+        {
+            var composeFiles = await FileManager.SearchFiles(_configuration["ComposeDir"]);
+            return Ok(composeFiles);
+        }
+
+        /// <summary>
+        /// Updates the content of a Docker compose file
+        /// </summary>
+        /// <param name="filePath">Path to the compose file</param>
+        /// <param name="content">File content</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpPut("UpdateCompose")]
+        public async Task<IActionResult> UpdateCompose(string filePath, string content)
+        {
+            await FileManager.WriteFileContent(filePath, content);
+            return Ok();
         }
     }
 }

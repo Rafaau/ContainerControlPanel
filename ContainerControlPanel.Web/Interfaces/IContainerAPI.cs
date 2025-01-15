@@ -64,4 +64,10 @@ public interface IContainerAPI
             DateTime? date = null,
             string timeFrom = "00:00:00",
             string timeTo = "23:59:59");
+
+    [Get("/api/searchForComposes")]
+    Task<List<ComposeFile>> SearchForComposes();
+
+    [Put("/api/updateCompose?filePath={filePath}&content={fileContent}")]
+    Task UpdateCompose(string filePath, string fileContent);
 }
