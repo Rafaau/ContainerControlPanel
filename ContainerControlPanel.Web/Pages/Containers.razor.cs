@@ -228,6 +228,25 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         );
     }
 
+    private Task OpenComposesDirectoryDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        return DialogService.ShowAsync<DockerComposeDirectoryViewDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "ComposeFiles", composeFiles }
+            },
+            options
+        );
+    }
+
     private bool IsASPNETCoreContainer(string containerId)
     {
         if (MemoryCache.TryGetValue($"containerDetails_{containerId}", out ContainerDetails containerDetails))

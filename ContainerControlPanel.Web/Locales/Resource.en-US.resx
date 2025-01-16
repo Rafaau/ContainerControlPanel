@@ -384,4 +384,10 @@
   <data name="SaveError" xml:space="preserve">
     <value>Error while saving file</value>
   </data>
+  <data name="ViewComposeDir" xml:space="preserve">
+    <value>View Docker-compose directory</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

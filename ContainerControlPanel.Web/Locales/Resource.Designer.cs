@@ -214,6 +214,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Zamknij.
+        /// </summary>
+        public static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Kontener.
         /// </summary>
         public static string Container {
@@ -831,6 +840,15 @@ namespace Locales {
         public static string ViewAPIDocs {
             get {
                 return ResourceManager.GetString("ViewAPIDocs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wyświetl katalog Docker-compose.
+        /// </summary>
+        public static string ViewComposeDir {
+            get {
+                return ResourceManager.GetString("ViewComposeDir", resourceCulture);
             }
         }
         

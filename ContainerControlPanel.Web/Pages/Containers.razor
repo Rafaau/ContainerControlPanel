@@ -14,7 +14,15 @@
 			<MudIconButton @onclick="() => { LoadContainers(true); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
 		</div>
 	}
-	<div style="margin-left: auto; width: 200px;">
+	<div style="margin-left: auto; margin-right: 12px;">
+		@if (composeFiles.Count > 0) 
+		{
+			<MudTooltip Text="@Localizer[Locales.Resource.ViewComposeDir]">
+				<MudIconButton @onclick="async () => { await OpenComposesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.DriveFileMove" />
+			</MudTooltip>
+		}	
+	</div>
+	<div style="width: 200px;">
 		<MudSelect Immediate="true" T="bool" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="liveFilter">		
 			<MudSelectItem Value="true">@Localizer[Locales.Resource.Running]</MudSelectItem>
 			<MudSelectItem Value="false">@Localizer[Locales.Resource.All]</MudSelectItem>

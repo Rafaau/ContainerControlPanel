@@ -1,0 +1,21 @@
+﻿@using MudBlazor;
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <div class="dir-name">
+            @ComposeFiles[0].FilePath.Split("\\").SkipLast(1).Last()
+        </div>
+        <div class="directory-container">
+            @foreach (var composeFile in ComposeFiles)
+            {
+                <div class="file" @onclick="async () => { await OpenComposeFileEditDialogAsync(composeFile); }">
+                    @composeFile.FileName
+                </div>
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>
+    </DialogActions>
+</MudDialog>

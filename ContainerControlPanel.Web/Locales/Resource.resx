@@ -384,4 +384,10 @@
   <data name="SaveError" xml:space="preserve">
     <value>Nie udało się zapisać pliku</value>
   </data>
+  <data name="ViewComposeDir" xml:space="preserve">
+    <value>Wyświetl katalog Docker-compose</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Zamknij</value>
+  </data>
 </root>
