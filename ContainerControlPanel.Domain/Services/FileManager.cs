@@ -1,5 +1,6 @@
 ﻿using ContainerControlPanel.Domain.Methods;
 using ContainerControlPanel.Domain.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace ContainerControlPanel.Domain.Services;
 
@@ -22,6 +23,11 @@ public class FileManager
 
             foreach (var file in files)
             {
+                if (Path.GetExtension(file) != ".yml")
+                {
+                    continue;
+                }
+
                 try
                 {
                     composeFiles.Add(new ComposeFile
@@ -55,6 +61,22 @@ public class FileManager
         catch (Exception ex)
         {
             throw new Exception($"There was an error while writing the file content: {ex.Message}");
+        }
+    }
+
+    public async static Task UploadFile(string directoryPath, IFormFile file)
+    {
+        try
+        {
+            var filePath = Path.Combine(directoryPath, file.FileName);
+            using var stream = file.OpenReadStream();
+            using var reader = new StreamReader(stream);
+            var content = await reader.ReadToEndAsync();
+            await File.WriteAllTextAsync(filePath, content);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"There was an error while uploading the file: {ex.Message}");
         }
     }
 }

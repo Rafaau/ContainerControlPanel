@@ -17,8 +17,8 @@
 	<div style="margin-left: auto; margin-right: 12px;">
 		@if (composeFiles.Count > 0) 
 		{
-			<MudTooltip Text="@Localizer[Locales.Resource.ViewComposeDir]">
-				<MudIconButton @onclick="async () => { await OpenComposesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.DriveFileMove" />
+			<MudTooltip Text="@Localizer[Locales.Resource.ViewComposeDir]" ShowOnFocus="false" ShowOnClick="false">
+				<MudIconButton @onclick="async () => { await OpenComposesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.Source" />
 			</MudTooltip>
 		}	
 	</div>

@@ -1,4 +1,6 @@
 ﻿using ContainerControlPanel.Domain.Models;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Refit;
 
 namespace ContainerControlPanel.Web.Interfaces;
@@ -70,4 +72,7 @@ public interface IContainerAPI
 
     [Put("/api/updateCompose?filePath={filePath}&content={fileContent}")]
     Task UpdateCompose(string filePath, string fileContent);
+
+    [Post("/api/uploadCompose")]
+    Task UploadCompose([Body] MultipartFormDataContent file);
 }

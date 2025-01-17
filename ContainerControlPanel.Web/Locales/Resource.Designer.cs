@@ -358,6 +358,24 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas przesyłania pliku.
+        /// </summary>
+        public static string FileUploadError {
+            get {
+                return ResourceManager.GetString("FileUploadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pomyślnie przesłano plik.
+        /// </summary>
+        public static string FileUploadSuccess {
+            get {
+                return ResourceManager.GetString("FileUploadSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filtruj....
         /// </summary>
         public static string Filter {
@@ -822,6 +840,15 @@ namespace Locales {
         public static string TryItOut {
             get {
                 return ResourceManager.GetString("TryItOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prześlij plik.
+        /// </summary>
+        public static string UploadFile {
+            get {
+                return ResourceManager.GetString("UploadFile", resourceCulture);
             }
         }
         

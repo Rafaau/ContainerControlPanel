@@ -390,4 +390,13 @@
   <data name="Close" xml:space="preserve">
     <value>Zamknij</value>
   </data>
+  <data name="UploadFile" xml:space="preserve">
+    <value>Prześlij plik</value>
+  </data>
+  <data name="FileUploadSuccess" xml:space="preserve">
+    <value>Pomyślnie przesłano plik</value>
+  </data>
+  <data name="FileUploadError" xml:space="preserve">
+    <value>Błąd podczas przesyłania pliku</value>
+  </data>
 </root>

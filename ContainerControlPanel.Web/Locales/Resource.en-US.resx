@@ -390,4 +390,13 @@
   <data name="Close" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="UploadFile" xml:space="preserve">
+    <value>Upload file</value>
+  </data>
+  <data name="FileUploadSuccess" xml:space="preserve">
+    <value>File uploaded successfully</value>
+  </data>
+  <data name="FileUploadError" xml:space="preserve">
+    <value>Error while uploading file</value>
+  </data>
 </root>

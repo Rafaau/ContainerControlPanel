@@ -85,7 +85,7 @@
 .directory-container {
 	border: 2px solid #484848;
 	border-radius: 10px;
-	margin-top: 5px;
+	margin-top: 20px;
 	padding-top: 24px;
 }
 
@@ -94,6 +94,7 @@
 	margin: 6px;
 	cursor: pointer;
 	font-size: 12px;
+	user-select: none;
 }
 
 .file:hover {
@@ -103,9 +104,42 @@
 
 .dir-name {
 	position: absolute;
-	top: -15px;
+	top: 0;
 	left: 50px;
 	background-color: #0D0D0D;
 	padding: 3px;
 	font-size: 24px;
+	user-select: none;
+}
+
+.upload-btn {
+	position: absolute;
+	right: 50px;
+	top: 2px;
+	background-color: #0D0D0D;
+	width: 40px;
+	height: 40px;
+	align-content: center;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 50%;
+}
+
+	.upload-btn:hover {
+		background-color: #484848;
+	}
+
+input {
+	position: absolute;
+	right: 0;
+	opacity: 0 !important;
+	top: 2px;
+	width: 40px;
+	height: 40px;
+	align-content: center;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 50%;
+	overflow: hidden;
+	font-size: 0;
 }

@@ -81,6 +81,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
                     try
                     {
                         await LoadContainers(true);
+                        await LoadComposeFiles();
                         await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
                     }
                     catch (TaskCanceledException)

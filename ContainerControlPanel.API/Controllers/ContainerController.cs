@@ -1,5 +1,6 @@
 using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Domain.Services;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -140,6 +141,13 @@ namespace ContainerControlPanel.API.Controllers
         public async Task<IActionResult> UpdateCompose(string filePath, string content)
         {
             await FileManager.WriteFileContent(filePath, content);
+            return Ok();
+        }
+
+        [HttpPost("UploadCompose")]
+        public async Task<IActionResult> UploadCompose([FromForm] IFormFile file)
+        {
+            await FileManager.UploadFile(_configuration["ComposeDir"], file);
             return Ok();
         }
     }
