@@ -358,6 +358,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Eksplorator plików.
+        /// </summary>
+        public static string FileExplorer {
+            get {
+                return ResourceManager.GetString("FileExplorer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Błąd podczas przesyłania pliku.
         /// </summary>
         public static string FileUploadError {
@@ -885,6 +894,15 @@ namespace Locales {
         public static string ViewDetails {
             get {
                 return ResourceManager.GetString("ViewDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wyświetl katalog obrazów Docker.
+        /// </summary>
+        public static string ViewImagesDir {
+            get {
+                return ResourceManager.GetString("ViewImagesDir", resourceCulture);
             }
         }
         

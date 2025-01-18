@@ -46,6 +46,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private IContainerAPI containerAPI { get; set; } = containerAPI;
     private List<Container> containers { get; set; } = new();
     private List<ComposeFile> composeFiles { get; set; } = new();
+    private List<ImageFile> imageFiles { get; set; } = new();
 
     private bool _open;
     private Anchor _anchor;
@@ -71,6 +72,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
 
         await LoadContainers(true);
         await LoadComposeFiles();
+        await LoadImageFiles();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -82,6 +84,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
                     {
                         await LoadContainers(true);
                         await LoadComposeFiles();
+                        await LoadImageFiles();
                         await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
                     }
                     catch (TaskCanceledException)
@@ -123,6 +126,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private async Task LoadComposeFiles()
     {
         composeFiles = await containerAPI.SearchForComposes();
+    }
+
+    private async Task LoadImageFiles()
+    {
+        imageFiles = await containerAPI.SearchForImages();
     }
 
     private async Task StopContainer(string containerId)
@@ -243,6 +251,25 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             new DialogParameters()
             {
                 { "ComposeFiles", composeFiles }
+            },
+            options
+        );
+    }
+
+    private Task OpenImagesDirectoryDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        return DialogService.ShowAsync<DockerImageDirectoryViewDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "ImageFiles", imageFiles }
             },
             options
         );

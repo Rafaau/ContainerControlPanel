@@ -97,7 +97,12 @@
 	user-select: none;
 }
 
-.file:hover {
+	.file:hover {
+		background-color: #484848;
+		border-radius: 5px;
+	}
+
+.chosen-file {
 	background-color: #484848;
 	border-radius: 5px;
 }

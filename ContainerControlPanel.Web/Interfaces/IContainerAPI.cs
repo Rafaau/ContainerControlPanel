@@ -67,12 +67,50 @@ public interface IContainerAPI
             string timeFrom = "00:00:00",
             string timeTo = "23:59:59");
 
+    /// <summary>
+    /// Searches for compose files.
+    /// </summary>
+    /// <returns>Returns the list of compose files.</returns>
     [Get("/api/searchForComposes")]
     Task<List<ComposeFile>> SearchForComposes();
 
+    /// <summary>
+    /// Updates the compose file.
+    /// </summary>
+    /// <param name="filePath">Path to the file.</param>
+    /// <param name="fileContent">File content.</param>
+    /// <returns>Returns the result of the operation.</returns>
     [Put("/api/updateCompose?filePath={filePath}&content={fileContent}")]
     Task UpdateCompose(string filePath, string fileContent);
 
+    /// <summary>
+    /// Uploads the compose file.
+    /// </summary>
+    /// <param name="file">File to upload.</param>
+    /// <returns>Returns the result of the operation.</returns>
     [Post("/api/uploadCompose")]
     Task UploadCompose([Body] MultipartFormDataContent file);
+
+    /// <summary>
+    /// Searches for images.
+    /// </summary>
+    /// <returns>Returns the list of images.</returns>
+    [Get("/api/searchForImages")]
+    Task<List<ImageFile>> SearchForImages();
+
+    /// <summary>
+    /// Uploads a single chunk of an image file.
+    /// </summary>
+    /// <param name="chunk">Chunk to upload.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Post("/api/uploadChunk")]
+    Task UploadChunk([Body] MultipartFormDataContent chunk);
+
+    /// <summary>
+    /// Merges the chunks of an image file.
+    /// </summary>
+    /// <param name="fileName">Name of the file.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Post("/api/mergeChunks?fileName={fileName}")]
+    Task MergeChunks(string fileName);
 }

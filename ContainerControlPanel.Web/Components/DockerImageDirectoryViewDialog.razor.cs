@@ -1,18 +1,15 @@
 using ContainerControlPanel.Domain.Models;
-using ContainerControlPanel.Web.Enums;
 using ContainerControlPanel.Web.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System.IO;
 using System.Net.Http.Headers;
-using System.Net.Mime;
 
 namespace ContainerControlPanel.Web.Components;
 
-public partial class DockerComposeDirectoryViewDialog(IContainerAPI containerAPI)
+public partial class DockerImageDirectoryViewDialog(IContainerAPI containerAPI)
 {
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
@@ -27,30 +24,11 @@ public partial class DockerComposeDirectoryViewDialog(IContainerAPI containerAPI
     private MudDialogInstance MudDialog { get; set; }
 
     [Parameter]
-    public List<ComposeFile> ComposeFiles { get; set; }
-
-    private IContainerAPI containerAPI { get; set; } = containerAPI;
+    public List<ImageFile> ImageFiles { get; set; }
 
     private bool loading { get; set; } = false;
 
-    private Task OpenComposeFileEditDialogAsync(ComposeFile composeFile)
-    {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            FullWidth = true,
-            MaxWidth = MaxWidth.Large
-        };
-
-        return DialogService.ShowAsync<ContainerComposeEditDialog>(
-            "",
-            new DialogParameters()
-            {
-                { "ComposeFile", composeFile }
-            },
-            options
-        );
-    }
+    private ImageFile chosenFile { get; set; } = null;
 
     async Task UploadFile(InputFileChangeEventArgs e)
     {
@@ -58,21 +36,35 @@ public partial class DockerComposeDirectoryViewDialog(IContainerAPI containerAPI
         {
             loading = true;
 
-            using var stream = e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
-            using var content = new MultipartFormDataContent();
-            var fileContent = new StreamContent(stream);
-            fileContent.Headers.ContentType = 
-                new MediaTypeHeaderValue(string.IsNullOrEmpty(e.File.ContentType) ? "application/x-yaml" : e.File.ContentType);
+            const int chunkSize = 10 * 1024 * 1024; // 10MB
+            var file = e.File;
+            using var stream = file.OpenReadStream(maxAllowedSize: long.MaxValue);
 
-            content.Add(fileContent, "file", e.File.Name);
+            byte[] buffer = new byte[chunkSize];
+            int bytesRead;
+            int chunkIndex = 0;
 
-            await containerAPI.UploadCompose(content);
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                using var chunkStream = new MemoryStream(buffer, 0, bytesRead);
+                using var chunkContent = new StreamContent(chunkStream);
+                chunkContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                var content = new MultipartFormDataContent
+                {
+                    { chunkContent, "chunk", $"{file.Name}.part{chunkIndex++}" }
+                };
+
+                await containerAPI.UploadChunk(content);             
+            }
+
+            await containerAPI.MergeChunks(file.Name);
 
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
             Snackbar.Add(Localizer[Locales.Resource.FileUploadSuccess], Severity.Normal);
 
-            ComposeFiles = await containerAPI.SearchForComposes();
+            ImageFiles = await containerAPI.SearchForImages();
         }
         catch (Exception ex)
         {
@@ -80,7 +72,7 @@ public partial class DockerComposeDirectoryViewDialog(IContainerAPI containerAPI
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
             Snackbar.Add(Localizer[Locales.Resource.FileUploadError], Severity.Error);
             return;
-        }        
+        }
         finally
         {
             loading = false;

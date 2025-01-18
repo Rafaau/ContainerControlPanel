@@ -399,4 +399,10 @@
   <data name="FileUploadError" xml:space="preserve">
     <value>Błąd podczas przesyłania pliku</value>
   </data>
+  <data name="ViewImagesDir" xml:space="preserve">
+    <value>Wyświetl katalog obrazów docker</value>
+  </data>
+  <data name="FileExplorer" xml:space="preserve">
+    <value>Eksplorator plików</value>
+  </data>
 </root>

@@ -127,7 +127,7 @@ namespace ContainerControlPanel.API.Controllers
         [HttpGet("SearchForComposes")]
         public async Task<IActionResult> SearchForComposes()
         {
-            var composeFiles = await FileManager.SearchFiles(_configuration["ComposeDir"]);
+            var composeFiles = await FileManager.SearchComposeFiles(_configuration["ComposeDir"]);
             return Ok(composeFiles);
         }
 
@@ -144,10 +144,50 @@ namespace ContainerControlPanel.API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Uploads a Docker compose file to the specified directory
+        /// </summary>
+        /// <param name="file">IFormFile object</param>
+        /// <returns>Returns the result of the operation</returns>
         [HttpPost("UploadCompose")]
         public async Task<IActionResult> UploadCompose([FromForm] IFormFile file)
         {
             await FileManager.UploadFile(_configuration["ComposeDir"], file);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Searches for image files in the specified directory
+        /// </summary>
+        /// <returns>Returns the image files</returns>
+        [HttpGet("SearchForImages")]
+        public async Task<IActionResult> SearchForImages()
+        {
+            var imageFiles = await FileManager.SearchImageFiles(_configuration["ImagesDir"]);
+            return Ok(imageFiles);
+        }
+
+        /// <summary>
+        /// Uploads a single chunk of an image file
+        /// </summary>
+        /// <param name="chunk">IFormFile object</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpPost("UploadChunk")]
+        public async Task<IActionResult> UploadChunk([FromForm] IFormFile chunk)
+        {
+            await FileManager.UploadFile(_configuration["ImagesDir"], chunk);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Merges the chunks of an image file into a single file
+        /// </summary>
+        /// <param name="fileName">Name of the file</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpPost("MergeChunks")]
+        public async Task<IActionResult> MergeChunks(string fileName)
+        {
+            await FileManager.MergeChunks(_configuration["ImagesDir"], fileName);
             return Ok();
         }
     }
