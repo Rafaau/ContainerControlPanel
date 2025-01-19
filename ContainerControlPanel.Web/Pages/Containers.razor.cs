@@ -47,6 +47,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private List<Container> containers { get; set; } = new();
     private List<ComposeFile> composeFiles { get; set; } = new();
     private List<ImageFile> imageFiles { get; set; } = new();
+    private List<Image> images { get; set; } = new();
 
     private bool _open;
     private Anchor _anchor;
@@ -73,6 +74,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         await LoadContainers(true);
         await LoadComposeFiles();
         await LoadImageFiles();
+        await LoadImages();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -131,6 +133,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private async Task LoadImageFiles()
     {
         imageFiles = await containerAPI.SearchForImages();
+    }
+
+    private async Task LoadImages()
+    {
+        images = await containerAPI.GetImages();
     }
 
     private async Task StopContainer(string containerId)
@@ -273,6 +280,33 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             },
             options
         );
+    }
+
+    private Task OpenImagesListDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large
+        };
+
+        return DialogService.ShowAsync<DockerImagesListDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "Images", images }
+            },
+            options
+        );
+    }
+
+    private async Task Refresh()
+    {
+        await LoadContainers(true);
+        await LoadComposeFiles();
+        await LoadImageFiles();
+        await LoadImages();
     }
 
     private bool IsASPNETCoreContainer(string containerId)

@@ -304,6 +304,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Obrazy Docker.
+        /// </summary>
+        public static string DockerImages {
+            get {
+                return ResourceManager.GetString("DockerImages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Czas trwania.
         /// </summary>
         public static string Duration {
@@ -439,6 +448,24 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas usuwania obrazu Docker.
+        /// </summary>
+        public static string ImageRemoveError {
+            get {
+                return ResourceManager.GetString("ImageRemoveError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Obraz Docker usunięty pomyślnie.
+        /// </summary>
+        public static string ImageRemoveSuccess {
+            get {
+                return ResourceManager.GetString("ImageRemoveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nieprawidłowy token.
         /// </summary>
         public static string InvalidToken {
@@ -543,6 +570,15 @@ namespace Locales {
         public static string NoAliveContainers {
             get {
                 return ResourceManager.GetString("NoAliveContainers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nie znaleziono żadnych obrazów.
+        /// </summary>
+        public static string NoImagesFound {
+            get {
+                return ResourceManager.GetString("NoImagesFound", resourceCulture);
             }
         }
         
@@ -894,6 +930,15 @@ namespace Locales {
         public static string ViewDetails {
             get {
                 return ResourceManager.GetString("ViewDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wyświetl listę obrazów Docker.
+        /// </summary>
+        public static string ViewImages {
+            get {
+                return ResourceManager.GetString("ViewImages", resourceCulture);
             }
         }
         

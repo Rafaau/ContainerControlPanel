@@ -1,0 +1,225 @@
+﻿.detail-label {
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.single-detail {
+	font-size: 12px;
+}
+
+.details-content {
+}
+
+.data-grid {
+	display: grid;
+	grid-template-rows: auto;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-top: 16px;
+	margin-inline: 16px;
+}
+
+.data-grid-header {
+	font-size: 12px;
+}
+
+.data-grid-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	border-bottom: 1px solid #484848;
+}
+
+	.data-grid-row.header {
+		font-weight: 100;
+	}
+
+.header .data-grid-cell {
+	border-right: 1px solid #484848;
+}
+
+.data-grid-cell {
+	padding: 8px;
+	display: inline-flex;
+	align-self: center;
+	position: relative;
+}
+
+.data {
+	font-size: 12px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.data-grid-cell:last-child {
+	border-right: none;
+	padding-left: 16px;
+}
+
+.text-overflow {
+	width: 100%;
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.env-value {
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	margin-right: 8px;
+}
+
+.show-hide {
+	margin-left: auto;
+	cursor: pointer;
+}
+
+.hide-value {
+	-webkit-text-security: disc;
+	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.directory-container {
+	border: 2px solid #484848;
+	border-radius: 10px;
+	margin-top: 20px;
+	padding-top: 24px;
+}
+
+.file {
+	padding: 6px;
+	margin: 6px;
+	cursor: pointer;
+	font-size: 12px;
+	user-select: none;
+}
+
+	.file:hover {
+		background-color: #484848;
+		border-radius: 5px;
+	}
+
+.chosen-file {
+	background-color: #484848;
+	border-radius: 5px;
+}
+
+.dir-name {
+	position: absolute;
+	top: 0;
+	left: 50px;
+	background-color: #0D0D0D;
+	padding: 3px;
+	font-size: 24px;
+	user-select: none;
+}
+
+.upload-btn {
+	position: absolute;
+	right: 50px;
+	top: 2px;
+	background-color: #0D0D0D;
+	width: 40px;
+	height: 40px;
+	align-content: center;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 50%;
+}
+
+	.upload-btn:hover {
+		background-color: #484848;
+	}
+
+input {
+	position: absolute;
+	right: 0;
+	opacity: 0 !important;
+	top: 2px;
+	width: 40px;
+	height: 40px;
+	align-content: center;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 50%;
+	overflow: hidden;
+	font-size: 0;
+}
+
+.loading {
+	position: absolute;
+	height: 5px;
+	top: -2px;
+	background: none;
+}
+
+.not-found {
+	text-align: center;
+}
+
+.data-grid {
+	display: grid;
+	grid-template-rows: auto;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-top: 16px;
+}
+
+.data:hover {
+	background-color: rgba(255,255,255,0.1);
+}
+
+.chosen-image {
+	background-color: rgba(255,255,255,0.1);
+}
+
+.data-grid-row {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr;
+	border-bottom: 1px solid #484848;
+}
+
+.header .data-grid-cell {
+	border-right: 1px solid #484848;
+	font-weight: 400;
+}
+
+.data-grid-cell {
+	padding: 8px;
+	padding-left: 24px;
+	display: inline-flex;
+	align-self: center;
+	position: relative;
+}
+
+.data .data-grid-cell:last-child {
+	padding-left: 8px;
+}
+
+.data {
+	font-size: 12px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	cursor: pointer;
+	font-weight: 200;
+}
+
+.data-grid-cell:last-child {
+	border-right: none;
+}
+
+.text-overflow {
+	width: 100%;
+	overflow: hidden;
+	display: inline-block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.remove-btn {
+	margin-right: auto;
+	margin-left: 24px;
+}

@@ -26,7 +26,7 @@ public static class Parser
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(containerObj));
             Container container = await JsonSerializer.DeserializeAsync<Container>(stream);
 
-            if (container.Names.Contains("ccp-compose") 
+            if (container.Names.Contains("ccp-compose")
                 || container.Names.Contains("ccpcompose"))
             {
                 continue;
@@ -79,5 +79,27 @@ public static class Parser
         }
 
         return serviceNames;
+    }
+
+    /// <summary>
+    /// Parses the output of the Docker images command
+    /// </summary>
+    /// <param name="output">Output of the Docker images command</param>
+    /// <returns>Returns a list of <see cref="Image"/> objects</returns>
+    public async static Task<List<Image>> ParseImages(string output)
+    {
+        List<Image> images = new List<Image>();
+
+        var imagesOutput = output.Split(new[] { '{' }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var imageOutput in imagesOutput)
+        {
+            string imageObj = $"{{{imageOutput}";
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(imageObj));
+            Image image = await JsonSerializer.DeserializeAsync<Image>(stream);
+            images.Add(image);
+        }
+
+        return images.OrderByDescending(i => i.CreatedAt).ToList();
     }
 }

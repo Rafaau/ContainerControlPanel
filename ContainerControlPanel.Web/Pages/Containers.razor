@@ -11,24 +11,32 @@
 	@if (!bool.Parse(Configuration["Realtime"]))
 	{
 		<div style="width: 100px;">
-			<MudIconButton @onclick="() => { LoadContainers(true); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+			<MudIconButton @onclick="async () => { await Refresh(); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
 		</div>
 	}
 	<div style="margin-left: auto; margin-right: 4px;">
-		@if (imageFiles.Count > 0)
-		{
-			<MudTooltip Text="@Localizer[Locales.Resource.ViewImagesDir]" ShowOnFocus="false" ShowOnClick="false">
-				<MudIconButton @onclick="async () => { await OpenImagesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.CloudCircle" />
-			</MudTooltip>
-		}
-	</div>
-	<div style="margin-right: 14px;">
-		@if (composeFiles.Count > 0) 
+		@if (composeFiles.Count > 0)
 		{
 			<MudTooltip Text="@Localizer[Locales.Resource.ViewComposeDir]" ShowOnFocus="false" ShowOnClick="false">
 				<MudIconButton @onclick="async () => { await OpenComposesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.Source" />
 			</MudTooltip>
-		}	
+		}
+	</div>
+	<div style="margin-right: 4px;">
+		@if (imageFiles.Count > 0)
+		{
+			<MudTooltip Text="@Localizer[Locales.Resource.ViewImagesDir]" ShowOnFocus="false" ShowOnClick="false">
+				<MudIconButton @onclick="async () => { await OpenImagesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.FolderZip" />
+			</MudTooltip>
+		}
+	</div>
+	<div style="margin-right: 14px;">
+		@if (imageFiles.Count > 0)
+		{
+			<MudTooltip Text="@Localizer[Locales.Resource.ViewImages]" ShowOnFocus="false" ShowOnClick="false">
+				<MudIconButton @onclick="async () => { await OpenImagesListDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.CloudCircle" />
+			</MudTooltip>
+		}
 	</div>
 	<div style="width: 200px;">
 		<MudSelect Immediate="true" T="bool" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="liveFilter">		

@@ -44,7 +44,7 @@ namespace ContainerControlPanel.API.Controllers
                 return Ok(cachedResponse);
             }
 
-            var response = await ContainerReader.GetContainersListAsync(liveFilter);
+            var response = await ContainerManager.GetContainersListAsync(liveFilter);
 
             memoryCache.Set("containers", response, TimeSpan.FromMinutes(1));
 
@@ -68,7 +68,7 @@ namespace ContainerControlPanel.API.Controllers
             string timeFrom = "00:00:00",
             string timeTo = "23:59:59")
         {
-            var result = await ContainerReader.GetContainerLogsAsync(containerId, timestamp, date, timeFrom, timeTo);
+            var result = await ContainerManager.GetContainerLogsAsync(containerId, timestamp, date, timeFrom, timeTo);
             return Ok(result);
         }
 
@@ -80,7 +80,7 @@ namespace ContainerControlPanel.API.Controllers
         [HttpGet("RestartContainer")]
         public async Task<IActionResult> RestartContainer(string containerId)
         {
-            var result = await ContainerReader.RestartContainerAsync(containerId);
+            var result = await ContainerManager.RestartContainerAsync(containerId);
             return Ok(result);
         }
 
@@ -92,7 +92,7 @@ namespace ContainerControlPanel.API.Controllers
         [HttpGet("StopContainer")]
         public async Task<IActionResult> StopContainer(string containerId)
         {
-            var result = await ContainerReader.StopContainerAsync(containerId);
+            var result = await ContainerManager.StopContainerAsync(containerId);
             return Ok(result);
         }
 
@@ -104,7 +104,7 @@ namespace ContainerControlPanel.API.Controllers
         [HttpGet("StartContainer")]
         public async Task<IActionResult> StartContainer(string containerId)
         {
-            var result = await ContainerReader.StartContainerAsync(containerId);
+            var result = await ContainerManager.StartContainerAsync(containerId);
             return Ok(result);
         }
 
@@ -116,7 +116,7 @@ namespace ContainerControlPanel.API.Controllers
         [HttpGet("GetContainerDetails")]
         public async Task<IActionResult> GetContainerDetails(string containerId)
         {
-            var result = await ContainerReader.GetContainerDetailsAsync(containerId);
+            var result = await ContainerManager.GetContainerDetailsAsync(containerId);
             return Ok(result);
         }
 
@@ -189,6 +189,29 @@ namespace ContainerControlPanel.API.Controllers
         {
             await FileManager.MergeChunks(_configuration["ImagesDir"], fileName);
             return Ok();
+        }
+
+        /// <summary>
+        /// Gets the currently available Docker images
+        /// </summary>
+        /// <returns>Returns the list of images</returns>
+        [HttpGet("GetImages")]
+        public async Task<IActionResult> GetImages()
+        {
+            var images = await ContainerManager.GetImagesAsync();
+            return Ok(images);
+        }
+
+        /// <summary>
+        /// Removes a Docker image by ID
+        /// </summary>
+        /// <param name="imageId">Image ID</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpDelete("RemoveImage")]
+        public async Task<IActionResult> RemoveImage(string imageId)
+        {
+            var result = await ContainerManager.RemoveImageAsync(imageId);
+            return Ok(result);
         }
     }
 }

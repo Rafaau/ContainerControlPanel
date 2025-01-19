@@ -113,4 +113,19 @@ public interface IContainerAPI
     /// <returns>Returns the result of the operation.</returns>
     [Post("/api/mergeChunks?fileName={fileName}")]
     Task MergeChunks(string fileName);
+
+    /// <summary>
+    /// Gets the currently available Docker images.
+    /// </summary>
+    /// <returns>Returns the list of images.</returns>
+    [Get("/api/getImages")]
+    Task<List<Image>> GetImages();
+
+    /// <summary>
+    /// Removes a Docker image by ID.
+    /// </summary>
+    /// <param name="imageId">Image ID.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Delete("/api/removeImage?imageId={imageId}")]
+    Task<bool> RemoveImage(string imageId);
 }

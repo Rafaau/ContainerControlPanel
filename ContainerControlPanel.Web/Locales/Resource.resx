@@ -405,4 +405,19 @@
   <data name="FileExplorer" xml:space="preserve">
     <value>Eksplorator plików</value>
   </data>
+  <data name="ViewImages" xml:space="preserve">
+    <value>Wyświetl listę obrazów Docker</value>
+  </data>
+  <data name="DockerImages" xml:space="preserve">
+    <value>Obrazy Docker</value>
+  </data>
+  <data name="NoImagesFound" xml:space="preserve">
+    <value>Nie znaleziono żadnych obrazów</value>
+  </data>
+  <data name="ImageRemoveSuccess" xml:space="preserve">
+    <value>Obraz Docker usunięty pomyślnie</value>
+  </data>
+  <data name="ImageRemoveError" xml:space="preserve">
+    <value>Błąd podczas usuwania obrazu Docker</value>
+  </data>
 </root>

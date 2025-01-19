@@ -1,0 +1,73 @@
+﻿@using MudBlazor;
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        @Localizer[Locales.Resource.DockerImages]
+    </TitleContent>
+    <DialogContent>
+        @if (Images.Count > 0)
+        {
+            <div class="data-grid">
+	            <div class="data-grid-row header">
+		            <div class="data-grid-cell">
+                        REPOSITORY
+                    </div>
+                    <div class="data-grid-cell">
+                        TAG
+                    </div>
+                    <div class="data-grid-cell">
+                        IMAGE ID
+                    </div>
+                    <div class="data-grid-cell">
+                        CREATED
+                    </div>
+                    <div class="data-grid-cell">
+                        SIZE
+                    </div>
+                </div>
+                @foreach (var image in Images)
+                {
+                    <div class="data-grid-row data @(chosenImage == image ? "chosen-image" : "")" @onclick="() => { chosenImage = image; }">
+                        <div class="data-grid-cell">
+                            @image.Repository
+                        </div>
+                        <div class="data-grid-cell">
+                            @image.Tag
+                        </div>
+                        <div class="data-grid-cell">
+                            @image.ImageId
+                        </div>
+                        <div class="data-grid-cell">
+                            @image.Created
+                        </div>
+                        <div class="data-grid-cell">
+                            @image.Size
+                        </div>
+                    </div>
+                }       
+            </div>
+        }
+        else
+        {
+            <div class="not-found">
+				@Localizer[Locales.Resource.NoImagesFound].
+            </div>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (chosenImage != null)
+        {
+            <div class="remove-btn">
+                <MudButton Color="Color.Primary" OnClick="RemoveImage" A>@Localizer[Locales.Resource.Remove]</MudButton>
+            </div>
+        }       
+        <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>
+    </DialogActions>
+</MudDialog>
+@if (loading)
+{
+    <div class="loading">
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    </div>
+}

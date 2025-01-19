@@ -7,7 +7,7 @@ namespace ContainerControlPanel.Domain.Services;
 /// <summary>
 /// Class to read information about containers
 /// </summary>
-public static class ContainerReader
+public static class ContainerManager
 {
     /// <summary>
     /// Gets a list of containers
@@ -180,6 +180,56 @@ public static class ContainerReader
             {
                 string output = await reader.ReadToEndAsync();
                 return Parser.ParseContainerDetails(output);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the currently available Docker images
+    /// </summary>
+    /// <returns>Returns a list of <see cref="Image"/> objects</returns>
+    public static async Task<List<Image>> GetImagesAsync()
+    {
+        ProcessStartInfo _imagesProcessStartInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = "images --format=\"{{json .}}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using (Process process = Process.Start(_imagesProcessStartInfo))
+        {
+            using (StreamReader reader = process.StandardOutput)
+            {
+                string output = await reader.ReadToEndAsync();
+                return await Parser.ParseImages(output);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Removes a Docker image by ID
+    /// </summary>
+    /// <param name="imageId">Image ID</param>
+    /// <returns>Returns a boolean indicating whether the image was removed</returns>
+    public static async Task<bool> RemoveImageAsync(string imageId)
+    {
+        ProcessStartInfo _removeImageProcessStartInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = $"rmi -f {imageId}",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        using (Process process = Process.Start(_removeImageProcessStartInfo))
+        {
+            using (StreamReader reader = process.StandardOutput)
+            {
+                string output = await reader.ReadToEndAsync();
+                return output.Contains("Deleted");
             }
         }
     }

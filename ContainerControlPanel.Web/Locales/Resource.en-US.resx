@@ -405,4 +405,19 @@
   <data name="FileExplorer" xml:space="preserve">
     <value>File explorer</value>
   </data>
+  <data name="ViewImages" xml:space="preserve">
+    <value>View Docker images</value>
+  </data>
+  <data name="DockerImages" xml:space="preserve">
+    <value>Docker images</value>
+  </data>
+  <data name="NoImagesFound" xml:space="preserve">
+    <value>No Docker images found</value>
+  </data>
+  <data name="ImageRemoveSuccess" xml:space="preserve">
+    <value>Docker image removed successfully</value>
+  </data>
+  <data name="ImageRemoveError" xml:space="preserve">
+    <value>Error while removing Docker image</value>
+  </data>
 </root>
