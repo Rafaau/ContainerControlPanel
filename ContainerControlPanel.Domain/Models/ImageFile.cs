@@ -14,4 +14,9 @@ public class ImageFile
     /// Gets or sets the name of the image file.
     /// </summary>
     public string FileName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the size of the image file.
+    /// </summary>
+    public string Size { get; set; }
 }

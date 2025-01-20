@@ -37,25 +37,17 @@ public static class ComposeFileExtensions
     /// <param name="serviceName">Name of the service</param>
     /// <param name="composeFiles">List of Docker Compose files</param>
     /// <returns>Returns the Docker Compose file for the specified service</returns>
-    public static ComposeFile? TryGetComposeFile(this string serviceName, List<ComposeFile> composeFiles)
+    public static ComposeFile? TryGetComposeFile(this string containerLabels, List<ComposeFile> composeFiles)
     {
-        foreach (var composeFile in composeFiles)
+        try
         {
-            foreach (var service in composeFile.ServiceNames)
-            {
-                if (service.Contains("redis")
-                    || service.Contains("postgres"))
-                {
-                    continue;
-                }
-
-                if (serviceName.Contains(service))
-                {
-                    return composeFile;
-                }
-            }
+            string composePath = containerLabels.Split(new[] { "com.docker.compose.project.config_files=" }, StringSplitOptions.RemoveEmptyEntries)[1];
+            composePath = composePath.Substring(0, composePath.IndexOf(","));
+            return composeFiles.FirstOrDefault(f => f.FilePath == composePath);
         }
-
-        return null;
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

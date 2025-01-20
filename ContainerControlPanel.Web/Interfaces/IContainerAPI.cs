@@ -128,4 +128,12 @@ public interface IContainerAPI
     /// <returns>Returns the result of the operation.</returns>
     [Delete("/api/removeImage?imageId={imageId}")]
     Task<bool> RemoveImage(string imageId);
+
+    /// <summary>
+    /// Executes a shell command.
+    /// </summary>
+    /// <param name="command">Command string.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Post("/api/executeCommand?command={command}")]
+    Task<bool> ExecuteCommand(string command);
 }

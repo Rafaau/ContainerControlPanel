@@ -7,13 +7,16 @@
     </TitleContent>
     <DialogContent>
         <div class="details-content">
-            @if (!string.IsNullOrEmpty(ComposeFile.FileContent))
-            {
-                <MudTextField Style="font-family: Consolas;" spellcheck="false" T="string" Label="@ComposeFile.FileName" Variant="Variant.Outlined" @bind-Value="ComposeFile.FileContent" AutoGrow/>
-            }
+            <MudTextField Immediate="true" Style="font-family: Consolas;" spellcheck="false" T="string" Label="@ComposeFile.FileName" Variant="Variant.Outlined" @bind-Value="ComposeFile.FileContent" AutoGrow/>
         </div>
     </DialogContent>
     <DialogActions>
+        @if (!string.IsNullOrEmpty(ComposeFile.FileContent))
+        {
+            <div class="run-btn">
+                <MudButton Color="Color.Primary" OnClick="OpenDockerComposeDialogAsync">@Localizer[Locales.Resource.Run]</MudButton>
+            </div>
+        }
         <MudButton Color="Color.Primary" OnClick="Save">@Localizer[Locales.Resource.Save]</MudButton>
         <MudButton Color="Color.Default" OnClick="Cancel">@Localizer[Locales.Resource.Cancel]</MudButton>
     </DialogActions>

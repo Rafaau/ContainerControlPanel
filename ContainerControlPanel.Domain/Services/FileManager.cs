@@ -96,7 +96,8 @@ public class FileManager
                     imageFiles.Add(new ImageFile
                     {
                         FilePath = file,
-                        FileName = Path.GetFileName(file)
+                        FileName = Path.GetFileName(file),
+                        Size = $"{new FileInfo(file).Length / (1024 * 1024)}MB"
                     });
                 }
                 catch (Exception)
@@ -156,6 +157,28 @@ public class FileManager
     }
 
     /// <summary>
+    /// Uploads a single chunk of a file
+    /// </summary>
+    /// <param name="directoryPath">Path to the directory</param>
+    /// <param name="chunk">Chunk to upload</param>
+    /// <returns>Returns the result of the operation</returns>
+    /// <exception cref="Exception">Thrown when there is an error while uploading the chunk</exception>
+    public async static Task UploadChunk(string directoryPath, IFormFile chunk)
+    {
+        try
+        {
+            using (var fileStream = new FileStream(directoryPath + $"\\{chunk.FileName}", FileMode.Create))
+            {
+                await chunk.CopyToAsync(fileStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"There was an error while uploading the chunk: {ex.Message}");
+        }
+    }
+
+    /// <summary>
     /// Merges the chunks of a file into a single file
     /// </summary>
     /// <param name="directoryPath">Path to the directory</param>
@@ -166,7 +189,9 @@ public class FileManager
     {
         try
         {
-            var chunkFiles = Directory.GetFiles(directoryPath, $"{fileName}.part*");
+            var chunkFiles = Directory.GetFiles(directoryPath, $"{fileName}.part*")
+                .OrderBy(f => int.Parse(Path.GetFileName(f).Split("part")[1]))
+                .ToArray();
             var filePath = Path.Combine(directoryPath, fileName);
 
             using var stream = new FileStream(filePath, FileMode.Create);

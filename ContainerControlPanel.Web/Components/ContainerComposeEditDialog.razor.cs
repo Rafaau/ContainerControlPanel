@@ -11,6 +11,9 @@ public partial class ContainerComposeEditDialog(IContainerAPI containerAPI)
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
+    [Inject]
+    IDialogService DialogService { get; set; }
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -38,5 +41,24 @@ public partial class ContainerComposeEditDialog(IContainerAPI containerAPI)
         }
 
         MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private Task OpenDockerComposeDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Medium
+        };
+
+        return DialogService.ShowAsync<RunCommandDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "Command", $"compose -f {ComposeFile.FilePath} up -d" }
+            },
+            options
+        );
     }
 }

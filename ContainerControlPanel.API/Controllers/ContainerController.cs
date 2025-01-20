@@ -175,7 +175,8 @@ namespace ContainerControlPanel.API.Controllers
         [HttpPost("UploadChunk")]
         public async Task<IActionResult> UploadChunk([FromForm] IFormFile chunk)
         {
-            await FileManager.UploadFile(_configuration["ImagesDir"], chunk);
+            Console.WriteLine("Uploading chunk" + chunk.FileName);
+            await FileManager.UploadChunk(_configuration["ImagesDir"], chunk);
             return Ok();
         }
 
@@ -211,6 +212,18 @@ namespace ContainerControlPanel.API.Controllers
         public async Task<IActionResult> RemoveImage(string imageId)
         {
             var result = await ContainerManager.RemoveImageAsync(imageId);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Executes a shell command
+        /// </summary>
+        /// <param name="command">Command string</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpPost("ExecuteCommand")]
+        public async Task<IActionResult> ExecuteCommand(string command)
+        {
+            var result = await ContainerManager.ExecuteCommand(command);
             return Ok(result);
         }
     }

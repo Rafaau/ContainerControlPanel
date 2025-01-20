@@ -420,4 +420,37 @@
   <data name="ImageRemoveError" xml:space="preserve">
     <value>Error while removing Docker image</value>
   </data>
+  <data name="Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="RunCommand" xml:space="preserve">
+    <value>Run command</value>
+  </data>
+  <data name="Command" xml:space="preserve">
+    <value>Command</value>
+  </data>
+  <data name="CommandExecuteSuccess" xml:space="preserve">
+    <value>Command executed successfully</value>
+  </data>
+  <data name="CommandExecuteError" xml:space="preserve">
+    <value>Error while executing command</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="StartContainerSuccess" xml:space="preserve">
+    <value>Container has started successfully</value>
+  </data>
+  <data name="StartContainerError" xml:space="preserve">
+    <value>Error while starting container</value>
+  </data>
+  <data name="RestartContainerSuccess" xml:space="preserve">
+    <value>Container has been restarted successfully</value>
+  </data>
+  <data name="RestartContainerError" xml:space="preserve">
+    <value>Error while restarting container</value>
+  </data>
 </root>

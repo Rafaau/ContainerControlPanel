@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace ContainerControlPanel.Domain.Models;
 
@@ -53,4 +54,9 @@ public class Container
     /// Gets or sets the names
     /// </summary>
     public string Names { get; set; }
+
+    /// <summary>
+    /// Gets or sets the labels
+    /// </summary>
+    public string Labels { get; set; }
 }

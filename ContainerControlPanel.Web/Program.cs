@@ -47,7 +47,11 @@ builder.Services
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddTransient<IScrollHandler, ScrollHandler>();
 builder.Services.AddSingleton<WebSocketService>();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.VisibleStateDuration = 2000;
+    config.SnackbarConfiguration.HideTransitionDuration = 500;
+});
 builder.Services.AddLocalization(opt => opt.ResourcesPath = "Locales");
 
 builder.Services.AddAuthorizationCore();
@@ -55,6 +59,8 @@ builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 builder.Services.AddMemoryCache();
+
+builder.Logging.SetMinimumLevel(LogLevel.None);
 
 var host = builder.Build();
 

@@ -95,15 +95,16 @@
 	cursor: pointer;
 	font-size: 12px;
 	user-select: none;
+	display: flex;
 }
 
 	.file:hover {
-		background-color: #484848;
+		background-color: rgba(255,255,255,0.1);
 		border-radius: 5px;
 	}
 
 .chosen-file {
-	background-color: #484848;
+	background-color: rgba(255,255,255,0.1);
 	border-radius: 5px;
 }
 
@@ -154,4 +155,9 @@ input {
 	height: 5px;
 	top: -2px;
 	background: none;
+}
+
+.install-btn {
+	margin-right: auto;
+	margin-left: 8px;
 }

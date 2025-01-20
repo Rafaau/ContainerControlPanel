@@ -1,0 +1,26 @@
+﻿@using MudBlazor;
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        @Localizer[Locales.Resource.RunCommand]
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Adornment="Adornment.Start" AdornmentText="docker" Immediate="true" Style="font-family: Consolas;" @bind-Value="Command" Label="@Localizer[Locales.Resource.Command]" />
+    </DialogContent>
+    <DialogActions>
+        @if (!string.IsNullOrEmpty(Command))
+        {
+            <div class="exec-btn">
+                <MudButton Color="Color.Primary" OnClick="ExecuteCommand">@Localizer[Locales.Resource.Execute]</MudButton>
+            </div>
+        }
+        <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Cancel]</MudButton>
+    </DialogActions>
+</MudDialog>
+@if (loading)
+{
+    <div class="loading">
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    </div>
+}

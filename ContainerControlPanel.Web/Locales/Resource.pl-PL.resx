@@ -420,4 +420,37 @@
   <data name="ImageRemoveError" xml:space="preserve">
     <value>Błąd podczas usuwania obrazu Docker</value>
   </data>
+  <data name="Install" xml:space="preserve">
+    <value>Zainstaluj</value>
+  </data>
+  <data name="RunCommand" xml:space="preserve">
+    <value>Uruchom polecenie</value>
+  </data>
+  <data name="Command" xml:space="preserve">
+    <value>Polecenie</value>
+  </data>
+  <data name="CommandExecuteSuccess" xml:space="preserve">
+    <value>Pomyślnie wykonano polecenie</value>
+  </data>
+  <data name="CommandExecuteError" xml:space="preserve">
+    <value>Błąd podczas wykonania polecenia</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Załaduj</value>
+  </data>
+  <data name="Run" xml:space="preserve">
+    <value>Uruchom</value>
+  </data>
+  <data name="StartContainerSuccess" xml:space="preserve">
+    <value>Pomyślnie uruchomiono kontener</value>
+  </data>
+  <data name="StartContainerError" xml:space="preserve">
+    <value>Błąd podczas uruchamiania kontenera</value>
+  </data>
+  <data name="RestartContainerSuccess" xml:space="preserve">
+    <value>Pomyślnie zrestartowano kontener</value>
+  </data>
+  <data name="RestartContainerError" xml:space="preserve">
+    <value>Błąd podczas restartowania kontenera</value>
+  </data>
 </root>

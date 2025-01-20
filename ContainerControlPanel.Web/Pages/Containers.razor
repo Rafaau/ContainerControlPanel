@@ -2,6 +2,7 @@
 @page "/containers"
 @page "/containers/{LiveFilter}"
 
+@using ContainerControlPanel.Web.Enums
 @using MudBlazor
 @using Locales
 @using ContainerControlPanel.Domain.Models
@@ -17,25 +18,31 @@
 	<div style="margin-left: auto; margin-right: 4px;">
 		@if (composeFiles.Count > 0)
 		{
-			<MudTooltip Text="@Localizer[Locales.Resource.ViewComposeDir]" ShowOnFocus="false" ShowOnClick="false">
-				<MudIconButton @onclick="async () => { await OpenComposesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.Source" />
-			</MudTooltip>
+			<AuthorizeView Roles="Administrator">
+				<MudTooltip Text="@Localizer[Locales.Resource.ViewComposeDir]" ShowOnFocus="false" ShowOnClick="false">
+					<MudIconButton @onclick="async () => { await OpenComposesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.Source" />
+				</MudTooltip>
+			</AuthorizeView>
 		}
 	</div>
 	<div style="margin-right: 4px;">
 		@if (imageFiles.Count > 0)
 		{
-			<MudTooltip Text="@Localizer[Locales.Resource.ViewImagesDir]" ShowOnFocus="false" ShowOnClick="false">
-				<MudIconButton @onclick="async () => { await OpenImagesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.FolderZip" />
-			</MudTooltip>
+			<AuthorizeView Roles="Administrator">
+				<MudTooltip Text="@Localizer[Locales.Resource.ViewImagesDir]" ShowOnFocus="false" ShowOnClick="false">
+					<MudIconButton @onclick="async () => { await OpenImagesDirectoryDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.FolderZip" />
+				</MudTooltip>
+			</AuthorizeView>
 		}
 	</div>
 	<div style="margin-right: 14px;">
 		@if (imageFiles.Count > 0)
 		{
-			<MudTooltip Text="@Localizer[Locales.Resource.ViewImages]" ShowOnFocus="false" ShowOnClick="false">
-				<MudIconButton @onclick="async () => { await OpenImagesListDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.CloudCircle" />
-			</MudTooltip>
+			<AuthorizeView Roles="Administrator">
+				<MudTooltip Text="@Localizer[Locales.Resource.ViewImages]" ShowOnFocus="false" ShowOnClick="false">
+					<MudIconButton @onclick="async () => { await OpenImagesListDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.CloudCircle" />
+				</MudTooltip>
+			</AuthorizeView>
 		}
 	</div>
 	<div style="width: 200px;">
@@ -123,27 +130,30 @@
 						@container.Created.ToString("dd/MM/yyyy")
 					</div>
 					<div class="data-grid-cell">
+						@{
+							var composeFile = container.Labels.TryGetComposeFile(composeFiles);
+						}
 						<AuthorizeView Roles="Administrator">
 							@if (!container.Status.Contains("Exited"))
 							{
-								<MudTooltip Text="@Localizer[Locales.Resource.Stop]">
+								<MudTooltip Text="@Localizer[Locales.Resource.Stop]" ShowOnFocus="false" ShowOnClick="false">
 									<MudIconButton @onclick="async () => { await StopContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Stop"/>
 								</MudTooltip>
-								<MudTooltip Text="@Localizer[Locales.Resource.Restart]">
-									<MudIconButton @onclick="async () => { await RestartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+								<MudTooltip Text="@Localizer[Locales.Resource.Restart]" ShowOnFocus="false" ShowOnClick="false">
+									<MudIconButton @onclick="async () => { await OpenStartContainerDialogAsync(container, ActionType.Restart); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
 								</MudTooltip>
 							}
 							else
 							{
-								<MudTooltip Text="@Localizer[Locales.Resource.Start]">
-									<MudIconButton @onclick="async () => { await StartContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.PlayArrow" />
+								<MudTooltip Text="@Localizer[Locales.Resource.Start]" ShowOnFocus="false" ShowOnClick="false">
+									<MudIconButton @onclick="async () => { await OpenStartContainerDialogAsync(container, ActionType.Start); }" Color="Color.Primary" Icon="@Icons.Material.Filled.PlayArrow" />
 								</MudTooltip>
 							}
 							<MudDivider Vertical="true" FlexItem="true" Class="opacity-100 mx-2"/>
 						</AuthorizeView>
 						<MudMenu AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight" Color="Color.Dark">
 							<ActivatorContent>
-								<MudTooltip Text="@Localizer[Locales.Resource.More]">
+								<MudTooltip Text="@Localizer[Locales.Resource.More]" ShowOnFocus="false" ShowOnClick="false">
 									<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.MoreHoriz" />
 								</MudTooltip>
 							</ActivatorContent>
@@ -154,13 +164,12 @@
 								{
 									<MudMenuItem @onclick="() => { ViewApiDocs(container.ContainerId); }">@Localizer[Locales.Resource.ViewAPIDocs]</MudMenuItem>
 								}
-								@{
-									var composeFile = container.Names.TryGetComposeFile(composeFiles);
-								}
-								@if (composeFile != null) 
-								{
-									<MudMenuItem @onclick="() => { OpenComposeFileEditDialogAsync(composeFile); }">@Localizer[Locales.Resource.EditCompose]</MudMenuItem>
-								}
+								<AuthorizeView Roles="Administrator">
+									@if (container.Labels.Contains("com.docker.compose.project.config_files="))
+									{									
+										<MudMenuItem @onclick="() => { OpenComposeFileEditDialogAsync(composeFile); }">@Localizer[Locales.Resource.EditCompose]</MudMenuItem>								
+									}
+								</AuthorizeView>
 							</ChildContent>
 						</MudMenu>
 					</div>

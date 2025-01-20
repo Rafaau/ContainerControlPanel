@@ -81,3 +81,8 @@
 	-webkit-text-security: disc;
 	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
+
+.run-btn {
+	margin-right: auto;
+}
+

@@ -59,7 +59,8 @@
         @if (chosenImage != null)
         {
             <div class="remove-btn">
-                <MudButton Color="Color.Primary" OnClick="RemoveImage" A>@Localizer[Locales.Resource.Remove]</MudButton>
+                <MudButton Color="Color.Primary" OnClick="OpenDockerRunDialogAsync">@Localizer[Locales.Resource.Run]</MudButton>
+                <MudButton Color="Color.Primary" OnClick="RemoveImage">@Localizer[Locales.Resource.Remove]</MudButton>
             </div>
         }       
         <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>

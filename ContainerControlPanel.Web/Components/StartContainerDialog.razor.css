@@ -2,3 +2,16 @@
 	font-size: 16px;
 	margin-bottom: 24px;
 }
+
+.action-btn {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.loading {
+	position: absolute;
+	height: 5px;
+	top: -2px;
+	background: none;
+}

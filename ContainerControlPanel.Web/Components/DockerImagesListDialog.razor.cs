@@ -67,5 +67,24 @@ public partial class DockerImagesListDialog(IContainerAPI containerAPI)
         } 
     }
 
+    private Task OpenDockerRunDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Medium
+        };
+
+        return DialogService.ShowAsync<RunCommandDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "Command", $"run --name {chosenImage.Repository} -d {chosenImage.Repository}:{chosenImage.Tag}" }
+            },
+            options
+        );
+    }
+
     private void Close() => MudDialog.Close(DialogResult.Ok(true));
 }

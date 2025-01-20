@@ -223,6 +223,33 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Polecenie.
+        /// </summary>
+        public static string Command {
+            get {
+                return ResourceManager.GetString("Command", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas wykonania polecenia.
+        /// </summary>
+        public static string CommandExecuteError {
+            get {
+                return ResourceManager.GetString("CommandExecuteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pomyślnie wykonano polecenie.
+        /// </summary>
+        public static string CommandExecuteSuccess {
+            get {
+                return ResourceManager.GetString("CommandExecuteSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Kontener.
         /// </summary>
         public static string Container {
@@ -466,6 +493,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Zainstaluj.
+        /// </summary>
+        public static string Install {
+            get {
+                return ResourceManager.GetString("Install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Nieprawidłowy token.
         /// </summary>
         public static string InvalidToken {
@@ -480,6 +516,15 @@ namespace Locales {
         public static string Just {
             get {
                 return ResourceManager.GetString("Just", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Załaduj.
+        /// </summary>
+        public static string Load {
+            get {
+                return ResourceManager.GetString("Load", resourceCulture);
             }
         }
         
@@ -682,6 +727,24 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas restartowania kontenera.
+        /// </summary>
+        public static string RestartContainerError {
+            get {
+                return ResourceManager.GetString("RestartContainerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pomyślnie zrestartowano kontener.
+        /// </summary>
+        public static string RestartContainerSuccess {
+            get {
+                return ResourceManager.GetString("RestartContainerSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to uruchomić ponownie.
         /// </summary>
         public static string RestartInfinitive {
@@ -696,6 +759,24 @@ namespace Locales {
         public static string RoutesOnly {
             get {
                 return ResourceManager.GetString("RoutesOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uruchom.
+        /// </summary>
+        public static string Run {
+            get {
+                return ResourceManager.GetString("Run", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uruchom polecenie.
+        /// </summary>
+        public static string RunCommand {
+            get {
+                return ResourceManager.GetString("RunCommand", resourceCulture);
             }
         }
         
@@ -759,6 +840,24 @@ namespace Locales {
         public static string Start {
             get {
                 return ResourceManager.GetString("Start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas uruchamiania kontenera.
+        /// </summary>
+        public static string StartContainerError {
+            get {
+                return ResourceManager.GetString("StartContainerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pomyślnie uruchomiono kontener.
+        /// </summary>
+        public static string StartContainerSuccess {
+            get {
+                return ResourceManager.GetString("StartContainerSuccess", resourceCulture);
             }
         }
         

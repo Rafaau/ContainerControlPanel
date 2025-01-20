@@ -151,43 +151,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         {
             container.Status = "Exited";
         }
-    }
-
-    private async Task RestartContainer(string containerId)
-    {
-        var container = containers.Find(x => x.ContainerId == containerId);
-        
-        var dialog = await OpenStartContainerDialogAsync(containerId, ActionType.Restart);
-        var option = await dialog.Result;
-
-        if (option.Data.GetType() != typeof(StartOption))
-            return;
-        
-        if ((StartOption)option.Data == StartOption.JustStart)
-        {
-            container.Status = "Restarting...";
-            this.StateHasChanged();
-            await containerAPI.RestartContainer(containerId);
-        }
-    }
-
-    private async Task StartContainer(string containerId)
-    {
-        var container = containers.Find(x => x.ContainerId == containerId);  
-
-        var dialog = await OpenStartContainerDialogAsync(containerId, ActionType.Start);
-        var option = await dialog.Result;
-
-        if (option.Data.GetType() != typeof(StartOption))
-            return;
-
-        if ((StartOption)option.Data == StartOption.JustStart)
-        {
-            container.Status = "Starting...";
-            this.StateHasChanged();
-            await containerAPI.StartContainer(containerId);
-        }
-    }
+    } 
 
     private Task OpenDetailsDialogAsync(string containerId)
     {
@@ -211,14 +175,15 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         );
     }
 
-    private async Task<IDialogReference> OpenStartContainerDialogAsync(string containerId, ActionType actionType)
+    private async Task<IDialogReference> OpenStartContainerDialogAsync(Container container, ActionType actionType)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         return await DialogService.ShowAsync<StartContainerDialog>(
             "",
             new DialogParameters()
             {
-                { "ContainerId", containerId },
+                { "Container", container },
+                { "ComposeFile", container.Labels.TryGetComposeFile(composeFiles) },
                 { "ActionType", actionType }
             },
             options

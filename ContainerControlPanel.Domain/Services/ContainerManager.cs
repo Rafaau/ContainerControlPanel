@@ -233,4 +233,39 @@ public static class ContainerManager
             }
         }
     }
+
+    /// <summary>
+    /// Executes a shell command
+    /// </summary>
+    /// <param name="command">Command string</param>
+    /// <returns>Returns a boolean indicating whether the command was executed successfully</returns>
+    public static async Task<bool> ExecuteCommand(string command)
+    {
+        ProcessStartInfo _executeCommandProcessStartInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = command,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        try
+        {
+            using (Process process = Process.Start(_executeCommandProcessStartInfo))
+            {
+                using (StreamReader reader = process.StandardOutput)
+                {
+                    string output = await reader.ReadToEndAsync();
+                    return command.Contains("load") && output.Contains("Loaded")
+                        || command.Contains("compose") && output.Contains("Started")
+                        || command.Contains("run") && !output.Contains("Error");
+                }
+            }
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 }

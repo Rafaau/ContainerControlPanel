@@ -1,4 +1,4 @@
-using ContainerControlPanel.Domain.Models;
+﻿using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Web.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -39,6 +39,7 @@ public partial class DockerImageDirectoryViewDialog(IContainerAPI containerAPI)
             const int chunkSize = 10 * 1024 * 1024; // 10MB
             var file = e.File;
             using var stream = file.OpenReadStream(maxAllowedSize: long.MaxValue);
+            var s = stream.Length;
 
             byte[] buffer = new byte[chunkSize];
             int bytesRead;
@@ -46,7 +47,9 @@ public partial class DockerImageDirectoryViewDialog(IContainerAPI containerAPI)
 
             while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
             {
-                using var chunkStream = new MemoryStream(buffer, 0, bytesRead);
+                byte[] chunkBuffer = new byte[bytesRead];
+                Array.Copy(buffer, 0, chunkBuffer, 0, bytesRead);
+                using var chunkStream = new MemoryStream(chunkBuffer);
                 using var chunkContent = new StreamContent(chunkStream);
                 chunkContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
@@ -66,7 +69,7 @@ public partial class DockerImageDirectoryViewDialog(IContainerAPI containerAPI)
 
             ImageFiles = await containerAPI.SearchForImages();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Snackbar.Clear();
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
@@ -77,6 +80,25 @@ public partial class DockerImageDirectoryViewDialog(IContainerAPI containerAPI)
         {
             loading = false;
         }
+    }
+
+    private Task OpenInstallImageDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Medium
+        };
+
+        return DialogService.ShowAsync<RunCommandDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "Command", $"load --input {chosenFile.FilePath}" }
+            },
+            options
+        );
     }
 
     private void Close() => MudDialog.Close(DialogResult.Ok(true));

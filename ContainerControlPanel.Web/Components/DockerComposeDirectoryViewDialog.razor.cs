@@ -39,7 +39,7 @@ public partial class DockerComposeDirectoryViewDialog(IContainerAPI containerAPI
         {
             CloseOnEscapeKey = true,
             FullWidth = true,
-            MaxWidth = MaxWidth.Large
+            MaxWidth = MaxWidth.Medium
         };
 
         return DialogService.ShowAsync<ContainerComposeEditDialog>(

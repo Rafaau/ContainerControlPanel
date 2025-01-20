@@ -23,11 +23,18 @@
             {
                 <div class="file @(imageFile == chosenFile? "chosen-file" : "")" @onclick="() => { chosenFile = imageFile; }">
                     @imageFile.FileName
+					<span style="margin-left: auto;">@imageFile.Size</span>
                 </div>
             }
         </div>
     </DialogContent>
     <DialogActions>
+        @if (chosenFile != null)
+        {
+            <div class="install-btn">
+                <MudButton Color="Color.Primary" OnClick="OpenInstallImageDialogAsync">@Localizer[Locales.Resource.Load]</MudButton>
+            </div>
+        }
         <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>
     </DialogActions>
 </MudDialog>
