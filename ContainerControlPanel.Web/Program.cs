@@ -33,16 +33,16 @@ foreach (var keyValue in configData)
 #endif
 
 builder.Services.AddScoped(sp => new HttpClient { 
-    BaseAddress = new Uri($"http://{builder.Configuration["WebAPI:Host"]}:{builder.Configuration["WebAPI:Port"]}")
+    BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}")
 });
 
 builder.Services
     .AddRefitClient<IContainerAPI>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{builder.Configuration["WebAPI:Host"]}:{builder.Configuration["WebAPI:Port"]}"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}"));
 
 builder.Services
     .AddRefitClient<ITelemetryAPI>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{builder.Configuration["WebAPI:Host"]}:{builder.Configuration["WebAPI:Port"]}"));
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}"));
 
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddTransient<IScrollHandler, ScrollHandler>();

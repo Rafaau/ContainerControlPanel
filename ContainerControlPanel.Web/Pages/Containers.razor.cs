@@ -71,10 +71,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             LiveFilter ??= "true";
         }
 
-        await LoadContainers(true);
         await LoadComposeFiles();
         await LoadImageFiles();
         await LoadImages();
+        await LoadContainers(true);
+        await LoadContainersDetails();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -85,6 +86,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
                     try
                     {
                         await LoadContainers(true);
+                        await LoadContainersDetails();
                         await LoadComposeFiles();
                         await LoadImageFiles();
                         await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
@@ -112,8 +114,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             MemoryCache.Set("containers", result);
             containers = result;
             this.StateHasChanged();
-        }
+        }       
+    }
 
+    private async Task LoadContainersDetails()
+    {
         foreach (var container in containers)
         {
             if (container.Status.Contains("Up") && !MemoryCache.TryGetValue($"containerDetails_{container.ContainerId}", out _))
@@ -128,16 +133,19 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private async Task LoadComposeFiles()
     {
         composeFiles = await containerAPI.SearchForComposes();
+        this.StateHasChanged();
     }
 
     private async Task LoadImageFiles()
     {
         imageFiles = await containerAPI.SearchForImages();
+        this.StateHasChanged();
     }
 
     private async Task LoadImages()
     {
         images = await containerAPI.GetImages();
+        this.StateHasChanged();
     }
 
     private async Task StopContainer(string containerId)

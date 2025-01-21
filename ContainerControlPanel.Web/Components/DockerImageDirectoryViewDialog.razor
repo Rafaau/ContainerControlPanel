@@ -7,7 +7,12 @@
     </TitleContent>
     <DialogContent>
         <div class="dir-name">
-            @ImageFiles[0].FilePath.Split("\\").SkipLast(1).Last()
+            @{
+                string directory = ImageFiles[0].FilePath.Contains("/")
+                    ? ImageFiles[0].FilePath.Split("/").SkipLast(1).Last()
+                    : ImageFiles[0].FilePath.Split("\\").SkipLast(1).Last();
+            }
+            @directory
         </div>
         <div class="upload-btn">
             <MudTooltip Text="@Localizer[Locales.Resource.UploadFile]">

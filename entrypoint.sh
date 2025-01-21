@@ -7,8 +7,8 @@ cat > /usr/share/nginx/html/config.json <<EOF
 	"AdminToken": "${AdminToken}",
 	"Realtime": "${Realtime}",
 	"TimeOffset": "${TimeOffset}",
-	"WebAPI__Port": "${WebAPI__Port}",
-	"WebAPI__Host": "${WebAPI__Host}"
+	"WebAPIPort": "${WebAPIPort}",
+	"WebAPIHost": "${WebAPIHost}"	
 }
 EOF
 

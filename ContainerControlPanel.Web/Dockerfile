@@ -19,14 +19,20 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 COPY --from=build /app/publish/wwwroot .
 
-# Copy entrypoint.sh to the container
+# Add a custom nginx.conf for SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 
-# Fix entrypoint.sh line endings from CRLF to LF
+# Fix line endings in entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh
+
+# Make the script executable
+RUN chmod +x /entrypoint.sh
 
 # Expose port 80 to serve the Blazor app
 EXPOSE 80
 
-# Start the application
-ENTRYPOINT ["bash", "/entrypoint.sh"]
+# Use entrypoint.sh to initialize the app and start Nginx
+ENTRYPOINT ["/entrypoint.sh"]
