@@ -1,4 +1,5 @@
-﻿using OpenTelemetry.Logs;
+﻿using ContainerControlPanel.API.Authorization;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using StackExchange.Redis;
@@ -28,6 +29,7 @@ builder.Services.AddHybridCache();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
 builder.Services.AddSingleton<RedisService>();
+builder.Services.AddSingleton<SessionValidation>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

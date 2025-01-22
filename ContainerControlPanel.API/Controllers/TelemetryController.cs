@@ -5,6 +5,7 @@ using System.Text.Json;
 using OpenTelemetry.Proto.Collector.Metrics.V1;
 using OpenTelemetry.Proto.Collector.Logs.V1;
 using ContainerControlPanel.API.Models;
+using ContainerControlPanel.API.Authorization;
 
 /// <summary>
 /// Controller for handling telemetry data.
@@ -156,6 +157,7 @@ public class TelemetryController : ControllerBase
     /// <param name="timestamp">Timestamp</param>
     /// <returns>Returns the stored traces</returns>
     [HttpGet("GetTraces")]
+    [TokenAuthorize]
     public async Task<IActionResult> GetTraces(int timeOffset, string? resource, string? timestamp)
     {
         List<TracesRoot> traces = new();
@@ -179,6 +181,7 @@ public class TelemetryController : ControllerBase
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns the stored trace</returns>
     [HttpGet("GetTrace")]
+    [TokenAuthorize]
     public async Task<IActionResult> GetTrace(string traceId)
     {
         List<TracesRoot> traces = new();
@@ -203,6 +206,7 @@ public class TelemetryController : ControllerBase
     /// </summary>
     /// <returns>Returns the stored metrics</returns>
     [HttpGet("GetMetrics")]
+    [TokenAuthorize]
     public async Task<IActionResult> GetMetrics()
     {
         List<MetricsRoot> metrics = new();
@@ -223,6 +227,7 @@ public class TelemetryController : ControllerBase
     /// <param name="resource">Resource name</param>
     /// <returns>Returns the stored logs</returns>
     [HttpGet("GetLogs")]
+    [TokenAuthorize]
     public async Task<IActionResult> GetLogs(int timeOffset, string? timestamp, string? resource)
     {
         List<LogsRoot> logs = new();
@@ -244,6 +249,7 @@ public class TelemetryController : ControllerBase
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns the stored log</returns>
     [HttpGet("GetLog")]
+    [TokenAuthorize]
     public async Task<IActionResult> GetLog(string traceId)
     {
         var result = await _redisService.ScanKeysByPatternAsync($"log{traceId}");
@@ -261,6 +267,7 @@ public class TelemetryController : ControllerBase
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns the request and response for the trace</returns>
     [HttpGet("GetRequestAndResponse")]
+    [TokenAuthorize]
     public async Task<IActionResult> GetRequestAndResponse(string traceId)
     {
         var result = await _redisService.ScanKeysByPatternAsync($"log{traceId}");

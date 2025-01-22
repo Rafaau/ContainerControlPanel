@@ -32,17 +32,26 @@ foreach (var keyValue in configData)
 }
 #endif
 
-builder.Services.AddScoped(sp => new HttpClient { 
-    BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}")
+builder.Services.AddScoped(sp => new HttpClient {
+    BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}"),
+    DefaultRequestHeaders = { { "Authorization", builder.Configuration["AuthToken"] } }
 });
 
 builder.Services
     .AddRefitClient<IContainerAPI>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}"));
+    .ConfigureHttpClient(config =>
+    {
+        config.BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}");
+        config.DefaultRequestHeaders.Add("Authorization", builder.Configuration["AuthToken"]);
+    });
 
 builder.Services
     .AddRefitClient<ITelemetryAPI>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}"));
+    .ConfigureHttpClient(config =>
+    {
+        config.BaseAddress = new Uri($"http://{builder.Configuration["WebAPIHost"]}:{builder.Configuration["WebAPIPort"]}");
+        config.DefaultRequestHeaders.Add("Authorization", builder.Configuration["AuthToken"]);
+    });
 
 builder.Services.AddScoped<IServiceProvider, ServiceProvider>();
 builder.Services.AddTransient<IScrollHandler, ScrollHandler>();

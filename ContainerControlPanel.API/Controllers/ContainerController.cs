@@ -1,3 +1,4 @@
+using ContainerControlPanel.API.Authorization;
 using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Domain.Services;
 using Microsoft.AspNetCore.Components.Forms;
@@ -11,6 +12,7 @@ namespace ContainerControlPanel.API.Controllers
     /// </summary>
     [ApiController]
     [Route("/api")]
+    [TokenAuthorize]
     public class ContainerController : ControllerBase
     {
         /// <summary>
