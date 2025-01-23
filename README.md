@@ -21,8 +21,6 @@ To get started, you can use the recommended Docker Compose file and run the appl
 ```
 version: '3'
 
-name: ccp-compose #NECCESSARY
-
 services:
     ccp-api:
         image: rafaau/ccp-api:latest
@@ -35,6 +33,9 @@ services:
         environment:
             - Redis__ConnectionString=redis:6379
             - WebApp__Port=5069
+            - WebApp__Host=localhost
+            - ComposeDir=C:\\Users\\user\\Desktop\composes
+            - ImagesDir=C:\\Users\\user\\Desktop\images
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:rw
         privileged: true
@@ -51,7 +52,8 @@ services:
             - UserToken=Password
             - AdminToken=Password12345
             - AppName=NotAspire
-            - WebAPI__Port=5121
+            - WebAPIPort=5121
+            - WebAPIHost=localhost
 
     redis:
         image: redis:latest
@@ -189,13 +191,18 @@ You can configure your CCP stack by specifing following environment variables in
 | ------- | ----------------------- | ---------- | --------------------------------------------------------------- |
 | WebAPI  | Redis__ConnectionString | String     | Specifies the connection string for the Redis server.           |
 | WebAPI  | WebApp__Port            | Int        | Specifies the port number for the WebApp service.               |
+| WebAPI  | WebApp__Host            | String     | Specifies the host address of the WebApp service.               |
+| WebAPI  | ComposeDir              | String     | Specifies the path to Docker composes directory.                |
+| WebAPI  | ImagesDir               | String     | Specifies the path to Docker images directory.                  |
+| WebAPI  | AuthToken               | String     | Specifies the authorization token.                              |
 | WebApp  | AppName                 | String     | Specifies the name of the application.                          |
 | WebApp  | AdminToken              | String     | Specifies the token for the admin user.                         |
 | WebApp  | UserToken               | String     | Specifies the token for the regular user.                       |
-| WebApp  | WebAPI__Port            | Int        | Specifies the port number for the WebAPI service.               |
-| WebApp  | WebAPI__Host            | String     | Specifies the host of the WebAPI service.                       |
+| WebApp  | WebAPIPort              | Int        | Specifies the port number for the WebAPI service.               |
+| WebApp  | WebAPIHost              | String     | Specifies the host of the WebAPI service.                       |
 | WebApp  | Realtime                | Boolean    | Specifies whether the application should use real-time updates. |
 | WebApp  | TimeOffset              | Int        | Specifies the time offset for the application.                  |
+| WebApp  | AuthToken               | String     | Specifies the authorization token for WebAPI calls.             |
 
 ## Screenshots
 
