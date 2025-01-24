@@ -46,7 +46,7 @@ namespace ContainerControlPanel.API.Controllers
                 return Ok(cachedResponse);
             }
 
-            var response = await ContainerManager.GetContainersListAsync(liveFilter);
+            var response = await ContainerManager.GetContainersListAsync(_configuration, liveFilter);
 
             memoryCache.Set("containers", response, TimeSpan.FromMinutes(1));
 

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using ContainerControlPanel.Domain.Methods;
 using ContainerControlPanel.Domain.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace ContainerControlPanel.Domain.Services;
 
@@ -12,9 +13,10 @@ public static class ContainerManager
     /// <summary>
     /// Gets a list of containers
     /// </summary>
+    /// <param name="config">Configuration settings</param>
     /// <param name="liveFilter">Indicates whether to filter live containers</param>
     /// <returns>Returns a list of <see cref="Container"/> objects</returns>
-    public static async Task<List<Container>> GetContainersListAsync(bool liveFilter = false)
+    public static async Task<List<Container>> GetContainersListAsync(IConfiguration config, bool liveFilter = false)
     {
         string argString = liveFilter 
             ? @"ps --format=""{{json .}}"""
@@ -34,7 +36,7 @@ public static class ContainerManager
             using (StreamReader reader = process.StandardOutput)
             {
                 string output = await reader.ReadToEndAsync();
-                return await Parser.ParseContainers(output);
+                return await Parser.ParseContainers(config, output);
             }
         }
     }

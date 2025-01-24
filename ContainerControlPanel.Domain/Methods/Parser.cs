@@ -1,4 +1,5 @@
 ﻿using ContainerControlPanel.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Text.Json;
 using YamlDotNet.RepresentationModel;
@@ -13,9 +14,10 @@ public static class Parser
     /// <summary>
     /// Parses the output of the Docker ps command
     /// </summary>
+    /// <param name="config">Configuration settings</param>
     /// <param name="output">String output of the Docker ps command</param>
     /// <returns>Returns a list of <see cref="Container"/> objects</returns>
-    public async static Task<List<Container>> ParseContainers(string output)
+    public async static Task<List<Container>> ParseContainers(IConfiguration config, string output)
     {
         List<Container> containers = new List<Container>();
         var containersOutput = output.Split(new[] { '{' }, StringSplitOptions.RemoveEmptyEntries);
@@ -26,13 +28,28 @@ public static class Parser
             Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(containerObj));
             Container container = await JsonSerializer.DeserializeAsync<Container>(stream);
 
-            if (container.Names.Contains("ccp-compose")
-                || container.Names.Contains("ccpcompose"))
+            List<string> namesToExclude = config["ExcludeByName"].Split(';').ToList();
+            List<string> imagesToExclude = config["ExcludeByImage"].Split(';').ToList();
+            bool excluded = false;
+
+            foreach (var name in namesToExclude.Where(x => !string.IsNullOrEmpty(x)))
             {
-                continue;
+                if (container.Names.Contains(name))
+                {
+                    excluded = true;
+                }
             }
 
-            containers.Add(container);
+            foreach (var image in imagesToExclude.Where(x => !string.IsNullOrEmpty(x)))
+            {
+                if (container.Image.Contains(image))
+                {
+                    excluded = true;
+                }
+            }
+
+            if (!excluded)
+                containers.Add(container);
         }
 
         return containers.OrderByDescending(c => c.Status).ToList();
