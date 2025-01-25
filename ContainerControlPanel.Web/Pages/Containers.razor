@@ -80,7 +80,14 @@
 	@if (containers.Count < 1)
 	{
 		<div class="not-found">
-			@Localizer[Locales.Resource.NoAliveContainers].
+			@if (loading) 
+			{
+				<MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true"/>
+			}
+			else
+			{
+				<span>@Localizer[Locales.Resource.NoAliveContainers].</span>	
+			}
 		</div>
 	}	
 	else 

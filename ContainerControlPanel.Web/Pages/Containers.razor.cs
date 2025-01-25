@@ -48,6 +48,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private List<ComposeFile> composeFiles { get; set; } = new();
     private List<ImageFile> imageFiles { get; set; } = new();
     private List<Image> images { get; set; } = new();
+    private bool loading { get; set; } = false;
 
     private bool _open;
     private Anchor _anchor;
@@ -106,15 +107,22 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             && MemoryCache.TryGetValue("containers", out List<Container> cachedContainers))
         {
             containers = cachedContainers;
-            this.StateHasChanged();
         }
         else
         {
+            if (containers.Count() == 0)
+            {
+                loading = true;
+                this.StateHasChanged();
+            }
+
             var result = await containerAPI.GetContainers(force, liveFilter);
             MemoryCache.Set("containers", result);
-            containers = result;
-            this.StateHasChanged();
-        }       
+            containers = result;          
+        }
+
+        loading = false;
+        this.StateHasChanged();
     }
 
     private async Task LoadContainersDetails()
