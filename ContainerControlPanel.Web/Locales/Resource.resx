@@ -453,4 +453,10 @@
   <data name="RestartContainerError" xml:space="preserve">
     <value>Błąd podczas restartowania kontenera</value>
   </data>
+  <data name="StopContainerSuccess" xml:space="preserve">
+    <value>Pomyślnie zatrzymano kontener</value>
+  </data>
+  <data name="StopContainerError" xml:space="preserve">
+    <value>Błąd podczas zatrzymania kontenera</value>
+  </data>
 </root>

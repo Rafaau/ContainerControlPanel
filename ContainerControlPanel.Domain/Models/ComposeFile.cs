@@ -34,7 +34,7 @@ public static class ComposeFileExtensions
     /// <summary>
     /// Tries to get the Docker Compose file for a service.
     /// </summary>
-    /// <param name="serviceName">Name of the service</param>
+    /// <param name="containerLabels">Container labels</param>
     /// <param name="composeFiles">List of Docker Compose files</param>
     /// <returns>Returns the Docker Compose file for the specified service</returns>
     public static ComposeFile? TryGetComposeFile(this string containerLabels, List<ComposeFile> composeFiles)
@@ -49,5 +49,32 @@ public static class ComposeFileExtensions
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Tries to get the Docker Compose file for a service by service name.
+    /// </summary>
+    /// <param name="serviceName">Name of the service</param>
+    /// <param name="composeFiles">List of Docker Compose files</param>
+    /// <returns>Returns the Docker Compose file for the specified service</returns>
+    public static ComposeFile? TryGetComposeFileByServiceName(this string serviceName, List<ComposeFile> composeFiles)
+    {
+        foreach (var composeFile in composeFiles)
+        {
+            foreach (var service in composeFile.ServiceNames)
+            {
+                if (service.Contains("redis")
+                    || service.Contains("postgres"))
+                {
+                    continue;
+                }
+                if (serviceName.Contains(service))
+                {
+                    return composeFile;
+                }
+            }
+        }
+
+        return null;
     }
 }

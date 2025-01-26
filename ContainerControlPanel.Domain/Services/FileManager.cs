@@ -167,7 +167,8 @@ public class FileManager
     {
         try
         {
-            using (var fileStream = new FileStream(directoryPath + $"\\{chunk.FileName}", FileMode.Create))
+            using (var fileStream = new FileStream(directoryPath 
+                + (directoryPath.Contains("/") ? $"/{chunk.FileName}" : $"\\{chunk.FileName}"), FileMode.Create))
             {
                 await chunk.CopyToAsync(fileStream);
             }

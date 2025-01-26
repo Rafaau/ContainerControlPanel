@@ -889,6 +889,24 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas zatrzymania kontenera.
+        /// </summary>
+        public static string StopContainerError {
+            get {
+                return ResourceManager.GetString("StopContainerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pomyślnie zatrzymano kontener.
+        /// </summary>
+        public static string StopContainerSuccess {
+            get {
+                return ResourceManager.GetString("StopContainerSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Strukturalne.
         /// </summary>
         public static string Structured {

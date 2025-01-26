@@ -63,7 +63,7 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.TracesUpdated += OnTracesUpdated;
-            await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
         }
 
         base.OnInitialized();

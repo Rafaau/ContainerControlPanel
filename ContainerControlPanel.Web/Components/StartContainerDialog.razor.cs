@@ -77,7 +77,8 @@ public partial class StartContainerDialog(IContainerAPI containerAPI)
             }
             else
             {
-                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath} restart");
+                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath} down");
+                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath} up -d");
             }
 
             Snackbar.Clear();

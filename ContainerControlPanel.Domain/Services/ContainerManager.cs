@@ -245,8 +245,12 @@ public static class ContainerManager
     {
         ProcessStartInfo _executeCommandProcessStartInfo = new ProcessStartInfo
         {
-            FileName = "docker",
-            Arguments = command,
+            FileName = command.Contains("compose") 
+                ? "docker-compose"
+                : "docker",
+            Arguments = command.Contains("compose")
+                ? command.Substring(7)
+                : command,
             RedirectStandardOutput = true,
             UseShellExecute = false,
             CreateNoWindow = true
@@ -260,7 +264,8 @@ public static class ContainerManager
                 {
                     string output = await reader.ReadToEndAsync();
                     return command.Contains("load") && output.Contains("Loaded")
-                        || command.Contains("compose") && output.Contains("Started")
+                        || _executeCommandProcessStartInfo.FileName.Contains("compose") 
+                            && (output.Contains("done") || output.Contains("Stopped") || output.Contains("Started"))
                         || command.Contains("run") && !output.Contains("Error");
                 }
             }

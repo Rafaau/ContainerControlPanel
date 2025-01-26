@@ -30,5 +30,8 @@ RUN apt-get update && \
     apt-get install -y docker.io && \
     rm -rf /var/lib/apt/lists/*
 
+# Add docker-compose
+RUN apt-get update && apt-get install -y docker-compose
+
 # Entry point for the application
 ENTRYPOINT ["dotnet", "ContainerControlPanel.API.dll"]

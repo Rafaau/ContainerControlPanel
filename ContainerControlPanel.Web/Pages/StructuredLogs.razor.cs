@@ -119,7 +119,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.LogsUpdated += OnLogsUpdated;
-            await WebSocketService.ConnectAsync("ws://localhost:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
         }      
     }
 

@@ -72,11 +72,11 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             LiveFilter ??= "true";
         }
 
+        await LoadContainers(true);
+        await LoadContainersDetails();
         await LoadComposeFiles();
         await LoadImageFiles();
         await LoadImages();
-        await LoadContainers(true);
-        await LoadContainersDetails();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -88,8 +88,6 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
                     {
                         await LoadContainers(true);
                         await LoadContainersDetails();
-                        await LoadComposeFiles();
-                        await LoadImageFiles();
                         await Task.Delay(TimeSpan.FromSeconds(1), _cts.Token);
                     }
                     catch (TaskCanceledException)
@@ -156,17 +154,31 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         this.StateHasChanged();
     }
 
-    private async Task StopContainer(string containerId)
+    private async Task StopContainer(string containerId, ComposeFile? composeFile)
     {
         var container = containers.Find(x => x.ContainerId == containerId);
         container.Status = "Stopping...";
 
-        string result = await containerAPI.StopContainer(containerId);
-
-        if (result.Contains(container.ContainerId))
+        try
         {
-            container.Status = "Exited";
+            if (composeFile != null)
+                await containerAPI.ExecuteCommand($"compose -f {composeFile.FilePath} down");
+            else
+                await containerAPI.StopContainer(containerId);
+
+            container.Status = "Stopped";
+            this.StateHasChanged();
+
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+            Snackbar.Add(Localizer[Locales.Resource.StopContainerSuccess], Severity.Normal);
         }
+        catch (Exception ex)
+        {
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+            Snackbar.Add(Localizer[Locales.Resource.StopContainerError], Severity.Normal);
+        }     
     } 
 
     private Task OpenDetailsDialogAsync(string containerId)
@@ -199,7 +211,12 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             new DialogParameters()
             {
                 { "Container", container },
-                { "ComposeFile", container.Labels.TryGetComposeFile(composeFiles) },
+                { 
+                  "ComposeFile", 
+                  container.Labels.Contains("com.docker.compose.project.config_files=")
+                    ? container.Labels.TryGetComposeFile(composeFiles)
+                    : container.Names.TryGetComposeFileByServiceName(composeFiles) 
+                },
                 { "ActionType", actionType }
             },
             options

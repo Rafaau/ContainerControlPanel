@@ -6,6 +6,7 @@
 @using MudBlazor
 @using Locales
 @using ContainerControlPanel.Domain.Models
+@inject ISnackbar Snackbar
 
 <div class="label">
 	<h1>@Localizer[Locales.Resource.Containers]</h1>
@@ -138,13 +139,15 @@
 					</div>
 					<div class="data-grid-cell">
 						@{
-							var composeFile = container.Labels.TryGetComposeFile(composeFiles);
+							var composeFile = container.Labels.Contains("com.docker.compose.project.config_files=")
+								? container.Labels.TryGetComposeFile(composeFiles)
+								: container.Names.TryGetComposeFileByServiceName(composeFiles);
 						}
 						<AuthorizeView Roles="Administrator">
 							@if (!container.Status.Contains("Exited"))
 							{
 								<MudTooltip Text="@Localizer[Locales.Resource.Stop]" ShowOnFocus="false" ShowOnClick="false">
-									<MudIconButton @onclick="async () => { await StopContainer(container.ContainerId); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Stop"/>
+									<MudIconButton @onclick="async () => { await StopContainer(container.ContainerId, composeFile); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Stop"/>
 								</MudTooltip>
 								<MudTooltip Text="@Localizer[Locales.Resource.Restart]" ShowOnFocus="false" ShowOnClick="false">
 									<MudIconButton @onclick="async () => { await OpenStartContainerDialogAsync(container, ActionType.Restart); }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
@@ -172,7 +175,7 @@
 									<MudMenuItem @onclick="() => { ViewApiDocs(container.ContainerId); }">@Localizer[Locales.Resource.ViewAPIDocs]</MudMenuItem>
 								}
 								<AuthorizeView Roles="Administrator">
-									@if (container.Labels.Contains("com.docker.compose.project.config_files="))
+									@if (container.Labels.Contains("com.docker.compose.project.config_files=") || container.Names.TryGetComposeFileByServiceName(composeFiles) != null)
 									{									
 										<MudMenuItem @onclick="() => { OpenComposeFileEditDialogAsync(composeFile); }">@Localizer[Locales.Resource.EditCompose]</MudMenuItem>								
 									}

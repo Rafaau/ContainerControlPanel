@@ -27,6 +27,9 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     [Inject]
     NavigationManager NavigationManager { get; set; }
 
+    [Inject]
+    IConfiguration Configuration { get; set; }
+
     [Parameter]
     public string ContainerId { get; set; }
 
@@ -91,7 +94,7 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         {
             httpClient = new HttpClient
             {
-                BaseAddress = new Uri($"http://localhost:{port}")
+                BaseAddress = new Uri($"http://{Configuration["WebAPIHost"]}:{port}")
             };
 
             await LoadEndpoints();
