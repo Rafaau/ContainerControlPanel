@@ -9,7 +9,8 @@ cat > /usr/share/nginx/html/config.json <<EOF
 	"TimeOffset": "${TimeOffset}",
 	"WebAPIPort": "${WebAPIPort}",
 	"WebAPIHost": "${WebAPIHost}",
-	"AuthToken": "${AuthToken}"	
+	"AuthToken": "${AuthToken}",
+	"Context": "${Context}"
 }
 EOF
 

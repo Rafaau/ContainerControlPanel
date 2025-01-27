@@ -14,6 +14,9 @@ public partial class StartContainerDialog(IContainerAPI containerAPI)
     [Inject]
     IStringLocalizer<Locales.Resource> Localizer { get; set; }
 
+    [Inject]
+    IConfiguration Configuration { get; set; }
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -70,15 +73,18 @@ public partial class StartContainerDialog(IContainerAPI containerAPI)
         try
         {
             loading = true;
+            string context = string.IsNullOrEmpty(Configuration["Context"])
+                    ? ""
+                    : $" -p {Configuration["Context"]}";
 
             if (ActionType == ActionType.Start)
             {
-                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath} up -d");
+                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath}{context} up -d");
             }
             else
             {
-                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath} down");
-                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath} up -d");
+                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath}{context} down");
+                await containerAPI.ExecuteCommand($"compose -f {ComposeFile!.FilePath}{context} up -d");
             }
 
             Snackbar.Clear();

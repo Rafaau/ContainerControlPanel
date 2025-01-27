@@ -162,7 +162,12 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         try
         {
             if (composeFile != null)
-                await containerAPI.ExecuteCommand($"compose -f {composeFile.FilePath} down");
+            {
+                string context = string.IsNullOrEmpty(Configuration["Context"])
+                    ? ""
+                    : $" -p {Configuration["Context"]}";
+                await containerAPI.ExecuteCommand($"compose -f {composeFile.FilePath}{context} down");
+            }            
             else
                 await containerAPI.StopContainer(containerId);
 
