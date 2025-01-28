@@ -14,6 +14,9 @@ public partial class ContainerComposeEditDialog(IContainerAPI containerAPI)
     [Inject]
     IDialogService DialogService { get; set; }
 
+    [Inject]
+    IConfiguration Configuration { get; set; }
+
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
 
@@ -52,11 +55,15 @@ public partial class ContainerComposeEditDialog(IContainerAPI containerAPI)
             MaxWidth = MaxWidth.Medium
         };
 
+        string context = string.IsNullOrEmpty(Configuration["Context"])
+                    ? ""
+                    : $" -p {Configuration["Context"]}";
+
         return DialogService.ShowAsync<RunCommandDialog>(
             "",
             new DialogParameters()
             {
-                { "Command", $"compose -f {ComposeFile.FilePath} up -d" }
+                { "Command", $"compose -f {ComposeFile.FilePath}{context} up -d" }
             },
             options
         );

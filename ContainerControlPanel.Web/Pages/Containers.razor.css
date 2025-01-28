@@ -12,7 +12,7 @@
 
 .data-grid-row {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
 	border-bottom: 1px solid #484848;
 }
 

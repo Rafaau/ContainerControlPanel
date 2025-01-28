@@ -1,11 +1,11 @@
 {
-  "name": "ContainerControlPanel.Web",
-  "short_name": "ContainerControlPanel.Web",
+  "name": "Container Control Panel",
+  "short_name": "CCP",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "theme_color": "#242424",
   "prefer_related_applications": false,
   "icons": [
     {
