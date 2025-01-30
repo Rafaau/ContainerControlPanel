@@ -203,6 +203,7 @@ You can configure your CCP stack by specifing following environment variables in
 | WebApp  | Realtime                | Boolean    | Specifies whether the application should use real-time updates. |
 | WebApp  | TimeOffset              | Int        | Specifies the time offset for the application.                  |
 | WebApp  | AuthToken               | String     | Specifies the authorization token for WebAPI calls.             |
+| WebApp  | Context                 | String     | Specifies the project identificator for docker-compose (-p flag)|
 
 ## Screenshots
 
