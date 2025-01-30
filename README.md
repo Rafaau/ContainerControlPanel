@@ -69,64 +69,14 @@ networks:
 ```
 
 At this point, you can access the CCP application at http://localhost:5069. You will be redirected to Containers page, where you can
-see the list of containers running on your machine. To enable the full monitoring capabilities, you need to implement the OpenTelemetry and
-and also add <a href="https://www.nuget.org/packages/ApiDocs/">ApiDocs</a> NuGet package to your project.
+see the list of containers running on your machine. To enable the full monitoring capabilities, you need to add 
+<a href="https://www.nuget.org/packages/ContainerControlPanel.Extensions/">ContainerControlPanel.Extensions</a>
+and also <a href="https://www.nuget.org/packages/ApiDocs/">ApiDocs</a> NuGet packages to your project.
 
 The sample implementation should look like this:
 
 ```
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing =>
-    {
-        tracing
-            .SetSampler(new AlwaysOnSampler())
-            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WeatherForecastAPI"))
-            .AddAspNetCoreInstrumentation(options =>
-            {
-                options.EnrichWithHttpRequest = (activity, httpContext) =>
-                {
-                    if (Activity.Current?.ParentId == null)
-                    {
-                        activity.SetParentId(ActivityTraceId.CreateRandom(), ActivitySpanId.CreateRandom());
-                    }
-                };
-            })
-            .AddHttpClientInstrumentation()
-            .AddOtlpExporter(options =>
-            {
-                options.Endpoint = new Uri("http://host.docker.internal:5121/v1/traces");
-                options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-            });
-    })
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WeatherForecastAPI"))
-            .AddHttpClientInstrumentation()
-            .AddAspNetCoreInstrumentation()
-            .AddOtlpExporter((exporterOptions, metricReaderOptions) =>
-            {
-                exporterOptions.Endpoint = new Uri("http://host.docker.internal:5121/v1/metrics");
-                exporterOptions.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-                exporterOptions.ExportProcessorType = ExportProcessorType.Simple;
-                metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10000;
-            });
-    })
-    .WithLogging(logging =>
-    {
-        logging
-            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("WeatherForecastAPI"))
-            .AddOtlpExporter(options =>
-            {
-                options.Endpoint = new Uri("http://host.docker.internal:5121/v1/logs");
-                options.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-            });
-    });
-
-builder.Logging.AddFilter("System.Net.Http.HttpClient.OtlpMetricExporter", LogLevel.None);
-builder.Logging.AddFilter("System.Net.Http.HttpClient.OtlpLogExporter", LogLevel.None);
-builder.Logging.AddFilter("System.Net.Http.HttpClient.OtlpTraceExporter", LogLevel.None);
-builder.Logging.AddFilter("Polly", LogLevel.None);
+builder.AddOpenTelemetry(host: "host.docker.internal", port: 5121, resourceName: "WeatherForecastAPI");
 ```
 
 And then:
@@ -159,9 +109,7 @@ And then:
 app.UseCors("AllowCCP");
 ```
 
-To allow CCP to capture your detailed requests, responses and summaries of your API calls, you need to get 
-<a href="https://www.nuget.org/packages/ContainerControlPanel.Extensions/">ContainerControlPanel.Extensions</a> NuGet package
-and implement request and response logging as in the sample below:
+To allow CCP to capture your detailed requests, responses and summaries of your API calls, you need to implement request and response logging as in the sample below:
 
 ```
 [Display(Description = "Method to get weather forecast.")]
