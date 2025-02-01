@@ -132,6 +132,17 @@ public IEnumerable<WeatherForecast> Get([FromBody] Body data, int forecastId)
 }
 ```
 
+> [!NOTE]
+> There is a probability that Controller will return <i>NotSupportedException</i> due to logging requests. In that case you need to specify the additional middleware in your <i>Program.cs</i> as below:
+
+```
+app.Use(async (context, next) =>
+    {
+        context.Request.EnableBuffering();
+        await next();
+    });
+```
+
 ## Configuration
 You can configure your CCP stack by specifing following environment variables in your docker-compose file:
 
