@@ -4,6 +4,7 @@ using ContainerControlPanel.Domain.Services;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 
 namespace ContainerControlPanel.API.Controllers
 {
@@ -21,12 +22,19 @@ namespace ContainerControlPanel.API.Controllers
         private readonly IConfiguration _configuration;
 
         /// <summary>
+        /// Redis service 
+        /// </summary>
+        private readonly RedisService _redisService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ContainerController"/> class.
         /// </summary>
         /// <param name="configuration">Configuration settings</param>
-        public ContainerController(IConfiguration configuration)
+        /// <param name="redisService">Redis service</param>
+        public ContainerController(IConfiguration configuration, RedisService redisService)
         {
             _configuration = configuration;
+            _redisService = redisService;
         }
 
         /// <summary>
@@ -227,6 +235,26 @@ namespace ContainerControlPanel.API.Controllers
         {
             var result = await ContainerManager.ExecuteCommand(command);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Saves a request to the cache
+        /// </summary>
+        /// <param name="request">Request object</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpPost("SaveRequest")]
+        public async Task<IActionResult> SaveRequest([FromBody] SavedRequest request)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(request);
+                await _redisService.SetValueAsync($"request{Guid.NewGuid().ToString()}", json);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

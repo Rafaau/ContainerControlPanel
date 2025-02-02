@@ -275,9 +275,65 @@ public class ParameterView
 }
 
 /// <summary>
-/// Extension methods for the API documentation
+/// Class to store the saved request
 /// </summary>
-public static class ApiDocsExtensions
+public class SavedRequest
+{
+    /// <summary>
+    /// Gets or sets the http method
+    /// </summary>
+    public string HttpMethod { get; set; }
+
+    /// <summary>
+    /// Gets or sets the route
+    /// </summary>
+    public string Route { get; set; }
+
+    /// <summary>
+    /// Gets or sets the request body
+    /// </summary>
+    public string RequestBody { get; set; }
+
+    /// <summary>
+    /// Gets or sets the response body
+    /// </summary>
+    public string ResponseBody { get; set; }
+
+    /// <summary>
+    /// Gets or sets the response headers
+    /// </summary>
+    public string ResponseHeaders { get; set; }
+
+    /// <summary>
+    /// Gets or sets the response status code
+    /// </summary>
+    public string ResponseStatusCode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the response status description
+    /// </summary>
+    public string ResponseStatusDescription { get; set; }
+
+    /// <summary>
+    /// Gets or sets the request curl
+    /// </summary>
+    public string RequestCurl { get; set; }
+
+    /// <summary>
+    /// Gets or sets the indicator if the request is pinned
+    /// </summary>
+    public bool IsPinned { get; set; }
+
+    /// <summary>
+    /// Gets or sets the call time
+    /// </summary>
+    public DateTime CallTime { get; set; }
+}
+
+    /// <summary>
+    /// Extension methods for the API documentation
+    /// </summary>
+    public static class ApiDocsExtensions
 {
     /// <summary>
     /// Maps the data from the endpoints to the controller view model

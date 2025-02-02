@@ -241,6 +241,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
+
+        await SaveRequest(route, action);
     }
 
     private async Task ExecutePostAction(ActionView action)
@@ -256,6 +258,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
+
+        await SaveRequest(route, action);
     }
 
     private async Task ExecutePutAction(ActionView action)
@@ -271,6 +275,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
+
+        await SaveRequest(route, action);
     }
 
     private async Task ExecuteDeleteAction(ActionView action)
@@ -284,6 +290,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         var response = await httpClient.SendAsync(request);
 
         await ReadResponse(response, action);
+
+        await SaveRequest(route, action);
     }
 
     private async Task ExecutePatchAction(ActionView action)
@@ -301,6 +309,21 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         await ReadResponse(response, action);
     }
 
+    private async Task SaveRequest(string route, ActionView action)
+    {
+        await containerAPI.SaveRequest(new SavedRequest
+        {
+            HttpMethod = action.HttpMethod,
+            Route = route,
+            RequestBody = action.TestRequestBody,
+            ResponseBody = action.TestResponseBody,
+            ResponseHeaders = action.TestResponseHeaders,
+            ResponseStatusCode = action.TestResponseStatusCode,
+            ResponseStatusDescription = action.TestResponseStatusDescription,
+            RequestCurl = action.TestRequestCurl,
+            CallTime = DateTime.Now
+        });
+    }
     private string GetRouteString(ActionView action)
     {
         string route = action.Route;

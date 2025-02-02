@@ -136,4 +136,12 @@ public interface IContainerAPI
     /// <returns>Returns the result of the operation.</returns>
     [Post("/api/executeCommand?command={command}")]
     Task<bool> ExecuteCommand(string command);
+
+    /// <summary>
+    /// Saves the request to the database.
+    /// </summary>
+    /// <param name="request">Request to save.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Post("/api/saveRequest")]
+    Task SaveRequest([Body] SavedRequest request);
 }
