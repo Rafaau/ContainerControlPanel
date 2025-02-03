@@ -430,6 +430,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Historia.
+        /// </summary>
+        public static string History {
+            get {
+                return ResourceManager.GetString("History", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to godzina.
         /// </summary>
         public static string Hour {

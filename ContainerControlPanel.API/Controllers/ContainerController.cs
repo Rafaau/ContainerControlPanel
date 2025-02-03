@@ -72,8 +72,8 @@ namespace ContainerControlPanel.API.Controllers
         /// <returns>Returns the logs for the specified container</returns>
         [HttpGet("GetContainerLogs")]
         public async Task<IActionResult> GetContainerLogs(
-            string containerId, 
-            string timestamp = null, 
+            string containerId,
+            string timestamp = null,
             DateTime? date = null,
             string timeFrom = "00:00:00",
             string timeTo = "23:59:59")
@@ -255,6 +255,23 @@ namespace ContainerControlPanel.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Gets the saved requests from the cache
+        /// </summary>
+        /// <returns>Returns the list of saved requests</returns>
+        [HttpGet("GetSavedRequests")]
+        public async Task<IActionResult> GetSavedRequests()
+        {
+            var keys = await _redisService.ScanKeysByPatternAsync("request");
+            var requests = new List<SavedRequest>();
+            foreach (var key in keys)
+            {
+                var request = JsonSerializer.Deserialize<SavedRequest>(key);
+                requests.Add(request);
+            }
+            return Ok(requests);
         }
     }
 }

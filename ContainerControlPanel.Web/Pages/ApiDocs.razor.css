@@ -205,3 +205,25 @@ pre {
 	margin-bottom: 10px;
 	margin-left: 10px;
 }
+
+.history-btn {
+	margin-left: auto;
+}
+
+.history-container {
+	margin-left: 22px;
+	margin-right: 18px;
+	margin-bottom: 12px;
+}
+
+.single-request {
+	display: flex;
+	cursor: pointer;
+	padding: 6px;
+	padding-inline: 12px;
+	border-radius: 4px;
+}
+
+	.single-request:hover {
+		background-color: #323232;
+	}

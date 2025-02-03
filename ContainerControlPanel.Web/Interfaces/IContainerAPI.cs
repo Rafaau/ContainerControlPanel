@@ -144,4 +144,11 @@ public interface IContainerAPI
     /// <returns>Returns the result of the operation.</returns>
     [Post("/api/saveRequest")]
     Task SaveRequest([Body] SavedRequest request);
+
+    /// <summary>
+    /// Gets the saved requests.
+    /// </summary>
+    /// <returns>Returns the list of saved requests.</returns>
+    [Get("/api/getSavedRequests")]
+    Task<List<SavedRequest>> GetSavedRequests();
 }

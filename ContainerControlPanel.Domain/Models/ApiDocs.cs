@@ -285,9 +285,9 @@ public class SavedRequest
     public string HttpMethod { get; set; }
 
     /// <summary>
-    /// Gets or sets the route
+    /// Gets or sets the URL
     /// </summary>
-    public string Route { get; set; }
+    public string URL { get; set; }
 
     /// <summary>
     /// Gets or sets the request body

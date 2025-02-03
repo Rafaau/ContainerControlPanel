@@ -43,6 +43,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private HttpClient httpClient { get; set; }
 
+    private List<SavedRequest> savedRequests { get; set; } = new();
+
     private string? containerId
     {
         get => ContainerId ?? null;
@@ -63,6 +65,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private List<Header> headers { get; set; } = new();
 
+    private bool historyExpanded { get; set; } = false;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadContainers();
@@ -76,7 +80,9 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         {
             MemoryCache.Set("lastApiDocsHref", $"/apidocs/{ContainerId}");
             await LoadData();
-        }       
+        }
+
+        await LoadHistory();
     }
 
     private async Task LoadData()
@@ -119,6 +125,11 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         MemoryCache.Set("apiDocsContainers", containers);
 
         this.StateHasChanged();
+    }
+
+    private async Task LoadHistory()
+    {
+        savedRequests = await containerAPI.GetSavedRequests();
     }
 
     private async Task LoadEndpoints()
@@ -311,10 +322,10 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private async Task SaveRequest(string route, ActionView action)
     {
-        await containerAPI.SaveRequest(new SavedRequest
+        var request = new SavedRequest
         {
             HttpMethod = action.HttpMethod,
-            Route = route,
+            URL = httpClient.BaseAddress + route,
             RequestBody = action.TestRequestBody,
             ResponseBody = action.TestResponseBody,
             ResponseHeaders = action.TestResponseHeaders,
@@ -322,7 +333,12 @@ public partial class ApiDocs(IContainerAPI containerAPI)
             ResponseStatusDescription = action.TestResponseStatusDescription,
             RequestCurl = action.TestRequestCurl,
             CallTime = DateTime.Now
-        });
+        };
+
+        await containerAPI.SaveRequest(request);
+        savedRequests.Add(request);
+
+        this.StateHasChanged();
     }
     private string GetRouteString(ActionView action)
     {
@@ -431,6 +447,41 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
             request.Headers.Add(header.Key, header.Value);
         }
+    }
+
+    private (string Primary, string ListItemStyle) GetActionStyle(string httpMethod)
+    {
+        string primary = "";
+        string listItemStyle = "";
+
+        switch (httpMethod)
+        {
+            case "Get":
+                primary = "#61AFFE";
+                listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
+                break;
+            case "Post":
+                primary = "#49CC90";
+                listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
+                break;
+            case "Put":
+                primary = "#FCA130";
+                listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
+                break;
+            case "Delete":
+                primary = "#F93E3E";
+                listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
+                break;
+            case "Patch":
+                primary = "#50E3C2";
+                listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
+                break;
+            default:
+                primary = "";
+                break;
+        }
+
+        return (primary, listItemStyle);
     }
 }
 

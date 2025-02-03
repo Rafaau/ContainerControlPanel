@@ -54,7 +54,28 @@
 			}
 		</MudSelect>
 	</div>
+	@if (savedRequests.Count > 0)
+	{
+		<div class="history-btn">
+			<MudIconButton Color="Color.Default" OnClick="() => { historyExpanded = !historyExpanded; }" Icon="@Icons.Material.Outlined.History"></MudIconButton>
+		</div>
+	}	
 </div>
+
+<MudCollapse Expanded="historyExpanded"> 
+	<div class="history-container">
+		@foreach (var request in savedRequests.OrderByDescending(r => r.CallTime))
+		{
+			string primary = GetActionStyle(request.HttpMethod).Primary;
+			<div class="single-request">
+				<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right;">
+					@request.HttpMethod.ToUpper()
+				</span>
+				@request.URL
+			</div>
+		}
+	</div>
+</MudCollapse>
 
 @if (controllers.Count > 0)
 {	
@@ -65,35 +86,9 @@
 				<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
 					<NestedList>
 						@foreach (var action in controller.Actions)
-						{
-							string primary = "";
-							string listItemStyle = "";
-							switch (action.HttpMethod)
-							{
-								case "Get":
-									primary = "#61AFFE";
-									listItemStyle = "background-color: rgba(97, 175, 254, 0.1); border: 2px solid #61AFFE;";
-									break;
-								case "Post":
-									primary = "#49CC90";
-									listItemStyle = "background-color: rgba(73, 204, 144, 0.1); border: 2px solid #49CC90;";
-									break;
-								case "Put":
-									primary = "#FCA130";
-									listItemStyle = "background-color: rgba(252, 161, 48, 0.1); border: 2px solid #FCA130;";
-									break;
-								case "Delete":
-									primary = "#F93E3E";
-									listItemStyle = "background-color: rgba(249, 62, 62, 0.1); border: 2px solid #F93E3E;";
-									break;
-								case "Patch":
-									primary = "#50E3C2";
-									listItemStyle = "background-color: rgba(80, 227, 194, 0.1); border: 2px solid #50E3C2;";
-									break;
-								default:
-									primary = "";
-									break;
-							}
+					{
+							var (primary, listItemStyle) = GetActionStyle(action.HttpMethod);
+
 							<MudListItem Style="@(listItemStyle)">
 								<ChildContent>
 									<div class="endpoint-label">

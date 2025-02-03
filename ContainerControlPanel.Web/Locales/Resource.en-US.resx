@@ -459,4 +459,7 @@
   <data name="StopContainerError" xml:space="preserve">
     <value>Error while stopping container</value>
   </data>
+  <data name="History" xml:space="preserve">
+    <value>History</value>
+  </data>
 </root>
