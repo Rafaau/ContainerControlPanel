@@ -222,6 +222,7 @@ pre {
 	padding: 6px;
 	padding-inline: 12px;
 	border-radius: 4px;
+	align-items: center;
 }
 
 	.single-request:hover {

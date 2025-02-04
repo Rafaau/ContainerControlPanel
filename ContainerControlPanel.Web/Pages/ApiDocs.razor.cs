@@ -45,6 +45,14 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private List<SavedRequest> savedRequests { get; set; } = new();
 
+    private List<DateTime> historyDates
+    {
+        get
+        {
+            return savedRequests.Select(r => r.CallTime.Date).Distinct().ToList();
+        }
+    }
+
     private string? containerId
     {
         get => ContainerId ?? null;

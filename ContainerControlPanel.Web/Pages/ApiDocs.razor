@@ -55,25 +55,36 @@
 		</MudSelect>
 	</div>
 	@if (savedRequests.Count > 0)
-	{
+	{		
 		<div class="history-btn">
-			<MudIconButton Color="Color.Default" OnClick="() => { historyExpanded = !historyExpanded; }" Icon="@Icons.Material.Outlined.History"></MudIconButton>
-		</div>
+			<MudTooltip Text="@Localizer[Locales.Resource.History]" ShowOnFocus="false" ShowOnClick="false">
+				<MudIconButton Color="Color.Default" OnClick="() => { historyExpanded = !historyExpanded; }" Icon="@Icons.Material.Outlined.History"></MudIconButton>
+			</MudTooltip>
+		</div>		
 	}	
 </div>
 
 <MudCollapse Expanded="historyExpanded"> 
 	<div class="history-container">
-		@foreach (var request in savedRequests.OrderByDescending(r => r.CallTime))
-		{
-			string primary = GetActionStyle(request.HttpMethod).Primary;
-			<div class="single-request">
-				<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right;">
-					@request.HttpMethod.ToUpper()
-				</span>
-				@request.URL
-			</div>
-		}
+		<MudList T="string">
+			@foreach (var date in historyDates.OrderByDescending(x => x)) 
+			{
+				<MudListItem Style="--mud-typography-body1-size: 12px; color: #6A6A6A; padding: 0; padding-left: 8px; padding-right: 8px; border-radius: 3px;" Text="@(date.ToString("MMMM d"))" Expanded>
+					<NestedList>
+						@foreach (var request in savedRequests.Where(r => r.CallTime.Date == date.Date).OrderByDescending(r => r.CallTime))
+						{
+							string primary = GetActionStyle(request.HttpMethod).Primary;
+							<div class="single-request">
+								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
+									@request.HttpMethod.ToUpper()
+								</span>
+								@request.URL
+							</div>
+						}
+					</NestedList>
+				</MudListItem>
+			}
+		</MudList>
 	</div>
 </MudCollapse>
 
@@ -86,7 +97,7 @@
 				<MudListItem Style="--mud-typography-body1-size: 20px; padding-left: 24px; border-radius: 5px;" Text="@controller.Name" Expanded>
 					<NestedList>
 						@foreach (var action in controller.Actions)
-					{
+						{
 							var (primary, listItemStyle) = GetActionStyle(action.HttpMethod);
 
 							<MudListItem Style="@(listItemStyle)">
