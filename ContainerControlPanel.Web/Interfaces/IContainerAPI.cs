@@ -151,4 +151,12 @@ public interface IContainerAPI
     /// <returns>Returns the list of saved requests.</returns>
     [Get("/api/getSavedRequests")]
     Task<List<SavedRequest>> GetSavedRequests();
+
+    /// <summary>
+    /// Removes a saved request by ID.
+    /// </summary>
+    /// <param name="requestId">ID of the request.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Delete("/api/removeRequest?requestId={requestId}")]
+    Task RemoveRequest(string requestId);
 }

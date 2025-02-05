@@ -332,6 +332,7 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         var request = new SavedRequest
         {
+            Id = Guid.NewGuid().ToString(),
             HttpMethod = action.HttpMethod,
             URL = httpClient.BaseAddress + route,
             RequestBody = action.TestRequestBody,
@@ -414,6 +415,14 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         action.TestResponseStatusCode = response.ToString().Substring(ToString().IndexOf("StatusCode: ") + 13, 3);
         action.TestResponseStatusDescription = response.ReasonPhrase;
         action.TestRequestCurl = GetRequestCurlString(action);
+    }
+
+    private async Task RemoveFromHistory(string id)
+    {
+        await containerAPI.RemoveRequest(id);
+        savedRequests.RemoveAll(r => r.Id == id);
+
+        this.StateHasChanged();
     }
 
     private void TryOut(ActionView action)

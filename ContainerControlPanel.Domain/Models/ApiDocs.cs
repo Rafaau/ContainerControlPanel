@@ -280,6 +280,11 @@ public class ParameterView
 public class SavedRequest
 {
     /// <summary>
+    /// Gets or sets the ID
+    /// </summary>
+    public string Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the http method
     /// </summary>
     public string HttpMethod { get; set; }

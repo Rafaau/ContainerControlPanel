@@ -228,3 +228,12 @@ pre {
 	.single-request:hover {
 		background-color: #323232;
 	}
+
+	.single-request:hover .remove-btn {
+		opacity: 1;
+	}
+
+.remove-btn {
+	opacity: 0;
+	margin-left: auto;
+}

@@ -79,6 +79,11 @@
 									@request.HttpMethod.ToUpper()
 								</span>
 								@request.URL
+								<span class="remove-btn">
+									<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
+										<MudIconButton Size="Size.Small" OnClick="async () => { await RemoveFromHistory(request.Id); }" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
+									</MudTooltip>
+								</span>
 							</div>
 						}
 					</NestedList>

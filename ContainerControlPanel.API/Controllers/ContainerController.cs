@@ -248,7 +248,7 @@ namespace ContainerControlPanel.API.Controllers
             try
             {
                 var json = JsonSerializer.Serialize(request);
-                await _redisService.SetValueAsync($"request{Guid.NewGuid().ToString()}", json);
+                await _redisService.SetValueAsync($"request{request.Id}", json);
                 return Ok();
             }
             catch (Exception ex)
@@ -272,6 +272,18 @@ namespace ContainerControlPanel.API.Controllers
                 requests.Add(request);
             }
             return Ok(requests);
+        }
+
+        /// <summary>
+        /// Removes a request from the cache
+        /// </summary>
+        /// <param name="requestId">ID of the request</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpDelete("RemoveRequest")]
+        public async Task<IActionResult> RemoveRequest(string requestId)
+        {
+            await _redisService.RemoveKeyAsync($"request{requestId}");
+            return Ok();
         }
     }
 }

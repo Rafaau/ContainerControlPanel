@@ -79,4 +79,15 @@ public class RedisService
 
         return values;
     }
+
+    /// <summary>
+    /// Removes a key from the cache
+    /// </summary>
+    /// <param name="key">Redis key</param>
+    /// <returns>Returns a task</returns>
+    public async Task RemoveKeyAsync(string key)
+    {
+        var db = _redis.GetDatabase();
+        await db.KeyDeleteAsync(key);
+    }
 }
