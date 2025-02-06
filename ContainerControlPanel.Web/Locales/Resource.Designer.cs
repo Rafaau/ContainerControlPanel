@@ -664,6 +664,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Przypnij.
+        /// </summary>
+        public static string Pin {
+            get {
+                return ResourceManager.GetString("Pin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Porty.
         /// </summary>
         public static string Ports {
@@ -1011,6 +1020,15 @@ namespace Locales {
         public static string TryItOut {
             get {
                 return ResourceManager.GetString("TryItOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Odepnij.
+        /// </summary>
+        public static string Unpin {
+            get {
+                return ResourceManager.GetString("Unpin", resourceCulture);
             }
         }
         

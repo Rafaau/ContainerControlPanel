@@ -462,4 +462,10 @@
   <data name="History" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="Pin" xml:space="preserve">
+    <value>Pin</value>
+  </data>
+  <data name="Unpin" xml:space="preserve">
+    <value>Unpin</value>
+  </data>
 </root>

@@ -67,6 +67,33 @@
 <MudCollapse Expanded="historyExpanded"> 
 	<div class="history-container">
 		<MudList T="string">
+			@if (savedRequests.Any(r => r.IsPinned))
+			{
+				<MudListItem Style="--mud-typography-body1-size: 12px; color: #6A6A6A; padding: 0; padding-left: 8px; padding-right: 8px; border-radius: 3px;" Text="Pinned" Expanded>
+					<NestedList>
+						@foreach (var request in savedRequests.Where(r => r.IsPinned).OrderByDescending(r => r.CallTime))
+						{
+							string primary = GetActionStyle(request.HttpMethod).Primary;
+							<div class="single-request">
+								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
+									@request.HttpMethod.ToUpper()
+								</span>
+								@request.URL
+								<span style="margin-left: auto;" class="action-btn">
+									<MudTooltip Text="@Localizer[Locales.Resource.Unpin]">
+										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
+									</MudTooltip>
+								</span>
+								<span class="action-btn">
+									<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
+										<MudIconButton Size="Size.Small" OnClick="async () => { await RemoveFromHistory(request.Id); }" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
+									</MudTooltip>
+								</span>
+							</div>
+						}
+					</NestedList>
+				</MudListItem>
+			}		
 			@foreach (var date in historyDates.OrderByDescending(x => x)) 
 			{
 				<MudListItem Style="--mud-typography-body1-size: 12px; color: #6A6A6A; padding: 0; padding-left: 8px; padding-right: 8px; border-radius: 3px;" Text="@(date.ToString("MMMM d"))" Expanded>
@@ -79,7 +106,12 @@
 									@request.HttpMethod.ToUpper()
 								</span>
 								@request.URL
-								<span class="remove-btn">
+								<span style="margin-left: auto;" class="action-btn">
+									<MudTooltip Text="@(request.IsPinned ? Localizer[Locales.Resource.Unpin] : Localizer[Locales.Resource.Pin])">
+										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
+									</MudTooltip>
+								</span>
+								<span class="action-btn">
 									<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await RemoveFromHistory(request.Id); }" Icon="@Icons.Material.Filled.Delete" Color="Color.Default" />
 									</MudTooltip>

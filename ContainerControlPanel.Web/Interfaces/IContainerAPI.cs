@@ -159,4 +159,12 @@ public interface IContainerAPI
     /// <returns>Returns the result of the operation.</returns>
     [Delete("/api/removeRequest?requestId={requestId}")]
     Task RemoveRequest(string requestId);
+
+    /// <summary>
+    /// Sets the request as pinned or unpinned.
+    /// </summary>
+    /// <param name="requestId">ID of the request.</param>
+    /// <returns>Returns the result of the operation.</returns>
+    [Patch("/api/pinRequest?requestId={requestId}")]
+    Task PinRequest(string requestId);
 }

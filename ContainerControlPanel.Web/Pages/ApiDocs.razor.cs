@@ -425,6 +425,15 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         this.StateHasChanged();
     }
 
+    private async Task PinRequest(string id)
+    {
+        await containerAPI.PinRequest(id);
+        var request = savedRequests.Find(r => r.Id == id);
+        request.IsPinned = !request.IsPinned;
+
+        this.StateHasChanged();
+    }
+
     private void TryOut(ActionView action)
     {
         action.TryOut = !action.TryOut;

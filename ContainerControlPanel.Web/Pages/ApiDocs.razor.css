@@ -229,11 +229,10 @@ pre {
 		background-color: #323232;
 	}
 
-	.single-request:hover .remove-btn {
+	.single-request:hover .action-btn {
 		opacity: 1;
 	}
 
-.remove-btn {
+.action-btn {
 	opacity: 0;
-	margin-left: auto;
 }

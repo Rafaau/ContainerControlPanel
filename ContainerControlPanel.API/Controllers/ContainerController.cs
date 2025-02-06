@@ -1,7 +1,6 @@
 using ContainerControlPanel.API.Authorization;
 using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Domain.Services;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
@@ -283,6 +282,31 @@ namespace ContainerControlPanel.API.Controllers
         public async Task<IActionResult> RemoveRequest(string requestId)
         {
             await _redisService.RemoveKeyAsync($"request{requestId}");
+            return Ok();
+        }
+
+        /// <summary>
+        /// Sets a request as pinned or unpinned
+        /// </summary>
+        /// <param name="requestId">ID of the request</param>
+        /// <returns>Returns the result of the operation</returns>
+        [HttpPatch("PinRequest")]
+        public async Task<IActionResult> PinRequest(string requestId)
+        {
+            var request = await _redisService.GetValueAsync($"request{requestId}");
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                var requestObj = JsonSerializer.Deserialize<SavedRequest>(request);
+                requestObj.IsPinned = !requestObj.IsPinned;
+                var json = JsonSerializer.Serialize(requestObj);
+                await _redisService.SetValueAsync($"request{requestId}", json);
+            }
+
             return Ok();
         }
     }
