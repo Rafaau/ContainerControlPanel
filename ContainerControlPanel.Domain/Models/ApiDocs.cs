@@ -277,68 +277,33 @@ public class ParameterView
 /// <summary>
 /// Class to store the saved request
 /// </summary>
-public class SavedRequest
+public class SavedRequest : ActionView
 {
     /// <summary>
-    /// Gets or sets the ID
+    /// Gets or sets the ID of the request
     /// </summary>
-    public string Id { get; set; }
-
-    /// <summary>
-    /// Gets or sets the http method
-    /// </summary>
-    public string HttpMethod { get; set; }
-
-    /// <summary>
-    /// Gets or sets the URL
-    /// </summary>
-    public string URL { get; set; }
-
-    /// <summary>
-    /// Gets or sets the request body
-    /// </summary>
-    public string RequestBody { get; set; }
-
-    /// <summary>
-    /// Gets or sets the response body
-    /// </summary>
-    public string ResponseBody { get; set; }
-
-    /// <summary>
-    /// Gets or sets the response headers
-    /// </summary>
-    public string ResponseHeaders { get; set; }
-
-    /// <summary>
-    /// Gets or sets the response status code
-    /// </summary>
-    public string ResponseStatusCode { get; set; }
-
-    /// <summary>
-    /// Gets or sets the response status description
-    /// </summary>
-    public string ResponseStatusDescription { get; set; }
-
-    /// <summary>
-    /// Gets or sets the request curl
-    /// </summary>
-    public string RequestCurl { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// Gets or sets the indicator if the request is pinned
     /// </summary>
-    public bool IsPinned { get; set; }
+    public bool IsPinned { get; set; } = false;
 
     /// <summary>
     /// Gets or sets the call time
     /// </summary>
-    public DateTime CallTime { get; set; }
-}
+    public DateTime CallTime { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// Extension methods for the API documentation
+    /// Gets or sets the indicator if the request is expanded
     /// </summary>
-    public static class ApiDocsExtensions
+    public bool IsExpanded { get; set; } = false;
+}
+
+/// <summary>
+/// Extension methods for the API documentation
+/// </summary>
+public static class ApiDocsExtensions
 {
     /// <summary>
     /// Maps the data from the endpoints to the controller view model
@@ -506,5 +471,29 @@ public class SavedRequest
     {
         var primitiveTypes = new HashSet<string> { "String", "Int32", "Double", "Boolean", "DateTime", "DateOnly" };
         return primitiveTypes.Contains(type);
+    }
+
+    public static ActionView AsAction(this SavedRequest request)
+    {
+        return new ActionView
+        {
+            Name = request.Name,
+            HttpMethod = request.HttpMethod,
+            Route = request.Route,
+            ReturnType = request.ReturnType,
+            Parameters = request.Parameters,
+            Summary = request.Summary,
+            RequestBodyFormatted = request.RequestBodyFormatted,
+            ResponseBodyFormatted = request.ResponseBodyFormatted,
+            TryOut = request.TryOut,
+            Loading = request.Loading,
+            TestRequestBody = request.TestRequestBody,
+            TestResponseBody = request.TestResponseBody,
+            TestResponseHeaders = request.TestResponseHeaders,
+            TestResponseStatusCode = request.TestResponseStatusCode,
+            TestResponseStatusDescription = request.TestResponseStatusDescription,
+            TestRequestCurl = request.TestRequestCurl,
+            CurrentTabIndex = request.CurrentTabIndex
+        };
     }
 }

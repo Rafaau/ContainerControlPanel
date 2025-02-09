@@ -74,11 +74,11 @@
 						@foreach (var request in savedRequests.Where(r => r.IsPinned).OrderByDescending(r => r.CallTime))
 						{
 							string primary = GetActionStyle(request.HttpMethod).Primary;
-							<div class="single-request">
+							<div class="single-request" @onclick="() => { request.IsExpanded = !request.IsExpanded; }">
 								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
 									@request.HttpMethod.ToUpper()
 								</span>
-								@request.URL
+								@($"{httpClient.BaseAddress}{request.Route.Substring(1)}")
 								<span style="margin-left: auto;" class="action-btn">
 									<MudTooltip Text="@Localizer[Locales.Resource.Unpin]">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
@@ -90,6 +90,139 @@
 									</MudTooltip>
 								</span>
 							</div>
+							<MudCollapse Expanded="request.IsExpanded">
+								<div class="endpoint-details" style="border: none;">
+									<div class="section">
+										<div class="section-label @(request.CurrentTabIndex == 0 ? "label-active": "label-inactive")" @onclick="() => { request.CurrentTabIndex = 0; }">
+											Parameters
+										</div>
+										<div class="section-label @(request.CurrentTabIndex == 1 ? "label-active" : "label-inactive")" @onclick="() => { request.CurrentTabIndex = 1; }">
+											Headers
+										</div>
+										<div class="section-button">
+											<MudButton Color="Color.Default" @onclick="async () => { await ExecuteAction(request.AsAction()); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Execute]</MudButton>
+										</div>
+									</div>
+									<MudDivider Class="opacity-100" />
+									@switch (request.CurrentTabIndex)
+									{
+										case 0:
+											@if (request.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1)
+											{
+												<div class="param-key">No parameters</div>
+											}
+											@foreach (var param in request.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
+											{
+												<div class="param-row">
+													<div class="param-key">
+														<div class="param-name">@param.Name</div>
+														<div class="param-type">@param.Type.Name</div>
+														<div class="param-source">(query)</div>
+													</div>
+													<div class="param-input">
+														<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+													</div>
+												</div>
+											}
+											break;
+										case 1:
+											@if (headers.Count < 1)
+											{
+												<div class="param-key">No headers</div>
+											}
+											@foreach (var header in headers.Where(h => h.Action == request.Name))
+											{
+												<div class="header-row">
+													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
+													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
+													<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
+														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+													</MudTooltip>
+												</div>
+											}
+											<div class="add-btn">
+												<MudTooltip Text="@Localizer[Locales.Resource.Add]">
+													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = request.Name, Key = "", Value = "" }); })" />
+												</MudTooltip>
+											</div>
+											break;
+									}
+
+									@if (request.Parameters.Any(p => p.Source == "Body"))
+									{
+										<MudDivider Class="opacity-100" />
+										<div class="section">
+											<div class="section-label">
+												Request Body
+											</div>
+										</div>
+										<MudDivider Class="opacity-100" />
+										<div class="body-container">
+											<MudTextField AutoGrow T="string" Variant="Variant.Outlined" @bind-Value="request.TestRequestBody"></MudTextField>
+										</div>
+									}
+									<MudDivider Class="opacity-100" />
+									@if (request.ReturnType != null)
+									{
+										<div class="section">
+											<div class="section-label">
+												Response Body
+											</div>
+										</div>
+										<MudDivider Class="opacity-100" />
+										@if (!string.IsNullOrEmpty(request.TestResponseStatusCode))
+										{
+											<div class="body-container">
+												<pre>
+													@request.TestRequestCurl
+												</pre>
+											</div>
+											<div class="action-result-row">
+												<span class="status-code">@request.TestResponseStatusCode</span>
+												<span class="status-desc">@request.TestResponseStatusDescription</span>
+											</div>
+										}
+										if (!string.IsNullOrEmpty(request.TestResponseBody))
+										{
+											<div class="body-container">
+												<pre>
+													@((MarkupString)request.TestResponseBody)
+												</pre>
+											</div>
+
+											<div class="body-container">
+												<pre>
+													@((MarkupString)request.TestResponseHeaders)
+												</pre>
+											</div>
+										}
+										else if (string.IsNullOrEmpty(request.TestResponseStatusCode))
+										{
+											@if (request.ReturnType.Name == "IActionResult" || request.ReturnType.Name == "Void")
+											{
+												<div class="action-result-row">
+													<span class="status-code">200</span>
+													<span class="status-desc">Success</span>
+												</div>
+											}
+											else if (request.ReturnType.Name.IsPrimitiveType())
+											{
+												<div class="body-container">
+													@request.ReturnType.Name.ToLower()
+												</div>
+											}
+											else
+											{
+												<div class="body-container">
+													<pre>
+														@((MarkupString)request.ResponseBodyFormatted)
+													</pre>
+												</div>
+											}
+										}
+									}
+								</div>
+							</MudCollapse>
 						}
 					</NestedList>
 				</MudListItem>
@@ -101,11 +234,11 @@
 						@foreach (var request in savedRequests.Where(r => r.CallTime.Date == date.Date).OrderByDescending(r => r.CallTime))
 						{
 							string primary = GetActionStyle(request.HttpMethod).Primary;
-							<div class="single-request">
+							<div class="single-request" @onclick="() => { request.IsExpanded = !request.IsExpanded; }">
 								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
 									@request.HttpMethod.ToUpper()
 								</span>
-								@request.URL
+								@($"{httpClient.BaseAddress}{request.Route.Substring(1)}")
 								<span style="margin-left: auto;" class="action-btn">
 									<MudTooltip Text="@(request.IsPinned ? Localizer[Locales.Resource.Unpin] : Localizer[Locales.Resource.Pin])">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
@@ -117,6 +250,139 @@
 									</MudTooltip>
 								</span>
 							</div>
+							<MudCollapse Expanded="request.IsExpanded">
+								<div class="endpoint-details" style="border: none;">
+									<div class="section">
+										<div class="section-label @(request.CurrentTabIndex == 0 ? "label-active": "label-inactive")" @onclick="() => { request.CurrentTabIndex = 0; }">
+											Parameters
+										</div>
+										<div class="section-label @(request.CurrentTabIndex == 1 ? "label-active" : "label-inactive")" @onclick="() => { request.CurrentTabIndex = 1; }">
+											Headers
+										</div>
+										<div class="section-button">
+											<MudButton Color="Color.Default" @onclick="async () => { await ExecuteAction(request.AsAction()); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Execute]</MudButton>
+										</div>
+									</div>
+									<MudDivider Class="opacity-100" />
+									@switch (request.CurrentTabIndex)
+									{
+										case 0:
+											@if (request.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1)
+											{
+												<div class="param-key">No parameters</div>
+											}
+											@foreach (var param in request.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
+											{
+												<div class="param-row">
+													<div class="param-key">
+														<div class="param-name">@param.Name</div>
+														<div class="param-type">@param.Type.Name</div>
+														<div class="param-source">(query)</div>
+													</div>
+													<div class="param-input">
+														<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+													</div>
+												</div>
+											}
+											break;
+										case 1:
+											@if (headers.Count < 1)
+											{
+												<div class="param-key">No headers</div>
+											}
+											@foreach (var header in headers.Where(h => h.Action == request.Name))
+											{
+												<div class="header-row">
+													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
+													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
+													<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
+														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+													</MudTooltip>
+												</div>
+											}
+											<div class="add-btn">
+												<MudTooltip Text="@Localizer[Locales.Resource.Add]">
+													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = request.Name, Key = "", Value = "" }); })" />
+												</MudTooltip>
+											</div>
+											break;
+									}
+
+									@if (request.Parameters.Any(p => p.Source == "Body"))
+									{
+										<MudDivider Class="opacity-100" />
+										<div class="section">
+											<div class="section-label">
+												Request Body
+											</div>
+										</div>
+										<MudDivider Class="opacity-100" />
+										<div class="body-container">
+											<MudTextField AutoGrow T="string" Variant="Variant.Outlined" @bind-Value="request.TestRequestBody"></MudTextField>
+										</div>
+									}
+									<MudDivider Class="opacity-100" />
+									@if (request.ReturnType != null)
+									{
+										<div class="section">
+											<div class="section-label">
+												Response Body
+											</div>
+										</div>
+										<MudDivider Class="opacity-100" />
+										@if (!string.IsNullOrEmpty(request.TestResponseStatusCode))
+										{
+											<div class="body-container">
+												<pre>
+													@request.TestRequestCurl
+																</pre>
+											</div>
+											<div class="action-result-row">
+												<span class="status-code">@request.TestResponseStatusCode</span>
+												<span class="status-desc">@request.TestResponseStatusDescription</span>
+											</div>
+										}
+										if (!string.IsNullOrEmpty(request.TestResponseBody))
+										{
+											<div class="body-container">
+												<pre>
+													@((MarkupString)request.TestResponseBody)
+																</pre>
+											</div>
+
+											<div class="body-container">
+												<pre>
+													@((MarkupString)request.TestResponseHeaders)
+																</pre>
+											</div>
+										}
+										else if (string.IsNullOrEmpty(request.TestResponseStatusCode))
+										{
+											@if (request.ReturnType.Name == "IActionResult" || request.ReturnType.Name == "Void")
+											{
+												<div class="action-result-row">
+													<span class="status-code">200</span>
+													<span class="status-desc">Success</span>
+												</div>
+											}
+											else if (request.ReturnType.Name.IsPrimitiveType())
+											{
+												<div class="body-container">
+													@request.ReturnType.Name.ToLower()
+												</div>
+											}
+											else
+											{
+												<div class="body-container">
+													<pre>
+														@((MarkupString)request.ResponseBodyFormatted)
+																		</pre>
+												</div>
+											}
+										}
+									}
+								</div>
+							</MudCollapse>
 						}
 					</NestedList>
 				</MudListItem>
@@ -149,67 +415,67 @@
 								<NestedList>
 									<div class="endpoint-details" style="border-color: @(primary);">
 										@if (!string.IsNullOrEmpty(action.Summary))
-									{
-										<div class="summary">
-											@action.Summary
+										{
+											<div class="summary">
+												@action.Summary
+											</div>
+											<MudDivider Class="opacity-100" />
+										}									
+										<div class="section">
+											<div class="section-label @(action.CurrentTabIndex == 0 ? "label-active": "label-inactive")" @onclick="() => { action.CurrentTabIndex = 0; }">
+												Parameters
+											</div>
+											<div class="section-label @(action.CurrentTabIndex == 1 ? "label-active" : "label-inactive")" @onclick ="() => { action.CurrentTabIndex = 1; }">
+												Headers
+											</div>
+											<div class="section-button">
+												<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? @Localizer[Locales.Resource.Cancel] : @Localizer[Locales.Resource.TryItOut])</MudButton>
+											</div>
 										</div>
 										<MudDivider Class="opacity-100" />
-									}									
-									<div class="section">
-										<div class="section-label @(action.CurrentTabIndex == 0 ? "label-active": "label-inactive")" @onclick="() => { action.CurrentTabIndex = 0; }">
-											Parameters
-										</div>
-										<div class="section-label @(action.CurrentTabIndex == 1 ? "label-active" : "label-inactive")" @onclick ="() => { action.CurrentTabIndex = 1; }">
-											Headers
-										</div>
-										<div class="section-button">
-											<MudButton Color="action.TryOut ? Color.Warning : Color.Default" @onclick="() => { TryOut(action); }" Variant="Variant.Outlined">@(action.TryOut ? @Localizer[Locales.Resource.Cancel] : @Localizer[Locales.Resource.TryItOut])</MudButton>
-										</div>
-									</div>
-									<MudDivider Class="opacity-100" />
-									@switch (action.CurrentTabIndex)
-									{
-										case 0:
-											@if (action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1)
-											{
-												<div class="param-key">No parameters</div>
-											}
-											@foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
-											{
-												<div class="param-row">
-													<div class="param-key">
-														<div class="param-name">@param.Name</div>
-														<div class="param-type">@param.Type.Name</div>
-														<div class="param-source">(query)</div>
+										@switch (action.CurrentTabIndex)
+										{
+											case 0:
+												@if (action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route").Count() < 1)
+												{
+													<div class="param-key">No parameters</div>
+												}
+												@foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
+												{
+													<div class="param-row">
+														<div class="param-key">
+															<div class="param-name">@param.Name</div>
+															<div class="param-type">@param.Type.Name</div>
+															<div class="param-source">(query)</div>
+														</div>
+														<div class="param-input">
+															<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+														</div>
 													</div>
-													<div class="param-input">
-														<MudTextField Error="param.Error" ErrorText="@Localizer[Locales.Resource.Required]" Disabled="!action.TryOut" Label="@param.Name" Variant="Variant.Outlined" @bind-Value="param.TestValue"></MudTextField>
+												}
+												break;
+											case 1:
+												@if (headers.Count < 1)
+												{
+													<div class="param-key">No headers</div>
+												}
+												@foreach (var header in headers.Where(h => h.Action == action.Name))
+												{
+													<div class="header-row">
+														<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
+														<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
+														<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
+															<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+														</MudTooltip>
 													</div>
-												</div>
-											}
-											break;
-										case 1:
-											@if (headers.Count < 1)
-											{
-												<div class="param-key">No headers</div>
-											}
-											@foreach (var header in headers.Where(h => h.Action == action.Name))
-											{
-												<div class="header-row">
-													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
-													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
-													<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
-														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+												}
+												<div class="add-btn">
+													<MudTooltip Text="@Localizer[Locales.Resource.Add]">
+														<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = action.Name, Key = "", Value = "" }); })" />
 													</MudTooltip>
 												</div>
-											}
-											<div class="add-btn">
-												<MudTooltip Text="@Localizer[Locales.Resource.Add]">
-													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = action.Name, Key = "", Value = "" }); })" />
-												</MudTooltip>
-											</div>
-											break;
-									}
+												break;
+										}
 										
 										@if (action.Parameters.Any(p => p.Source == "Body")) 
 										{

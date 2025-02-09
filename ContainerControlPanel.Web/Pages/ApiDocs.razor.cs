@@ -49,7 +49,11 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         get
         {
-            return savedRequests.Select(r => r.CallTime.Date).Distinct().ToList();
+            return savedRequests
+                .Where(r => !r.IsPinned)
+                .Select(r => r.CallTime.Date)
+                .Distinct()
+                .ToList();
         }
     }
 
@@ -332,16 +336,20 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     {
         var request = new SavedRequest
         {
-            Id = Guid.NewGuid().ToString(),
+            Name = action.Name,
             HttpMethod = action.HttpMethod,
-            URL = httpClient.BaseAddress + route,
-            RequestBody = action.TestRequestBody,
-            ResponseBody = action.TestResponseBody,
-            ResponseHeaders = action.TestResponseHeaders,
-            ResponseStatusCode = action.TestResponseStatusCode,
-            ResponseStatusDescription = action.TestResponseStatusDescription,
-            RequestCurl = action.TestRequestCurl,
-            CallTime = DateTime.Now
+            Route = route,
+            ReturnType = action.ReturnType,
+            Parameters = action.Parameters,
+            Summary = action.Summary,
+            RequestBodyFormatted = action.RequestBodyFormatted,
+            ResponseBodyFormatted = action.ResponseBodyFormatted,
+            TestRequestBody = action.TestRequestBody,
+            TestResponseBody = action.TestResponseBody,
+            TestResponseHeaders = action.TestResponseHeaders,
+            TestResponseStatusCode = action.TestResponseStatusCode,
+            TestResponseStatusDescription = action.TestResponseStatusDescription,
+            TestRequestCurl = action.TestRequestCurl,
         };
 
         await containerAPI.SaveRequest(request);
@@ -352,12 +360,15 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     private string GetRouteString(ActionView action)
     {
         string route = action.Route;
+        int queryIndex = 0;
 
         foreach (var param in action.Parameters)
         {
-            if (param.Source == "Query")
+            if (param.Source == "Query" && !route.Contains($"?{param.Name}={param.TestValue}"))
             {
-                route += $"?{param.Name}={param.TestValue}";
+                string separator = queryIndex == 0 ? "?" : "&";
+                route += $"{separator}{param.Name}={param.TestValue}";
+                queryIndex++;
             }
             else if (param.Source == "Route")
             {
