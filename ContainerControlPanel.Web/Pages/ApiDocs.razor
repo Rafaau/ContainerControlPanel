@@ -78,7 +78,7 @@
 								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
 									@request.HttpMethod.ToUpper()
 								</span>
-								@($"{httpClient.BaseAddress}{request.Route.Substring(1)}")
+								@($"{request.BaseAddress}{request.Route.Substring(1)}")
 								<span style="margin-left: auto;" class="action-btn">
 									<MudTooltip Text="@Localizer[Locales.Resource.Unpin]">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
@@ -100,7 +100,7 @@
 											Headers
 										</div>
 										<div class="section-button">
-											<MudButton Color="Color.Default" @onclick="async () => { await ExecuteAction(request.AsAction()); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Execute]</MudButton>
+											<MudButton Color="Color.Default" @onclick="async () => { await ExecuteAction(request.AsAction(), request.BaseAddress); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Execute]</MudButton>
 										</div>
 									</div>
 									<MudDivider Class="opacity-100" />
@@ -238,7 +238,7 @@
 								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
 									@request.HttpMethod.ToUpper()
 								</span>
-								@($"{httpClient.BaseAddress}{request.Route.Substring(1)}")
+								@($"{request.BaseAddress}{request.Route.Substring(1)}")
 								<span style="margin-left: auto;" class="action-btn">
 									<MudTooltip Text="@(request.IsPinned ? Localizer[Locales.Resource.Unpin] : Localizer[Locales.Resource.Pin])">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
@@ -260,7 +260,7 @@
 											Headers
 										</div>
 										<div class="section-button">
-											<MudButton Color="Color.Default" @onclick="async () => { await ExecuteAction(request.AsAction()); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Execute]</MudButton>
+											<MudButton Color="Color.Default" @onclick="async () => { await ExecuteAction(request.AsAction(), request.BaseAddress); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Execute]</MudButton>
 										</div>
 									</div>
 									<MudDivider Class="opacity-100" />
@@ -335,7 +335,7 @@
 											<div class="body-container">
 												<pre>
 													@request.TestRequestCurl
-																</pre>
+												</pre>
 											</div>
 											<div class="action-result-row">
 												<span class="status-code">@request.TestResponseStatusCode</span>
@@ -347,13 +347,13 @@
 											<div class="body-container">
 												<pre>
 													@((MarkupString)request.TestResponseBody)
-																</pre>
+												</pre>
 											</div>
 
 											<div class="body-container">
 												<pre>
 													@((MarkupString)request.TestResponseHeaders)
-																</pre>
+												</pre>
 											</div>
 										}
 										else if (string.IsNullOrEmpty(request.TestResponseStatusCode))
@@ -376,7 +376,7 @@
 												<div class="body-container">
 													<pre>
 														@((MarkupString)request.ResponseBodyFormatted)
-																		</pre>
+													</pre>
 												</div>
 											}
 										}

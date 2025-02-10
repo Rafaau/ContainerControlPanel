@@ -298,6 +298,11 @@ public class SavedRequest : ActionView
     /// Gets or sets the indicator if the request is expanded
     /// </summary>
     public bool IsExpanded { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the base address of the http client
+    /// </summary>
+    public string BaseAddress { get; set; } = string.Empty;
 }
 
 /// <summary>

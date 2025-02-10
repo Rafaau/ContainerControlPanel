@@ -142,6 +142,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     private async Task LoadHistory()
     {
         savedRequests = await containerAPI.GetSavedRequests();
+
+        this.StateHasChanged();
     }
 
     private async Task LoadEndpoints()
@@ -212,8 +214,28 @@ public partial class ApiDocs(IContainerAPI containerAPI)
             : json;
     }
 
-    private async Task ExecuteAction(ActionView action)
+    private async Task ExecuteAction(ActionView action, string? baseAddress = null)
     {
+        if (baseAddress != null)
+        {
+            httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(baseAddress)
+            };
+        }
+        else
+        {
+            var port = containerDetails.NetworkSettings.Ports.FirstOrDefault().Value.FirstOrDefault().HostPort;
+
+            if (port != null)
+            {
+                httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri($"http://{Configuration["WebAPIHost"]}:{port}")
+                };
+            }
+        }
+
         foreach (var param in action.Parameters.Where(p => p.Source == "Query" || p.Source == "Route"))
         {
             if (string.IsNullOrEmpty(param.TestValue))
@@ -350,6 +372,7 @@ public partial class ApiDocs(IContainerAPI containerAPI)
             TestResponseStatusCode = action.TestResponseStatusCode,
             TestResponseStatusDescription = action.TestResponseStatusDescription,
             TestRequestCurl = action.TestRequestCurl,
+            BaseAddress = httpClient.BaseAddress.ToString(),
         };
 
         await containerAPI.SaveRequest(request);
@@ -357,6 +380,7 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
         this.StateHasChanged();
     }
+
     private string GetRouteString(ActionView action)
     {
         string route = action.Route;
