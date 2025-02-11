@@ -75,8 +75,6 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private bool apiDocsNotImplemented { get; set; } = false;
 
-    private List<Header> headers { get; set; } = new();
-
     private bool historyExpanded { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
@@ -384,11 +382,15 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     private string GetRouteString(ActionView action)
     {
         string route = action.Route;
+
+        if (route.Contains("?"))
+            route = route.Substring(0, route.IndexOf('?'));
+
         int queryIndex = 0;
 
         foreach (var param in action.Parameters)
         {
-            if (param.Source == "Query" && !route.Contains($"?{param.Name}={param.TestValue}"))
+            if (param.Source == "Query" && !route.Contains($"{param.Name}="))
             {
                 string separator = queryIndex == 0 ? "?" : "&";
                 route += $"{separator}{param.Name}={param.TestValue}";
@@ -494,7 +496,7 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private void AssignHeaders(ActionView action, HttpRequestMessage request)
     {
-        foreach (var header in headers.Where(h => h.Action == action.Name))
+        foreach (var header in action.Headers)
         {
             if (string.IsNullOrEmpty(header.Key) || string.IsNullOrEmpty(header.Value))
             {
@@ -544,12 +546,4 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
         return (primary, listItemStyle);
     }
-}
-
-public class Header
-{
-    public string Action { get; set; }
-    public string Key { get; set; }
-    public string Value { get; set; }
-    public bool Error { get; set; } = false;
 }

@@ -241,6 +241,11 @@ public class ActionView
     /// Gets or sets the index of current tab
     /// </summary>
     public int CurrentTabIndex { get; set; } = 0;
+
+    /// <summary>
+    /// Gets or sets the headers of the action
+    /// </summary>
+    public List<HeaderView> Headers { get; set; } = new();
 }
 
 /// <summary>
@@ -270,6 +275,32 @@ public class ParameterView
 
     /// <summary>
     /// Gets or sets the indicator if the parameter has an error
+    /// </summary>
+    public bool Error { get; set; } = false;
+}
+
+/// <summary>
+/// Class to store the header information
+/// </summary>
+public class HeaderView
+{
+    /// <summary>
+    /// Gets or sets the name of the action
+    /// </summary>
+    public string Action { get; set; }
+
+    /// <summary>
+    /// Gets or sets the key of the header
+    /// </summary>
+    public string Key { get; set; }
+
+    /// <summary>
+    /// Gets or sets the value of the header
+    /// </summary>
+    public string Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the indicator if the header has an error
     /// </summary>
     public bool Error { get; set; } = false;
 }

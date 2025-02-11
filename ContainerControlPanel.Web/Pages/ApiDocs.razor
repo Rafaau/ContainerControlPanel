@@ -126,23 +126,23 @@
 											}
 											break;
 										case 1:
-											@if (headers.Count < 1)
+											@if (request.Headers.Count < 1)
 											{
 												<div class="param-key">No headers</div>
 											}
-											@foreach (var header in headers.Where(h => h.Action == request.Name))
+											@foreach (var header in request.Headers.Where(h => h.Action == request.Name))
 											{
 												<div class="header-row">
 													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
 													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
 													<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
-														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { request.Headers.Remove(header); })" />
 													</MudTooltip>
 												</div>
 											}
 											<div class="add-btn">
 												<MudTooltip Text="@Localizer[Locales.Resource.Add]">
-													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = request.Name, Key = "", Value = "" }); })" />
+													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { request.Headers.Add(new HeaderView { Action = request.Name, Key = "", Value = "" }); })" />
 												</MudTooltip>
 											</div>
 											break;
@@ -286,23 +286,23 @@
 											}
 											break;
 										case 1:
-											@if (headers.Count < 1)
+											@if (request.Headers.Count < 1)
 											{
 												<div class="param-key">No headers</div>
 											}
-											@foreach (var header in headers.Where(h => h.Action == request.Name))
+											@foreach (var header in request.Headers.Where(h => h.Action == request.Name))
 											{
 												<div class="header-row">
 													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
 													<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
 													<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
-														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { request.Headers.Remove(header); })" />
 													</MudTooltip>
 												</div>
 											}
 											<div class="add-btn">
 												<MudTooltip Text="@Localizer[Locales.Resource.Add]">
-													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = request.Name, Key = "", Value = "" }); })" />
+													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { request.Headers.Add(new HeaderView { Action = request.Name, Key = "", Value = "" }); })" />
 												</MudTooltip>
 											</div>
 											break;
@@ -455,23 +455,23 @@
 												}
 												break;
 											case 1:
-												@if (headers.Count < 1)
+											@if (action.Headers.Count < 1)
 												{
 													<div class="param-key">No headers</div>
 												}
-												@foreach (var header in headers.Where(h => h.Action == action.Name))
+											@foreach (var header in action.Headers.Where(h => h.Action == action.Name))
 												{
 													<div class="header-row">
 														<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Key" Variant="Variant.Outlined" @bind-Value="header.Key"></MudTextField>
 														<MudTextField Error="header.Error" Style="font-size: 12px;" Text="@header.Value" Variant="Variant.Outlined" @bind-Value="header.Value"></MudTextField>
 														<MudTooltip Text="@Localizer[Locales.Resource.Remove]">
-															<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { headers.Remove(header); })" />
+														<MudIconButton Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" @onclick="@(() => { action.Headers.Remove(header); })" />
 														</MudTooltip>
 													</div>
 												}
 												<div class="add-btn">
 													<MudTooltip Text="@Localizer[Locales.Resource.Add]">
-														<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { headers.Add(new Header { Action = action.Name, Key = "", Value = "" }); })" />
+													<MudIconButton Color="Color.Primary" Icon="@Icons.Material.Filled.Add" @onclick="@(() => { action.Headers.Add(new HeaderView { Action = action.Name, Key = "", Value = "" }); })" />
 													</MudTooltip>
 												</div>
 												break;
