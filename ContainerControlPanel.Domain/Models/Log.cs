@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -14,6 +15,10 @@ public class LogsRoot
     /// </summary>
     [JsonPropertyName("resourceLogs")]
     public List<ResourceLog> ResourceLogs { get; set; }
+
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 /// <summary>
