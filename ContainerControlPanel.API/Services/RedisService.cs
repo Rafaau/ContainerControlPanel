@@ -137,7 +137,7 @@ public class RedisService : IDataStoreService
         return logs;
     }
 
-    public async Task<LogsRoot> GetLogsAsync(string traceId)
+    public async Task<LogsRoot> GetLogAsync(string traceId)
     {
         var result = await ScanKeysByPatternAsync($"log{traceId}");
         return JsonSerializer.Deserialize<LogsRoot>(result[0]);

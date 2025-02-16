@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
@@ -8,6 +9,8 @@ namespace ContainerControlPanel.Domain.Models;
 /// </summary>
 public class TracesRoot
 {
+    public string Id { get; set; }
+
     /// <summary>
     /// Gets or sets the resource spans
     /// </summary>

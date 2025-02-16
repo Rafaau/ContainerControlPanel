@@ -27,7 +27,7 @@ public class MongoService : IDataStoreService
         {
             var metricsIndexModel = new CreateIndexModel<MetricsRoot>(
                 Builders<MetricsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
-                new CreateIndexOptions { ExpireAfter = TimeSpan.FromMinutes(1) });
+                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14) });
             await metricsCollection.Indexes.CreateOneAsync(metricsIndexModel);
         }
 
@@ -38,7 +38,7 @@ public class MongoService : IDataStoreService
         {
             var tracesIndexModel = new CreateIndexModel<TracesRoot>(
                 Builders<TracesRoot>.IndexKeys.Ascending(x => x.CreatedAt),
-                new CreateIndexOptions { ExpireAfter = TimeSpan.FromMinutes(1) });
+                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14) });
             await tracesCollection.Indexes.CreateOneAsync(tracesIndexModel);
         }
 
@@ -49,7 +49,7 @@ public class MongoService : IDataStoreService
         {
             var logsIndexModel = new CreateIndexModel<LogsRoot>(
                 Builders<LogsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
-                new CreateIndexOptions { ExpireAfter = TimeSpan.FromMinutes(1) });
+                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14) });
             await logsCollection.Indexes.CreateOneAsync(logsIndexModel);
         }
     }
@@ -80,20 +80,22 @@ public class MongoService : IDataStoreService
         await collection.ReplaceOneAsync(x => x.Id == id, request);
     }
 
-    public async Task SaveMetricsAsync(MetricsRoot metrics)
+    public async Task SaveMetricsAsync(MetricsRoot metrics, string? serviceName = "", string? routeName = "")
     {
         var collection = _database.GetCollection<MetricsRoot>("Metrics");
         await collection.InsertOneAsync(metrics);
     }
 
-    public async Task SaveTraceAsync(TracesRoot trace)
+    public async Task SaveTraceAsync(TracesRoot trace, string? traceId = "")
     {
+        trace.Id = traceId;
         var collection = _database.GetCollection<TracesRoot>("Traces");
         await collection.InsertOneAsync(trace);
     }
 
-    public async Task SaveLogAsync(LogsRoot log)
+    public async Task SaveLogAsync(LogsRoot log, string? traceId = "")
     {
+        log.Id = traceId;
         var collection = _database.GetCollection<LogsRoot>("Logs");
         await collection.InsertOneAsync(log);
     }
@@ -107,8 +109,7 @@ public class MongoService : IDataStoreService
     public async Task<List<TracesRoot>> GetTraceAsync(string traceId)
     {
         var collection = _database.GetCollection<TracesRoot>("Traces");
-        //return await collection.Find(x => x.TraceId == traceId).ToListAsync();
-        return await collection.Aggregate().ToListAsync();
+        return await collection.Find(x => x.Id == traceId).ToListAsync();
     }
 
     public async Task<List<MetricsRoot>> GetMetricsAsync()
@@ -126,7 +127,6 @@ public class MongoService : IDataStoreService
     public async Task<LogsRoot> GetLogAsync(string traceId)
     {
         var collection = _database.GetCollection<LogsRoot>("Logs");
-        //await collection.Find(x => x.TraceId == traceId).FirstOrDefaultAsync();
-        return await collection.Aggregate().FirstOrDefaultAsync();
+        return await collection.Find(x => x.Id == traceId).FirstOrDefaultAsync();
     }
 }

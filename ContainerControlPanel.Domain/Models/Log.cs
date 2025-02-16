@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -10,6 +11,8 @@ namespace ContainerControlPanel.Domain.Models;
 /// </summary>
 public class LogsRoot
 {
+    public string Id { get; set; }
+
     /// <summary>
     /// Gets or sets the resource logs
     /// </summary>

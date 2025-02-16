@@ -70,7 +70,7 @@ app.Use(async (context, next) =>
 
 if (!string.IsNullOrEmpty(builder.Configuration["MongoDB:ConnectionString"]))
 {
-    var mongoService = app.Services.GetRequiredService<MongoService>();
+    var mongoService = new MongoService(app.Configuration);
     await mongoService.InitializeAsync();
 }
 
