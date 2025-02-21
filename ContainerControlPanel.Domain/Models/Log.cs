@@ -22,6 +22,8 @@ public class LogsRoot
     [BsonElement("createdAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    public string ResourceName { get; set; }
 }
 
 /// <summary>
@@ -399,10 +401,10 @@ public static class LogsExtensions
     }
 
     /// <summary>
-    /// Gets the resource name
+    /// Gets the log records
     /// </summary>
     /// <param name="logsRoot">Logs root object</param>
-    /// <returns>Returns the resource name</returns>
+    /// <returns>Returns the log records</returns>
     public static List<LogRecord> GetLogRecords(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords;
 }

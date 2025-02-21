@@ -216,11 +216,16 @@ public class TelemetryController : ControllerBase
     /// <returns>Returns the stored logs</returns>
     [HttpGet("GetLogs")]
     [TokenAuthorize]
-    public async Task<IActionResult> GetLogs(int timeOffset, string? timestamp, string? resource)
+    public async Task<IActionResult> GetLogs(
+        int timeOffset, 
+        string? timestamp, 
+        string? resource, 
+        int page = 0, 
+        int pageSize = 0)
     {
         try
         {
-            List<LogsRoot> logs = await _dataStoreService.GetLogsAsync(timeOffset, timestamp, resource);
+            List<LogsRoot> logs = await _dataStoreService.GetLogsAsync(timeOffset, timestamp, resource, page, pageSize);
             return Ok(logs);
         }
         catch (Exception ex)

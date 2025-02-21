@@ -6,6 +6,7 @@
 
 @using MudBlazor
 @using ContainerControlPanel.Domain.Models
+@using ContainerControlPanel.Web.Components.Utils
 
 <div class="label">
 	<h1>@Localizer[Locales.Resource.StructuredLogs]</h1>
@@ -64,29 +65,30 @@
 	@{
 		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentSeverity, currentFilter, true);
 	}
-		<div class="data-container">
-	@foreach (var log in logs)
-	{
-		<div @onclick="() => { detailsDrawer = true; currentLog = logsRoot.GetLogDetails(log); }" class="data-grid-row data">
-			<div class="data-grid-cell text-overflow">
-				<div class="resource-badge" style="background-color: #@(GetHexString(log.ResourceName));"></div>
-				@log.ResourceName
+	<div class="data-container">
+		@foreach (var log in logs)
+		{
+			<div @onclick="() => { detailsDrawer = true; currentLog = logsRoot.GetLogDetails(log); }" class="data-grid-row data">
+				<div class="data-grid-cell text-overflow">
+					<div class="resource-badge" style="background-color: #@(GetHexString(log.ResourceName));"></div>
+					@log.ResourceName
+				</div>
+				<div class="data-grid-cell">
+					@log.Severity
+				</div>
+				<div class="data-grid-cell">
+					@log.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")
+				</div>
+				<div class="data-grid-cell text-overflow">
+					<MudHighlighter Text="@log.Message" HighlightedText="@currentFilter"
+									Style="padding: 0;"/>
+				</div>
+				<div class="data-grid-cell">
+					@log.TraceId
+				</div>
 			</div>
-			<div class="data-grid-cell">
-				@log.Severity
-			</div>
-			<div class="data-grid-cell">
-				@log.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")
-			</div>
-			<div class="data-grid-cell text-overflow">
-				<MudHighlighter Text="@log.Message" HighlightedText="@currentFilter"
-								Style="padding: 0;"/>
-			</div>
-			<div class="data-grid-cell">
-				@log.TraceId
-			</div>
-		</div>
-	}
+		}
+		<InfiniteScrolling OnScrollToEnd="@LoadMoreLogs"/>
 	</div>
 	@if (logs.Count == 0)
 	{

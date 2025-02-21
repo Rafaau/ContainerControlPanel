@@ -101,6 +101,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private readonly CancellationTokenSource _cts = new();
 
+    private bool firstScroll { get; set; } = false;
+
+    private int page { get; set; } = 1;
+
     protected override async Task OnInitializedAsync()
     {
         if (MemoryCache.TryGetValue("lastStructuredLogsHref", out string cachedHref))
@@ -144,8 +148,25 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         }
         else
         {
-            var result = await telemetryAPI
-                .GetLogs(int.Parse(Configuration["TimeOffset"]), currentTimestamp?.ToString() ?? "null", currentResource);
+            List<LogsRoot> result;
+
+            if (bool.Parse(Configuration["LazyLoading"]))
+            {
+                result = await telemetryAPI.GetLogs(
+                    int.Parse(Configuration["TimeOffset"]),
+                    currentTimestamp?.ToString() ?? "null",
+                    currentResource,
+                    1,
+                    10);
+            }
+            else
+            {
+                result = await telemetryAPI.GetLogs(
+                    int.Parse(Configuration["TimeOffset"]), 
+                    currentTimestamp?.ToString() ?? "null", 
+                    currentResource);
+            }
+            
             MemoryCache.Set("structuredlogs", result);
             logsRoot = result;
             this.StateHasChanged();
@@ -157,6 +178,29 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         if (log != null)
         {
             logsRoot.Add(log);
+            MemoryCache.Set("structuredlogs", logsRoot);
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task LoadMoreLogs()
+    {
+        if (!firstScroll)
+        {         
+            firstScroll = true;
+            return;
+        }
+
+        if (bool.Parse(Configuration["LazyLoading"]) && firstScroll)
+        {
+            page++;
+            var result = await telemetryAPI.GetLogs(
+                int.Parse(Configuration["TimeOffset"]),
+                currentTimestamp?.ToString() ?? "null",
+                currentResource,
+                page,
+                10);
+            logsRoot.AddRange(result);
             MemoryCache.Set("structuredlogs", logsRoot);
             this.StateHasChanged();
         }

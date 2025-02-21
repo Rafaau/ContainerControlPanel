@@ -24,7 +24,7 @@ public interface IDataStoreService
 
     Task<List<MetricsRoot>> GetMetricsAsync();
 
-    Task<List<LogsRoot>> GetLogsAsync(int timeOffset, string? timestamp, string? resource);
+    Task<List<LogsRoot>> GetLogsAsync(int timeOffset, string? timestamp, string? resource, int page, int pageSize);
 
     Task<LogsRoot> GetLogAsync(string traceId);
 }

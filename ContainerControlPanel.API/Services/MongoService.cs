@@ -27,7 +27,7 @@ public class MongoService : IDataStoreService
         {
             var metricsIndexModel = new CreateIndexModel<MetricsRoot>(
                 Builders<MetricsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
-                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14) });
+                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await metricsCollection.Indexes.CreateOneAsync(metricsIndexModel);
         }
 
@@ -38,7 +38,7 @@ public class MongoService : IDataStoreService
         {
             var tracesIndexModel = new CreateIndexModel<TracesRoot>(
                 Builders<TracesRoot>.IndexKeys.Ascending(x => x.CreatedAt),
-                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14) });
+                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await tracesCollection.Indexes.CreateOneAsync(tracesIndexModel);
         }
 
@@ -49,7 +49,7 @@ public class MongoService : IDataStoreService
         {
             var logsIndexModel = new CreateIndexModel<LogsRoot>(
                 Builders<LogsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
-                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14) });
+                new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await logsCollection.Indexes.CreateOneAsync(logsIndexModel);
         }
     }
@@ -97,7 +97,7 @@ public class MongoService : IDataStoreService
     {
         log.Id = traceId;
         var collection = _database.GetCollection<LogsRoot>("Logs");
-        await collection.InsertOneAsync(log);
+        await collection.FindOneAndReplaceAsync(x => x.Id == traceId, log, new FindOneAndReplaceOptions<LogsRoot> { IsUpsert = true });
     }
 
     public async Task<List<TracesRoot>> GetTracesAsync(int timeOffset, string? resource, string? timestamp)
@@ -118,10 +118,22 @@ public class MongoService : IDataStoreService
         return await collection.Aggregate().ToListAsync();
     }
 
-    public async Task<List<LogsRoot>> GetLogsAsync(int timeOffset, string? timestamp, string? resource)
+    public async Task<List<LogsRoot>> GetLogsAsync(int timeOffset, string? timestamp, string? resource, int page, int pageSize)
     {
         var collection = _database.GetCollection<LogsRoot>("Logs");
-        return await collection.Aggregate().ToListAsync();
+
+        if (page == 0 && pageSize == 0)
+        {
+            return await collection.Aggregate().ToListAsync();
+        }
+        else
+        {
+            return await collection
+                .Find(FilterDefinition<LogsRoot>.Empty)
+                .Skip((page - 1) * pageSize)
+                .Limit(pageSize)
+                .ToListAsync();
+        }
     }
 
     public async Task<LogsRoot> GetLogAsync(string traceId)
