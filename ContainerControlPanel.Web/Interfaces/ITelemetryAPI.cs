@@ -40,11 +40,13 @@ public interface ITelemetryAPI
     /// <param name="timestamp">Timestamp.</param>
     /// <param name="resource">Resource name.</param>
     /// <returns>Returns the list of logs.</returns>
-    [Get("/v1/getLogs?timestamp={timestamp}&resource={resource}&timeOffset={timeOffset}&page={page}&pageSize={pageSize}")]
+    [Get("/v1/getLogs?timestamp={timestamp}&resource={resource}&timeOffset={timeOffset}&severity={severity}&filter={filter}&page={page}&pageSize={pageSize}")]
     Task<List<LogsRoot>> GetLogs(
         int timeOffset, 
         string? timestamp = "null", 
-        string? resource = "all", 
+        string? resource = "all",
+        string? severity = "all",
+        string? filter = "",
         int page = 0, 
         int pageSize = 0);
 

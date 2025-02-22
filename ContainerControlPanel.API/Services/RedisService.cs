@@ -120,7 +120,14 @@ public class RedisService : IDataStoreService
         return metrics;
     }
 
-    public async Task<List<LogsRoot>> GetLogsAsync(int timeOffset, string? timestamp, string? resource, int page, int pageSize)
+    public async Task<List<LogsRoot>> GetLogsAsync(
+        int timeOffset, 
+        string? timestamp, 
+        string? resource, 
+        string? severity,
+        string? filter,
+        int page, 
+        int pageSize)
     {
         List<LogsRoot> logs = new();
         var result = await ScanKeysByPatternAsync("log");

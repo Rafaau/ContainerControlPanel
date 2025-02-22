@@ -129,9 +129,12 @@ public class TelemetryController : ControllerBase
             };
 
             LogsRoot logsRoot = JsonSerializer.Deserialize<LogsRoot>(bindable?.Message.ToString());
+            logsRoot.ResourceName = logsRoot.GetResourceName();
 
             foreach (var logRecord in logsRoot.GetLogRecords())
             {
+                logsRoot.Severity = logRecord.SeverityText;
+                logsRoot.Message = logRecord.Body.StringValue;
                 await _dataStoreService.SaveLogAsync(logsRoot, logRecord.TraceId);
             }
 
@@ -219,13 +222,22 @@ public class TelemetryController : ControllerBase
     public async Task<IActionResult> GetLogs(
         int timeOffset, 
         string? timestamp, 
-        string? resource, 
+        string? resource,
+        string? severity,
+        string? filter,
         int page = 0, 
         int pageSize = 0)
     {
         try
         {
-            List<LogsRoot> logs = await _dataStoreService.GetLogsAsync(timeOffset, timestamp, resource, page, pageSize);
+            List<LogsRoot> logs = await _dataStoreService.GetLogsAsync(
+                timeOffset, 
+                timestamp, 
+                resource,
+                severity,
+                filter,
+                page, 
+                pageSize);
             return Ok(logs);
         }
         catch (Exception ex)

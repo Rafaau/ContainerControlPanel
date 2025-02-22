@@ -24,6 +24,10 @@ public class LogsRoot
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public string ResourceName { get; set; }
+
+    public string Severity { get; set; }
+
+    public string Message { get; set; }
 }
 
 /// <summary>
@@ -320,6 +324,45 @@ public static class LogsExtensions
         return orderDesc 
             ? logs.OrderByDescending(x => x.Timestamp).ToList() 
             : logs.OrderBy(x => x.Timestamp).ToList();
+    }
+
+    public static List<LogView> GetStructuredLogs(this List<LogsRoot> logsRoots, int timeOffset)
+    {
+        var logs = new List<LogView>();
+        foreach (var logsRoot in logsRoots)
+        {
+            var resourceName = logsRoot.GetResourceName();
+            foreach (var resourceLog in logsRoot.ResourceLogs)
+            {
+                foreach (var scopeLog in resourceLog.ScopeLogs)
+                {
+                    foreach (var logRecord in scopeLog.LogRecords)
+                    {
+                        if (logs.Any(l => l.TraceId == logRecord.TraceId))
+                        {
+                            continue;
+                        }
+                        var contains = logRecord.Body.StringValue.Contains("[REQUEST]");
+                        if (logRecord.Body.StringValue.Contains("[REQUEST]")
+                            || logRecord.Body.StringValue.Contains("[RESPONSE]")
+                            || logRecord.Body.StringValue.Contains("[ERROR]"))
+                        {
+                            continue;
+                        }
+                        DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).AddHours(timeOffset).DateTime;
+                        logs.Add(new LogView
+                        {
+                            ResourceName = resourceName,
+                            Severity = logRecord.SeverityText,
+                            Timestamp = dateTime,
+                            Message = logRecord.Body.StringValue,
+                            TraceId = logRecord.TraceId
+                        });
+                    }
+                }
+            }
+        }
+        return logs.OrderByDescending(x => x.Timestamp).ToList();
     }
 
     /// <summary>

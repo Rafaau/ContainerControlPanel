@@ -1,5 +1,6 @@
 ﻿using ContainerControlPanel.API.Interfaces;
 using ContainerControlPanel.Domain.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ContainerControlPanel.API.Services;
@@ -118,23 +119,54 @@ public class MongoService : IDataStoreService
         return await collection.Aggregate().ToListAsync();
     }
 
-    public async Task<List<LogsRoot>> GetLogsAsync(int timeOffset, string? timestamp, string? resource, int page, int pageSize)
+    public async Task<List<LogsRoot>> GetLogsAsync(
+        int timeOffset, 
+        string? timestamp, 
+        string? resource,
+        string? severity,
+        string? filter,
+        int page, 
+        int pageSize)
     {
         var collection = _database.GetCollection<LogsRoot>("Logs");
 
-        if (page == 0 && pageSize == 0)
+        var filterBuilder = Builders<LogsRoot>.Filter;
+        var filterD = filterBuilder.Empty;
+
+        if (!string.IsNullOrEmpty(timestamp) && timestamp != "null")
         {
-            return await collection.Aggregate().ToListAsync();
+            DateTime targetDate = DateTime.Parse(timestamp).Date;
+            DateTime nextDay = targetDate.AddDays(1);
+
+            filterD &= filterBuilder.Gte(x => x.CreatedAt, targetDate) &
+                      filterBuilder.Lt(x => x.CreatedAt, nextDay);
         }
-        else
+
+        if (!string.IsNullOrEmpty(resource) && resource != "all")
         {
-            return await collection
-                .Find(FilterDefinition<LogsRoot>.Empty)
-                .Skip((page - 1) * pageSize)
-                .Limit(pageSize)
-                .ToListAsync();
+            filterD &= filterBuilder.Eq(x => x.ResourceName, resource);
         }
+
+        if (!string.IsNullOrEmpty(severity) && severity != "all")
+        {
+            filterD &= filterBuilder.Eq(x => x.Severity, severity);
+        }
+
+        if (!string.IsNullOrEmpty(filter))
+        {
+            filterD &= filterBuilder.Regex(x => x.Message, new BsonRegularExpression(filter, "i"));
+        }
+
+        var query = collection.Find(filterD).SortByDescending(x => x.CreatedAt);
+
+        if (page > 0 && pageSize > 0)
+        {
+            query.Skip((page - 1) * pageSize).Limit(pageSize);
+        }
+
+        return await query.ToListAsync();
     }
+
 
     public async Task<LogsRoot> GetLogAsync(string traceId)
     {

@@ -63,7 +63,15 @@
 		</div>
 	</div>
 	@{
-		var logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentSeverity, currentFilter, true);
+		List<LogView> logs;
+		if (bool.Parse(Configuration["LazyLoading"]))
+		{
+			logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]));
+		}
+		else
+		{
+			logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentSeverity, currentFilter, true);
+		}
 	}
 	<div class="data-container">
 		@foreach (var log in logs)

@@ -67,6 +67,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             SeverityParameter = value;
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastStructuredLogsHref", currentRoute);
+            if (bool.Parse(Configuration["LazyLoading"]))
+            {
+                LoadLogs();
+            }
         }
     }
 
@@ -78,6 +82,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             FilterParameter = value;
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastStructuredLogsHref", currentRoute);
+            if (bool.Parse(Configuration["LazyLoading"]))
+            {
+                LoadLogs();
+            }
         }
     }
 
@@ -111,7 +119,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         {
             NavigationManager.NavigateTo(cachedHref);
 
-            if (cachedHref.Split("/")[3] == "null")
+            if (cachedHref.Split("/")[3] == "null" && !bool.Parse(Configuration["LazyLoading"]))
                 await LoadLogs();
         }
         else
@@ -129,15 +137,31 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private async Task LoadLogs()
     {
+        List<LogsRoot> result;
+
         if (MemoryCache.TryGetValue("structuredlogs", out List<LogsRoot> cachedLogs))
         {
             logsRoot = cachedLogs;
             this.StateHasChanged();
 
-            var s = currentTimestamp?.ToString() ?? "null";
-
-            var result = await telemetryAPI
-                .GetLogs(int.Parse(Configuration["TimeOffset"]), currentTimestamp?.ToString() ?? "null", currentResource);
+            if (bool.Parse(Configuration["LazyLoading"]))
+            {
+                result = await telemetryAPI.GetLogs(
+                    int.Parse(Configuration["TimeOffset"]),
+                    currentTimestamp?.ToString() ?? "null",
+                    currentResource,
+                    currentSeverity,
+                    currentFilter,
+                    1,
+                    10);
+            }
+            else
+            {
+                result = await telemetryAPI.GetLogs(
+                    int.Parse(Configuration["TimeOffset"]),
+                    currentTimestamp?.ToString() ?? "null",
+                    currentResource);
+            }
 
             if (result.Count != logsRoot.Count)
             {
@@ -148,14 +172,14 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         }
         else
         {
-            List<LogsRoot> result;
-
             if (bool.Parse(Configuration["LazyLoading"]))
             {
                 result = await telemetryAPI.GetLogs(
                     int.Parse(Configuration["TimeOffset"]),
                     currentTimestamp?.ToString() ?? "null",
                     currentResource,
+                    currentSeverity,
+                    currentFilter,
                     1,
                     10);
             }
@@ -171,6 +195,9 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             logsRoot = result;
             this.StateHasChanged();
         }
+
+        firstScroll = false;
+        page = 1;
     }
 
     private void OnLogsUpdated(LogsRoot log)
@@ -185,19 +212,15 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private async Task LoadMoreLogs()
     {
-        if (!firstScroll)
-        {         
-            firstScroll = true;
-            return;
-        }
-
-        if (bool.Parse(Configuration["LazyLoading"]) && firstScroll)
+        if (bool.Parse(Configuration["LazyLoading"]))
         {
             page++;
             var result = await telemetryAPI.GetLogs(
                 int.Parse(Configuration["TimeOffset"]),
                 currentTimestamp?.ToString() ?? "null",
                 currentResource,
+                currentSeverity,
+                currentFilter,
                 page,
                 10);
             logsRoot.AddRange(result);
