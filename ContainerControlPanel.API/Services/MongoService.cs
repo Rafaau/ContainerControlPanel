@@ -1,5 +1,6 @@
 ﻿using ContainerControlPanel.API.Interfaces;
 using ContainerControlPanel.Domain.Models;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -101,10 +102,40 @@ public class MongoService : IDataStoreService
         await collection.FindOneAndReplaceAsync(x => x.Id == traceId, log, new FindOneAndReplaceOptions<LogsRoot> { IsUpsert = true });
     }
 
-    public async Task<List<TracesRoot>> GetTracesAsync(int timeOffset, string? resource, string? timestamp)
+    public async Task<List<TracesRoot>> GetTracesAsync(
+        int timeOffset, 
+        string? resource, 
+        string? timestamp,
+        int page,
+        int pageSize)
     {
         var collection = _database.GetCollection<TracesRoot>("Traces");
-        return await collection.Aggregate().ToListAsync();
+
+        var filterBuilder = Builders<TracesRoot>.Filter;
+        var filterD = filterBuilder.Empty;
+
+        if (!string.IsNullOrEmpty(timestamp) && timestamp != null)
+        {
+            DateTime targetDate = DateTime.Parse(timestamp).Date;
+            DateTime nextDay = targetDate.AddDays(1);
+
+            filterD &= filterBuilder.Gte(x => x.CreatedAt, targetDate) &
+                      filterBuilder.Lt(x => x.CreatedAt, nextDay);
+        }
+
+        if (!string.IsNullOrEmpty(resource) && resource != "all")
+        {
+            filterD &= filterBuilder.Eq(x => x.ResourceName, resource);
+        }
+
+        var query = collection.Find(filterD).SortByDescending(x => x.CreatedAt);
+
+        if (page > 0 && pageSize > 0)
+        {
+            query.Skip((page - 1) * pageSize).Limit(pageSize);
+        }
+
+        return await query.ToListAsync();
     }
 
     public async Task<List<TracesRoot>> GetTraceAsync(string traceId)

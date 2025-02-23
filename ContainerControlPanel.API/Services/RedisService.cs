@@ -75,7 +75,12 @@ public class RedisService : IDataStoreService
         await SetValueAsync($"log{traceId}", value, TimeSpan.FromDays(14));
     }
 
-    public async Task<List<TracesRoot>> GetTracesAsync(int timeOffset, string? resource, string? timestamp)
+    public async Task<List<TracesRoot>> GetTracesAsync(
+        int timeOffset, 
+        string? resource, 
+        string? timestamp,
+        int page,
+        int pageSize)
     {
         List<TracesRoot> traces = new();
         var result = await ScanKeysByPatternAsync("trace");

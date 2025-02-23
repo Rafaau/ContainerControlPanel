@@ -97,6 +97,8 @@ public class TelemetryController : ControllerBase
                     Data = tracesRoot
                 };
 
+                tracesRoot.ResourceName = tracesRoot.GetResourceName();
+
                 string json = JsonSerializer.Serialize(message);
                 await _dataStoreService.SaveTraceAsync(tracesRoot, span.TraceId);
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
@@ -157,11 +159,17 @@ public class TelemetryController : ControllerBase
     /// <returns>Returns the stored traces</returns>
     [HttpGet("GetTraces")]
     [TokenAuthorize]
-    public async Task<IActionResult> GetTraces(int timeOffset, string? resource, string? timestamp)
+    public async Task<IActionResult> GetTraces(
+        int timeOffset, 
+        string? resource, 
+        string? timestamp,
+        int page = 0,
+        int pageSize = 0)
     {
         try
         {
-            List<TracesRoot> traces = await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp);
+            List<TracesRoot> traces = 
+                await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp, page, pageSize);
 
             return Ok(traces);
         }

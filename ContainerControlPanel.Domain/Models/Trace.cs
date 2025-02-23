@@ -21,6 +21,8 @@ public class TracesRoot
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    public string ResourceName { get; set; }
+
     /// <summary>
     /// Clones the current instance
     /// </summary>
@@ -410,6 +412,9 @@ public static class TracesExtensions
         => tracesRoot.ResourceSpans.Any(rs => rs.Resource.Attributes
             .Any(attr => attr.Key == "service.name"
                 && attr.Value?.StringValue == resource));
+
+    public static string GetResourceName(this TracesRoot tracesRoot)
+        => tracesRoot.ResourceSpans[0].Resource.Attributes.Find(x => x.Key == "service.name").Value.StringValue;
 
     /// <summary>
     /// Gets the trace route

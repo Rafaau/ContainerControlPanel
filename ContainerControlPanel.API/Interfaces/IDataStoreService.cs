@@ -18,7 +18,7 @@ public interface IDataStoreService
 
     Task SaveLogAsync(LogsRoot log, string? traceId = "");
 
-    Task<List<TracesRoot>> GetTracesAsync(int timeOffset, string? resource, string? timestamp);
+    Task<List<TracesRoot>> GetTracesAsync(int timeOffset, string? resource, string? timestamp, int page, int pageSize);
 
     Task<List<TracesRoot>> GetTraceAsync(string traceId);
 

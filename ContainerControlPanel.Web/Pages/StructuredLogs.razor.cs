@@ -109,8 +109,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private readonly CancellationTokenSource _cts = new();
 
-    private bool firstScroll { get; set; } = false;
-
     private int page { get; set; } = 1;
 
     protected override async Task OnInitializedAsync()
@@ -196,7 +194,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             this.StateHasChanged();
         }
 
-        firstScroll = false;
         page = 1;
     }
 
