@@ -9,6 +9,9 @@ namespace ContainerControlPanel.Domain.Models;
 /// </summary>
 public class TracesRoot
 {
+    /// <summary>
+    /// Gets or sets the ID of the trace
+    /// </summary>
     public string Id { get; set; }
 
     /// <summary>
@@ -17,10 +20,16 @@ public class TracesRoot
     [JsonPropertyName("resourceSpans")]
     public List<ResourceSpan> ResourceSpans { get; set; }
 
+    /// <summary>
+    /// Gets or sets the DateTime when the trace was created
+    /// </summary>
     [BsonElement("createdAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    /// <summary>
+    /// Gets or sets the resource name
+    /// </summary>
     public string ResourceName { get; set; }
 
     /// <summary>

@@ -15,6 +15,9 @@ using ContainerControlPanel.API.Interfaces;
 [Route("/v1")]
 public class TelemetryController : ControllerBase
 {
+    /// <summary>
+    /// Data store service
+    /// </summary>
     private readonly IDataStoreService _dataStoreService;
 
     /// <summary>

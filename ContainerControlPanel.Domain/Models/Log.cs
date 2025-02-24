@@ -11,6 +11,9 @@ namespace ContainerControlPanel.Domain.Models;
 /// </summary>
 public class LogsRoot
 {
+    /// <summary>
+    /// Gets or sets the ID of the log
+    /// </summary>
     public string Id { get; set; }
 
     /// <summary>
@@ -19,14 +22,26 @@ public class LogsRoot
     [JsonPropertyName("resourceLogs")]
     public List<ResourceLog> ResourceLogs { get; set; }
 
+    /// <summary>
+    /// Gets or sets the DateTime of the log creation
+    /// </summary>
     [BsonElement("createdAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    /// <summary>
+    /// Gets or sets the name of the resource
+    /// </summary>
     public string ResourceName { get; set; }
 
+    /// <summary>
+    /// Gets or sets the severity of the log
+    /// </summary>
     public string Severity { get; set; }
 
+    /// <summary>
+    /// Gets or sets the message of the log
+    /// </summary>
     public string Message { get; set; }
 }
 
