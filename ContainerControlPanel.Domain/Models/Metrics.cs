@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
@@ -8,10 +10,22 @@ namespace ContainerControlPanel.Domain.Models;
 public class MetricsRoot
 {
     /// <summary>
+    /// Gets or sets the ID of the metrics
+    /// </summary>
+    public string Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the resource metrics
     /// </summary>
     [JsonPropertyName("resourceMetrics")]
     public List<ResourceMetric> ResourceMetrics { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DateTime when the metrics were created
+    /// </summary>
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 /// <summary>

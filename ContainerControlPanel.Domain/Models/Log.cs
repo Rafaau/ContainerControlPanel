@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -10,10 +12,37 @@ namespace ContainerControlPanel.Domain.Models;
 public class LogsRoot
 {
     /// <summary>
+    /// Gets or sets the ID of the log
+    /// </summary>
+    public string Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the resource logs
     /// </summary>
     [JsonPropertyName("resourceLogs")]
     public List<ResourceLog> ResourceLogs { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DateTime of the log creation
+    /// </summary>
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Gets or sets the name of the resource
+    /// </summary>
+    public string ResourceName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the severity of the log
+    /// </summary>
+    public string Severity { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message of the log
+    /// </summary>
+    public string Message { get; set; }
 }
 
 /// <summary>
@@ -312,6 +341,45 @@ public static class LogsExtensions
             : logs.OrderBy(x => x.Timestamp).ToList();
     }
 
+    public static List<LogView> GetStructuredLogs(this List<LogsRoot> logsRoots, int timeOffset)
+    {
+        var logs = new List<LogView>();
+        foreach (var logsRoot in logsRoots)
+        {
+            var resourceName = logsRoot.GetResourceName();
+            foreach (var resourceLog in logsRoot.ResourceLogs)
+            {
+                foreach (var scopeLog in resourceLog.ScopeLogs)
+                {
+                    foreach (var logRecord in scopeLog.LogRecords)
+                    {
+                        if (logs.Any(l => l.TraceId == logRecord.TraceId))
+                        {
+                            continue;
+                        }
+                        var contains = logRecord.Body.StringValue.Contains("[REQUEST]");
+                        if (logRecord.Body.StringValue.Contains("[REQUEST]")
+                            || logRecord.Body.StringValue.Contains("[RESPONSE]")
+                            || logRecord.Body.StringValue.Contains("[ERROR]"))
+                        {
+                            continue;
+                        }
+                        DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).AddHours(timeOffset).DateTime;
+                        logs.Add(new LogView
+                        {
+                            ResourceName = resourceName,
+                            Severity = logRecord.SeverityText,
+                            Timestamp = dateTime,
+                            Message = logRecord.Body.StringValue,
+                            TraceId = logRecord.TraceId
+                        });
+                    }
+                }
+            }
+        }
+        return logs.OrderByDescending(x => x.Timestamp).ToList();
+    }
+
     /// <summary>
     /// Gets the resources
     /// </summary>
@@ -391,10 +459,10 @@ public static class LogsExtensions
     }
 
     /// <summary>
-    /// Gets the resource name
+    /// Gets the log records
     /// </summary>
     /// <param name="logsRoot">Logs root object</param>
-    /// <returns>Returns the resource name</returns>
+    /// <returns>Returns the log records</returns>
     public static List<LogRecord> GetLogRecords(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords;
 }

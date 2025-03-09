@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
@@ -8,10 +10,27 @@ namespace ContainerControlPanel.Domain.Models;
 public class TracesRoot
 {
     /// <summary>
+    /// Gets or sets the ID of the trace
+    /// </summary>
+    public string Id { get; set; }
+
+    /// <summary>
     /// Gets or sets the resource spans
     /// </summary>
     [JsonPropertyName("resourceSpans")]
     public List<ResourceSpan> ResourceSpans { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DateTime when the trace was created
+    /// </summary>
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Gets or sets the resource name
+    /// </summary>
+    public string ResourceName { get; set; }
 
     /// <summary>
     /// Clones the current instance
@@ -402,6 +421,9 @@ public static class TracesExtensions
         => tracesRoot.ResourceSpans.Any(rs => rs.Resource.Attributes
             .Any(attr => attr.Key == "service.name"
                 && attr.Value?.StringValue == resource));
+
+    public static string GetResourceName(this TracesRoot tracesRoot)
+        => tracesRoot.ResourceSpans[0].Resource.Attributes.Find(x => x.Key == "service.name").Value.StringValue;
 
     /// <summary>
     /// Gets the trace route

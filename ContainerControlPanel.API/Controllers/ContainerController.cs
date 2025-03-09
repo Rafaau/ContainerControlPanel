@@ -1,4 +1,5 @@
 using ContainerControlPanel.API.Authorization;
+using ContainerControlPanel.API.Interfaces;
 using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -23,17 +24,17 @@ namespace ContainerControlPanel.API.Controllers
         /// <summary>
         /// Redis service 
         /// </summary>
-        private readonly RedisService _redisService;
+        private readonly IDataStoreService _dataStoreService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContainerController"/> class.
         /// </summary>
         /// <param name="configuration">Configuration settings</param>
         /// <param name="redisService">Redis service</param>
-        public ContainerController(IConfiguration configuration, RedisService redisService)
+        public ContainerController(IConfiguration configuration, IDataStoreService dataStoreService)
         {
             _configuration = configuration;
-            _redisService = redisService;
+            _dataStoreService = dataStoreService;
         }
 
         /// <summary>
@@ -246,8 +247,7 @@ namespace ContainerControlPanel.API.Controllers
         {
             try
             {
-                var json = JsonSerializer.Serialize(request);
-                await _redisService.SetValueAsync($"request{request.Id}", json);
+                await _dataStoreService.SaveRequestAsync(request);
                 return Ok();
             }
             catch (Exception ex)
@@ -263,14 +263,16 @@ namespace ContainerControlPanel.API.Controllers
         [HttpGet("GetSavedRequests")]
         public async Task<IActionResult> GetSavedRequests()
         {
-            var keys = await _redisService.ScanKeysByPatternAsync("request");
-            var requests = new List<SavedRequest>();
-            foreach (var key in keys)
+            try
             {
-                var request = JsonSerializer.Deserialize<SavedRequest>(key);
-                requests.Add(request);
+                List<SavedRequest> requests = await _dataStoreService.GetRequestsAsync();
+
+                return Ok(requests);
             }
-            return Ok(requests);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -281,8 +283,15 @@ namespace ContainerControlPanel.API.Controllers
         [HttpDelete("RemoveRequest")]
         public async Task<IActionResult> RemoveRequest(string requestId)
         {
-            await _redisService.RemoveKeyAsync($"request{requestId}");
-            return Ok();
+            try
+            {
+                await _dataStoreService.DeleteRequestAsync(requestId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         /// <summary>
@@ -293,21 +302,15 @@ namespace ContainerControlPanel.API.Controllers
         [HttpPatch("PinRequest")]
         public async Task<IActionResult> PinRequest(string requestId)
         {
-            var request = await _redisService.GetValueAsync($"request{requestId}");
-
-            if (request == null)
+            try
             {
-                return NotFound();
+                await _dataStoreService.PinRequestAsync(requestId);
+                return Ok();
             }
-            else
+            catch (Exception ex)
             {
-                var requestObj = JsonSerializer.Deserialize<SavedRequest>(request);
-                requestObj.IsPinned = !requestObj.IsPinned;
-                var json = JsonSerializer.Serialize(requestObj);
-                await _redisService.SetValueAsync($"request{requestId}", json);
+                return BadRequest(ex.Message);
             }
-
-            return Ok();
         }
     }
 }

@@ -4,6 +4,7 @@
 @page "/traces/{ResourceParameter}/{TimestampParameter}/{RoutesOnlyParameter}"
 
 @using ContainerControlPanel.Domain.Models
+@using ContainerControlPanel.Web.Components.Utils
 @using MudBlazor
 
 <div class="label">
@@ -131,6 +132,7 @@
 					</div>
 				</div>				
 			}
+			<InfiniteScrolling OnScrollToEnd="@LoadMoreTraces"/>
 		</div>
 		<div class="footer">
 			@Localizer[Locales.Resource.TotalNumberOfFoundTraces]: <b>@groupedTraces.Count</b>

@@ -6,6 +6,7 @@ using OpenTelemetry.Proto.Collector.Metrics.V1;
 using OpenTelemetry.Proto.Collector.Logs.V1;
 using ContainerControlPanel.API.Models;
 using ContainerControlPanel.API.Authorization;
+using ContainerControlPanel.API.Interfaces;
 
 /// <summary>
 /// Controller for handling telemetry data.
@@ -15,17 +16,17 @@ using ContainerControlPanel.API.Authorization;
 public class TelemetryController : ControllerBase
 {
     /// <summary>
-    /// Redis service 
+    /// Data store service
     /// </summary>
-    private readonly RedisService _redisService;
+    private readonly IDataStoreService _dataStoreService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TelemetryController"/> class.
     /// </summary>
     /// <param name="redisService">Redis service</param>
-    public TelemetryController(RedisService redisService)
+    public TelemetryController(IDataStoreService dataStoreService)
     {
-        _redisService = redisService;
+        _dataStoreService = dataStoreService;
     }
 
     /// <summary>
@@ -55,7 +56,7 @@ public class TelemetryController : ControllerBase
             if (serviceName != null 
                 && routeName != null)
             {
-                await _redisService.SetValueAsync($"metrics{serviceName}{routeName}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+                await _dataStoreService.SaveMetricsAsync(metricsRoot, serviceName, routeName);               
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
                  
@@ -93,16 +94,16 @@ public class TelemetryController : ControllerBase
                     Spans = new List<Span> { span }
                 });
 
-                var serializedData = JsonSerializer.Serialize(tracesRoot);
-
                 var message = new WebSocketMessage
                 {
                     Type = WebSocketMessageType.Traces,
                     Data = tracesRoot
                 };
 
+                tracesRoot.ResourceName = tracesRoot.GetResourceName();
+
                 string json = JsonSerializer.Serialize(message);
-                await _redisService.SetValueAsync($"trace{span.TraceId}{Guid.NewGuid().ToString()}", serializedData, TimeSpan.FromDays(14));      
+                await _dataStoreService.SaveTraceAsync(tracesRoot, span.TraceId);
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
            
@@ -133,10 +134,13 @@ public class TelemetryController : ControllerBase
             };
 
             LogsRoot logsRoot = JsonSerializer.Deserialize<LogsRoot>(bindable?.Message.ToString());
+            logsRoot.ResourceName = logsRoot.GetResourceName();
 
             foreach (var logRecord in logsRoot.GetLogRecords())
             {
-                await _redisService.SetValueAsync($"log{logRecord.TraceId}", bindable?.Message.ToString(), TimeSpan.FromDays(14));
+                logsRoot.Severity = logRecord.SeverityText;
+                logsRoot.Message = logRecord.Body.StringValue;
+                await _dataStoreService.SaveLogAsync(logsRoot, logRecord.TraceId);
             }
 
             string json = JsonSerializer.Serialize(message);
@@ -158,21 +162,24 @@ public class TelemetryController : ControllerBase
     /// <returns>Returns the stored traces</returns>
     [HttpGet("GetTraces")]
     [TokenAuthorize]
-    public async Task<IActionResult> GetTraces(int timeOffset, string? resource, string? timestamp)
+    public async Task<IActionResult> GetTraces(
+        int timeOffset, 
+        string? resource, 
+        string? timestamp,
+        int page = 0,
+        int pageSize = 0)
     {
-        List<TracesRoot> traces = new();
-        var result = await _redisService.ScanKeysByPatternAsync("trace");
-
-        foreach (var item in result)
+        try
         {
-            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
+            List<TracesRoot> traces = 
+                await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp, page, pageSize);
 
-            if ((resource == "all" || deserialized.HasResource(resource))
-                && (string.IsNullOrEmpty(timestamp) || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
-                traces.Add(deserialized);
+            return Ok(traces);
         }
-
-        return Ok(traces);
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     /// <summary>
@@ -184,21 +191,15 @@ public class TelemetryController : ControllerBase
     [TokenAuthorize]
     public async Task<IActionResult> GetTrace(string traceId)
     {
-        List<TracesRoot> traces = new();
-        var result = await _redisService.ScanKeysByPatternAsync($"trace{traceId}");
-
-        if (result.Count == 0)
+        try
         {
-            return NotFound();
+            List<TracesRoot> traces = await _dataStoreService.GetTraceAsync(traceId);
+            return Ok(traces);
         }
-
-        foreach (var item in result)
+        catch (Exception ex)
         {
-            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
-            traces.Add(deserialized);
+            return BadRequest(ex.Message);
         }
-
-        return Ok(traces);
     }
 
     /// <summary>
@@ -209,14 +210,15 @@ public class TelemetryController : ControllerBase
     [TokenAuthorize]
     public async Task<IActionResult> GetMetrics()
     {
-        List<MetricsRoot> metrics = new();
-        var result = await _redisService.ScanKeysByPatternAsync("metrics");
-        foreach (var item in result)
+        try
         {
-            var deserialized = JsonSerializer.Deserialize<MetricsRoot>(item);
-            metrics.Add(deserialized);
+            List<MetricsRoot> metrics = await _dataStoreService.GetMetricsAsync();
+            return Ok(metrics);
         }
-        return Ok(metrics);
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     /// <summary>
@@ -228,19 +230,31 @@ public class TelemetryController : ControllerBase
     /// <returns>Returns the stored logs</returns>
     [HttpGet("GetLogs")]
     [TokenAuthorize]
-    public async Task<IActionResult> GetLogs(int timeOffset, string? timestamp, string? resource)
+    public async Task<IActionResult> GetLogs(
+        int timeOffset, 
+        string? timestamp, 
+        string? resource,
+        string? severity,
+        string? filter,
+        int page = 0, 
+        int pageSize = 0)
     {
-        List<LogsRoot> logs = new();
-        var result = await _redisService.ScanKeysByPatternAsync("log");
-        foreach (var item in result)
+        try
         {
-            var deserialized = JsonSerializer.Deserialize<LogsRoot>(item);
-
-            if ((resource == "all" || resource == deserialized.GetResourceName())
-                && (timestamp == "null" || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
-                logs.Add(deserialized);
+            List<LogsRoot> logs = await _dataStoreService.GetLogsAsync(
+                timeOffset, 
+                timestamp, 
+                resource,
+                severity,
+                filter,
+                page, 
+                pageSize);
+            return Ok(logs);
         }
-        return Ok(logs);
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     /// <summary>
@@ -252,13 +266,15 @@ public class TelemetryController : ControllerBase
     [TokenAuthorize]
     public async Task<IActionResult> GetLog(string traceId)
     {
-        var result = await _redisService.ScanKeysByPatternAsync($"log{traceId}");
-        if (result.Count == 0)
+        try
         {
-            return NotFound();
+            LogsRoot log = await _dataStoreService.GetLogAsync(traceId);
+            return Ok(log);
         }
-        var deserialized = JsonSerializer.Deserialize<LogsRoot>(result[0]);
-        return Ok(deserialized);
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     /// <summary>
@@ -270,13 +286,8 @@ public class TelemetryController : ControllerBase
     [TokenAuthorize]
     public async Task<IActionResult> GetRequestAndResponse(string traceId)
     {
-        var result = await _redisService.ScanKeysByPatternAsync($"log{traceId}");
-        if (result.Count == 0)
-        {
-            return NotFound();
-        }
-        var deserialized = JsonSerializer.Deserialize<LogsRoot>(result[0]);
-        RequestResponse reqRes = deserialized.GetRequestResponse();
+        LogsRoot log = await _dataStoreService.GetLogAsync(traceId);
+        RequestResponse reqRes = log.GetRequestResponse();
 
         if (reqRes == null)
         {

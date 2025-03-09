@@ -10,7 +10,8 @@ cat > /usr/share/nginx/html/config.json <<EOF
 	"WebAPIPort": "${WebAPIPort}",
 	"WebAPIHost": "${WebAPIHost}",
 	"AuthToken": "${AuthToken}",
-	"Context": "${Context}"
+	"Context": "${Context}",
+	"LazyLoading": "${LazyLoading}"
 }
 EOF
 

@@ -1,4 +1,6 @@
 ﻿using ContainerControlPanel.API.Authorization;
+using ContainerControlPanel.API.Interfaces;
+using ContainerControlPanel.API.Services;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -27,8 +29,16 @@ builder.Services.AddMemoryCache();
 builder.Services.AddHybridCache();
 #pragma warning restore EXTEXP0018
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
-builder.Services.AddSingleton<RedisService>();
+if (string.IsNullOrEmpty(builder.Configuration["MongoDB:ConnectionString"]))
+{
+    builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]));
+    builder.Services.AddSingleton<RedisService>();
+}
+else
+{
+    builder.Services.AddSingleton<IDataStoreService, MongoService>();
+}
+
 builder.Services.AddSingleton<SessionValidation>();
 
 builder.Services.AddControllers();
@@ -57,6 +67,12 @@ app.Use(async (context, next) =>
         await next();
     }
 });
+
+if (!string.IsNullOrEmpty(builder.Configuration["MongoDB:ConnectionString"]))
+{
+    var mongoService = new MongoService(app.Configuration);
+    await mongoService.InitializeAsync();
+}
 
 app.UseCors("AllowBlazorClient");
 

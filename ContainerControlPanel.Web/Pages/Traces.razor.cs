@@ -4,6 +4,7 @@ using ContainerControlPanel.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using MudBlazor;
 using System.Text;
 
 namespace ContainerControlPanel.Web.Pages;
@@ -85,13 +86,15 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private readonly CancellationTokenSource _cts = new();
 
+    private int page { get; set; } = 1;
+
     protected override async Task OnInitializedAsync()
     {
         if (MemoryCache.TryGetValue("lastTracesHref", out string cachedHref))
         {
             NavigationManager.NavigateTo(cachedHref);
 
-            if (cachedHref.Split("/")[3] == "null")
+            if (cachedHref.Split("/")[3] == "null" && !bool.Parse(Configuration["LazyLoading"]))
                 await LoadTraces();
         }
         else
@@ -109,14 +112,28 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private async Task LoadTraces()
     {
+        List<TracesRoot> result = new();
         if (MemoryCache.TryGetValue("traces", out List<TracesRoot> cachedTraces))
         {
             allTraces = cachedTraces;
             this.StateHasChanged();
 
-            var result = await telemetryAPI
-                .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
-
+            if (bool.Parse(Configuration["LazyLoading"]))
+            {
+                result = await telemetryAPI
+                    .GetTraces(int.Parse(
+                        Configuration["TimeOffset"]), 
+                        currentResource, 
+                        currentTimestamp?.ToString(),
+                        1,
+                        10);
+            }
+            else
+            {
+                result = await telemetryAPI
+                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
+            }
+            
             if (result.Count != allTraces.Count)
             {
                 MemoryCache.Set("traces", result);
@@ -126,12 +143,28 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         }
         else
         {
-            var result = await telemetryAPI
-                .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
+            if (bool.Parse(Configuration["LazyLoading"]))
+            {
+                result = await telemetryAPI
+                    .GetTraces(int.Parse(
+                        Configuration["TimeOffset"]),
+                        currentResource,
+                        currentTimestamp?.ToString(),
+                        1,
+                        10);
+            }
+            else
+            {
+                result = await telemetryAPI
+                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
+            }
+
             MemoryCache.Set("traces", result);
             allTraces = result;
             this.StateHasChanged();
         }
+
+        page = 1;
     }
 
     private void OnTracesUpdated(TracesRoot traces)
@@ -140,6 +173,24 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             allTraces.Add(traces);
             MemoryCache.Set("traces", allTraces);
+            this.StateHasChanged();
+        }
+    }
+
+    private async Task LoadMoreTraces()
+    {
+        if (bool.Parse(Configuration["LazyLoading"]))
+        {
+            page++;
+            var result = await telemetryAPI
+                    .GetTraces(int.Parse(
+                        Configuration["TimeOffset"]),
+                        currentResource,
+                        currentTimestamp?.ToString(),
+                        page,
+                        10);
+            allTraces.AddRange(result);
+            MemoryCache.Set("structuredlogs", allTraces);
             this.StateHasChanged();
         }
     }
