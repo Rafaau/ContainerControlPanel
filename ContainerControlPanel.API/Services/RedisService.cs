@@ -101,7 +101,7 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="log">Logs to save</param>
     /// <param name="traceId">Trace ID</param>
-    public async Task SaveLogAsync(LogsRoot log, string traceId)
+    public async Task SaveLogAsync(Log log, string traceId)
     {
         string value = JsonSerializer.Serialize(log);
         await SetValueAsync($"log{traceId}", value, TimeSpan.FromDays(14));
@@ -186,7 +186,7 @@ public class RedisService : IDataStoreService
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of logs</returns>
-    public async Task<List<LogsRoot>> GetLogsAsync(
+    public async Task<List<Log>> GetLogsAsync(
         int timeOffset, 
         string? timestamp, 
         string? resource, 
@@ -195,15 +195,15 @@ public class RedisService : IDataStoreService
         int page, 
         int pageSize)
     {
-        List<LogsRoot> logs = new();
+        List<Log> logs = new();
         var result = await ScanKeysByPatternAsync("log");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<LogsRoot>(item);
+            var deserialized = JsonSerializer.Deserialize<Log>(item);
 
-            if ((resource == "all" || resource == deserialized.GetResourceName())
-                && (timestamp == "null" || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
+            if ((resource == "all" || resource == deserialized.ResourceName)
+                && (timestamp == "null" || deserialized.CreatedAt.AddHours(timeOffset).Date == DateTime.Parse(timestamp).Date))
                 logs.Add(deserialized);
         }
 

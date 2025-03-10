@@ -28,7 +28,7 @@ public class WebSocketService
     /// <summary>
     /// Event for logs updated.
     /// </summary>
-    public event Action<LogsRoot>? LogsUpdated;
+    public event Action<Log>? LogsUpdated;
 
     /// <summary>
     /// Connects to the WebSocket.
@@ -71,7 +71,7 @@ public class WebSocketService
                     break;
 
                 case Domain.Models.WebSocketMessageType.Logs:
-                    var logs = JsonSerializer.Deserialize<LogsRoot>(message.Data.ToString());
+                    var logs = JsonSerializer.Deserialize<Log>(message.Data.ToString());
                     LogsUpdated?.Invoke(logs);
                     break;
             }

@@ -22,7 +22,7 @@
 	<div class="select">
 		<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
 			<MudSelectItem T="string" Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
-			@foreach (var resource in logsRoot.GetResources())
+			@foreach (var resource in logs.GetResources())
 			{
 				<MudSelectItem T="string" Value="@resource">@resource</MudSelectItem>
 			}
@@ -62,21 +62,10 @@
 			@Localizer[Locales.Resource.Trace]
 		</div>
 	</div>
-	@{
-		List<LogView> logs;
-		if (bool.Parse(Configuration["LazyLoading"]))
-		{
-			logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]));
-		}
-		else
-		{
-			logs = logsRoot.GetStructuredLogs(int.Parse(Configuration["TimeOffset"]), currentSeverity, currentFilter, true);
-		}
-	}
 	<div class="data-container">
 		@foreach (var log in logs)
 		{
-			<div @onclick="() => { detailsDrawer = true; currentLog = logsRoot.GetLogDetails(log); }" class="data-grid-row data">
+			<div @onclick="() => { detailsDrawer = true; currentLog = log; }" class="data-grid-row data">
 				<div class="data-grid-cell text-overflow">
 					<div class="resource-badge" style="background-color: #@(GetHexString(log.ResourceName));"></div>
 					@log.ResourceName
@@ -85,7 +74,7 @@
 					@log.Severity
 				</div>
 				<div class="data-grid-cell">
-					@log.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")
+					@log.CreatedAt.ToString("dd.MM.yyyy HH:mm:ss")
 				</div>
 				<div class="data-grid-cell text-overflow">
 					<MudHighlighter Text="@log.Message" HighlightedText="@currentFilter"
@@ -131,16 +120,16 @@
 				@Localizer[Locales.Resource._Resource]
 				<b>@currentLog.ResourceName</b>
 				<div style="margin-left: auto;">
-					<b>@currentLog.Timestamp.Value.ToString("dd.MM.yyyy HH:mm:ss")</b>
+					<b>@currentLog.CreatedAt.ToString("dd.MM.yyyy HH:mm:ss")</b>
 				</div>
 			</div>
 			<div class="details-row">
 				<div class="details-key">Scope</div>
-				<div class="details-value text-overflow">@currentLog.ScopeName</div>
+				<div class="details-value text-overflow">@currentLog.Scope</div>
 			</div>
 			<div class="details-row">
 				<div class="details-key">Service instance</div>
-				<div class="details-value text-overflow">@currentLog.ServiceInstanceId</div>
+				<div class="details-value text-overflow">@currentLog.ServiceInstance</div>
 			</div>
 			<div class="details-row">
 				<div class="details-key">Trace Id</div>
@@ -160,7 +149,7 @@
 			</div>
 			<div class="details-row">
 				<div class="details-key">Message</div>
-				<div class="details-value" style="font-family: Consolas; color: #CE9178;">
+				<div class="details-value message" style="font-family: Consolas; color: #CE9178;">
 					@currentLog.Message
 				</div>
 			</div>

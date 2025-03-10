@@ -39,7 +39,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private List<LogsRoot> logsRoot { get; set; } = new();
+    private List<Log> logs { get; set; } = new();
 
     private string? currentRoute =>
         $"/structuredlogs/{currentResource}" +
@@ -105,7 +105,7 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private bool detailsDrawer { get; set; } = false;
 
-    private LogDetailsView currentLog { get; set; } = null;
+    private Log currentLog { get; set; } = null;
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -135,11 +135,11 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
 
     private async Task LoadLogs()
     {
-        List<LogsRoot> result;
+        List<Log> result;
 
-        if (MemoryCache.TryGetValue("structuredlogs", out List<LogsRoot> cachedLogs))
+        if (MemoryCache.TryGetValue("structuredlogs", out List<Log> cachedLogs))
         {
-            logsRoot = cachedLogs;
+            logs = cachedLogs;
             this.StateHasChanged();
 
             if (bool.Parse(Configuration["LazyLoading"]))
@@ -161,10 +161,10 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
                     currentResource);
             }
 
-            if (result.Count != logsRoot.Count)
+            if (result.Count != logs.Count)
             {
                 MemoryCache.Set("structuredlogs", result);
-                logsRoot = result;
+                logs = result;
                 this.StateHasChanged();
             }
         }
@@ -190,19 +190,19 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             }
             
             MemoryCache.Set("structuredlogs", result);
-            logsRoot = result;
+            logs = result;
             this.StateHasChanged();
         }
 
         page = 1;
     }
 
-    private void OnLogsUpdated(LogsRoot log)
+    private void OnLogsUpdated(Log log)
     {
-        if (log != null)
+        if (log != null && !log.ContainsReqRes())
         {
-            logsRoot.Add(log);
-            MemoryCache.Set("structuredlogs", logsRoot);
+            logs.Add(log);
+            MemoryCache.Set("structuredlogs", logs);
             this.StateHasChanged();
         }
     }
@@ -220,8 +220,8 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
                 currentFilter,
                 page,
                 10);
-            logsRoot.AddRange(result);
-            MemoryCache.Set("structuredlogs", logsRoot);
+            logs.AddRange(result);
+            MemoryCache.Set("structuredlogs", logs);
             this.StateHasChanged();
         }
     }
