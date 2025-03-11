@@ -276,9 +276,9 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a log</returns>
-    public async Task<LogsRoot> GetLogAsync(string traceId)
+    public async Task<List<Log>> GetLogsByTraceAsync(string traceId)
     {
-        var collection = _database.GetCollection<LogsRoot>("Logs");
-        return await collection.Find(x => x.Id == traceId).FirstOrDefaultAsync();
+        var collection = _database.GetCollection<Log>("Logs");
+        return await collection.Find(x => x.TraceId == traceId).ToListAsync();
     }
 }

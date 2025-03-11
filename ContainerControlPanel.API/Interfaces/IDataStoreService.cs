@@ -98,9 +98,9 @@ public interface IDataStoreService
         int pageSize);
 
     /// <summary>
-    /// Gets a log
+    /// Gets a list of logs by trace id
     /// </summary>
     /// <param name="traceId">Trace ID</param>
-    /// <returns>Returns a log</returns>
-    Task<LogsRoot> GetLogAsync(string traceId);
+    /// <returns>Returns a list of logs</returns>
+    Task<List<Log>> GetLogsByTraceAsync(string traceId);
 }

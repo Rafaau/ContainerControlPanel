@@ -441,20 +441,20 @@ public static class LogsExtensions
     /// </summary>
     /// <param name="logsRoot">Logs root object</param>
     /// <returns>Returns the request response object</returns>
-    public static RequestResponse? GetRequestResponse(this LogsRoot logsRoot)
+    public static RequestResponse? GetRequestResponse(this List<Log> logs)
     {
-        var request = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[REQUEST]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[REQUEST]"));
-        var response = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[RESPONSE]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[RESPONSE]"));
+        var request = logs.Find(x => x.Message.Contains("[REQUEST]"))?.Message;
+        var response = logs.Find(x => x.Message.Contains("[RESPONSE]"))?.Message;
 
         if (request != null || response != null)
         {
             var requestJson = request is null 
                 ? null 
-                : JsonObject.Parse(request.Body.StringValue.Replace("[REQUEST]", ""));
+                : JsonObject.Parse(request.Replace("[REQUEST]", ""));
             return new RequestResponse
             {
                 Request = JsonSerializer.Deserialize<Request>(requestJson) ?? null,
-                Response = response.Body.StringValue.Replace("[RESPONSE]", "") ?? null
+                Response = response?.Replace("[RESPONSE]", "") ?? null
             };
         }
 

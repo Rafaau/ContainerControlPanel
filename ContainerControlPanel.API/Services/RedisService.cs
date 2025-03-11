@@ -215,10 +215,18 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a log</returns>
-    public async Task<LogsRoot> GetLogAsync(string traceId)
+    public async Task<List<Log>> GetLogsByTraceAsync(string traceId)
     {
+        List<Log> logs = new();
         var result = await ScanKeysByPatternAsync($"log{traceId}");
-        return JsonSerializer.Deserialize<LogsRoot>(result[0]);
+
+        foreach (var item in result)
+        {
+            var deserialized = JsonSerializer.Deserialize<Log>(item);
+            logs.Add(deserialized);
+        }
+
+        return logs;
     }
 
     /// <summary>

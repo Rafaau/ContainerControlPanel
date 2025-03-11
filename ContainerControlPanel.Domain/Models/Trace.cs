@@ -4,6 +4,41 @@ using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
+public class Trace
+{
+    /// <summary>
+    /// Gets or sets the ID of the trace
+    /// </summary>
+    public string Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DateTime when the trace was created
+    /// </summary>
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Gets or sets the timestamp
+    /// </summary>
+    public DateTime Timestamp { get; set; }
+
+    /// <summary>
+    /// Gets or sets the request
+    /// </summary>
+    public string Request { get; set; }
+
+    /// <summary>
+    /// Gets or sets the source
+    /// </summary>
+    public List<string> Source { get; set; }
+
+    /// <summary>
+    /// Gets or sets the duration
+    /// </summary>
+    public TimeSpan Duration { get; set; }
+}
+
 /// <summary>
 /// Class to represent a trace output
 /// </summary>
