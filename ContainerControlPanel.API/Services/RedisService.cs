@@ -90,7 +90,7 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="trace">Traces to save</param>
     /// <param name="traceId">ID of the trace</param>
-    public async Task SaveTraceAsync(TracesRoot trace, string traceId)
+    public async Task SaveTraceAsync(Trace trace, string traceId)
     {
         string value = JsonSerializer.Serialize(trace);
         await SetValueAsync($"trace{traceId}{Guid.NewGuid().ToString()}", value, TimeSpan.FromDays(14));
@@ -116,22 +116,22 @@ public class RedisService : IDataStoreService
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
-    public async Task<List<TracesRoot>> GetTracesAsync(
+    public async Task<List<Trace>> GetTracesAsync(
         int timeOffset, 
         string? resource, 
         string? timestamp,
         int page,
         int pageSize)
     {
-        List<TracesRoot> traces = new();
+        List<Trace> traces = new();
         var result = await ScanKeysByPatternAsync("trace");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
+            var deserialized = JsonSerializer.Deserialize<Trace>(item);
 
-            if ((resource == "all" || deserialized.HasResource(resource))
-                && (string.IsNullOrEmpty(timestamp) || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
+            if ((resource == "all" || deserialized.ResourceName == resource)
+                && (string.IsNullOrEmpty(timestamp) || deserialized.Timestamp.Date == DateTime.Parse(timestamp).Date))
                 traces.Add(deserialized);
         }
 

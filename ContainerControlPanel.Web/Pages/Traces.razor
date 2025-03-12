@@ -17,13 +17,6 @@
 	}
 </div>
 
-@{
-	List<ResourceSpan> traces = allTraces.GetTracesList(
-		routesOnly: routesOnly, 
-		timeOffset: int.Parse(Configuration["TimeOffset"])
-	);
-}
-
 <div class="flex">
 	<div class="resource-select">	
 		<MudSelect T="string" Label="@Localizer[Locales.Resource.ChooseResource]" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
@@ -61,7 +54,7 @@
 			@Localizer[Locales.Resource.Duration]
 		</div>
 	</div>
-	@if (traces.Count < 1)
+	@if (allTraces.Count < 1)
 	{
 		<div class="not-found">
 			@Localizer[Locales.Resource.NoTracesFound].
@@ -70,12 +63,9 @@
 	else 
 	{
 		<div class="data-container">			
-			@{
-				var groupedTraces = traces.GroupTraces(int.Parse(Configuration["TimeOffset"]));
-			}
-			@foreach (var trace in groupedTraces)
+			@foreach (var trace in allTraces)
 			{
-				<div @onclick="() => { LoadTrace(trace.TraceId); }" class="data-grid-row data">
+				<div @onclick="() => { LoadTrace(trace.Id); }" class="data-grid-row data">
 					<div class="data-grid-cell">
 						@if (trace.Timestamp.Date == DateTime.Now.Date)
 						{
@@ -106,7 +96,7 @@
 					<div class="data-grid-cell">
 						<div class="text-overflow">@trace.Request</div>
 						<div class="trace-id">
-							@trace.TraceId
+							@trace.Id
 						</div>
 					</div>
 					<div class="data-grid-cell">
@@ -135,7 +125,7 @@
 			<InfiniteScrolling OnScrollToEnd="@LoadMoreTraces"/>
 		</div>
 		<div class="footer">
-			@Localizer[Locales.Resource.TotalNumberOfFoundTraces]: <b>@groupedTraces.Count</b>
+			@Localizer[Locales.Resource.TotalNumberOfFoundTraces]: <b>@allTraces.Count</b>
 		</div>
 	}
 </div>

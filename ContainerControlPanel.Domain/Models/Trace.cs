@@ -11,6 +11,8 @@ public class Trace
     /// </summary>
     public string Id { get; set; }
 
+    public string ResourceName { get; set; }
+
     /// <summary>
     /// Gets or sets the DateTime when the trace was created
     /// </summary>
@@ -37,6 +39,8 @@ public class Trace
     /// Gets or sets the duration
     /// </summary>
     public TimeSpan Duration { get; set; }
+
+    public List<Span> Spans { get; set; }
 }
 
 /// <summary>
@@ -428,6 +432,9 @@ public static class TracesExtensions
                      .Distinct()
                      .ToList();
 
+    public static List<string> GetResources(this List<Trace> traces)
+        => traces.Select(r => r.ResourceName).ToList();
+
     /// <summary>
     /// Gets the service name
     /// </summary>
@@ -520,10 +527,24 @@ public static class TracesExtensions
             else
             {
                 traceList.Add(traceListItem);
-            }               
+            }
         }
 
         return traceList;
+    }
+
+    public static Trace GetTrace(this TracesRoot tracesRoot, Span span)
+    {
+        return new Trace
+        {
+            Id = span.TraceId,
+            ResourceName = tracesRoot.GetResourceName(),
+            Timestamp = tracesRoot.GetTimestamp(1),
+            Request = span.Name,
+            Source = new List<string> { tracesRoot.GetResourceName() },
+            Duration = span.GetDuration(),
+            Spans = tracesRoot.GetSpans()
+        };
     }
 }
 

@@ -128,10 +128,10 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="trace">Trace to save</param>
     /// <param name="traceId">Trace ID</param>
-    public async Task SaveTraceAsync(TracesRoot trace, string? traceId = "")
+    public async Task SaveTraceAsync(Trace trace, string? traceId = "")
     {
         trace.Id = traceId;
-        var collection = _database.GetCollection<TracesRoot>("Traces");
+        var collection = _database.GetCollection<Trace>("Traces");
         await collection.InsertOneAsync(trace);
     }
 
@@ -155,16 +155,16 @@ public class MongoService : IDataStoreService
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
-    public async Task<List<TracesRoot>> GetTracesAsync(
+    public async Task<List<Trace>> GetTracesAsync(
         int timeOffset, 
         string? resource, 
         string? timestamp,
         int page,
         int pageSize)
     {
-        var collection = _database.GetCollection<TracesRoot>("Traces");
+        var collection = _database.GetCollection<Trace>("Traces");
 
-        var filterBuilder = Builders<TracesRoot>.Filter;
+        var filterBuilder = Builders<Trace>.Filter;
         var filterD = filterBuilder.Empty;
 
         if (!string.IsNullOrEmpty(timestamp) && timestamp != null)

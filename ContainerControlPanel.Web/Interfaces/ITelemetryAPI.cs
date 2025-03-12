@@ -16,7 +16,7 @@ public interface ITelemetryAPI
     /// <param name="timestamp">Timestamp.</param>
     /// <returns>Returns the list of traces.</returns>
     [Get("/v1/getTraces?resource={resource}&timestamp={timestamp}&timeOffset={timeOffset}&page={page}&pageSize={pageSize}")]
-    Task<List<TracesRoot>> GetTraces(int timeOffset, string? resource = null, string? timestamp = null, int page = 0, int pageSize = 0);
+    Task<List<Trace>> GetTraces(int timeOffset, string? resource = null, string? timestamp = null, int page = 0, int pageSize = 0);
 
     /// <summary>
     /// Gets the metrics.

@@ -44,7 +44,7 @@ public interface IDataStoreService
     /// </summary>
     /// <param name="trace">Traces to save</param>
     /// <param name="traceId">Trace ID</param>
-    Task SaveTraceAsync(TracesRoot trace, string? traceId = "");
+    Task SaveTraceAsync(Trace trace, string? traceId = "");
 
     /// <summary>
     /// Saves logs
@@ -62,7 +62,7 @@ public interface IDataStoreService
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
-    Task<List<TracesRoot>> GetTracesAsync(int timeOffset, string? resource, string? timestamp, int page, int pageSize);
+    Task<List<Trace>> GetTracesAsync(int timeOffset, string? resource, string? timestamp, int page, int pageSize);
 
     /// <summary>
     /// Gets a trace

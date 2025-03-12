@@ -222,14 +222,14 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
     {
         var result = await telemetryAPI
             .GetTraces(int.Parse(Configuration["TimeOffset"]), ResourceName, null, 0, 0);
-        traces = result.GetTracesList(routesOnly: true);
+        //traces = result.GetTracesList(routesOnly: true);
     }
     
-    private void OnTracesUpdated(TracesRoot tracesRoot)
+    private void OnTracesUpdated(ContainerControlPanel.Domain.Models.Trace trace)
     {
-        if (tracesRoot != null && tracesRoot.HasResource(ResourceName))
+        if (trace != null && trace.ResourceName == ResourceName)
         {
-            traces.AddRange(tracesRoot.ResourceSpans);
+            //traces.AddRange(trace);
             this.StateHasChanged();
         }
     }

@@ -82,7 +82,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private List<TracesRoot> allTraces { get; set; } = new();
+    private List<ContainerControlPanel.Domain.Models.Trace> allTraces { get; set; } = new();
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -112,8 +112,8 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private async Task LoadTraces()
     {
-        List<TracesRoot> result = new();
-        if (MemoryCache.TryGetValue("traces", out List<TracesRoot> cachedTraces))
+        List<ContainerControlPanel.Domain.Models.Trace> result = new();
+        if (MemoryCache.TryGetValue("traces", out List<ContainerControlPanel.Domain.Models.Trace> cachedTraces))
         {
             allTraces = cachedTraces;
             this.StateHasChanged();
@@ -167,7 +167,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         page = 1;
     }
 
-    private void OnTracesUpdated(TracesRoot traces)
+    private void OnTracesUpdated(ContainerControlPanel.Domain.Models.Trace traces)
     {
         if (traces != null)
         {

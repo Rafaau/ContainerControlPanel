@@ -87,23 +87,16 @@ public class TelemetryController : ControllerBase
                 if (span.Name == "GET /docs")
                     continue;
 
-                tracesRoot.ResourceSpans[0].ScopeSpans.Clear();
-                tracesRoot.ResourceSpans[0].ScopeSpans.Add(new ScopeSpan
-                {
-                    Scope = new Scope { Name = "System.Net.Http" },
-                    Spans = new List<Span> { span }
-                });
+                Trace trace = tracesRoot.GetTrace(span);
 
                 var message = new WebSocketMessage
                 {
                     Type = WebSocketMessageType.Traces,
-                    Data = tracesRoot
+                    Data = trace
                 };
 
-                tracesRoot.ResourceName = tracesRoot.GetResourceName();
-
                 string json = JsonSerializer.Serialize(message);
-                await _dataStoreService.SaveTraceAsync(tracesRoot, span.TraceId);
+                await _dataStoreService.SaveTraceAsync(trace, span.TraceId);
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
            
@@ -171,7 +164,7 @@ public class TelemetryController : ControllerBase
     {
         try
         {
-            List<TracesRoot> traces = 
+            List<Trace> traces = 
                 await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp, page, pageSize);
 
             return Ok(traces);

@@ -18,7 +18,7 @@ public class WebSocketService
     /// <summary>
     /// Event for traces updated.
     /// </summary>
-    public event Action<TracesRoot>? TracesUpdated;
+    public event Action<Trace>? TracesUpdated;
 
     /// <summary>
     /// Event for metrics updated.
@@ -61,7 +61,7 @@ public class WebSocketService
             switch (message.Type)
             {
                 case Domain.Models.WebSocketMessageType.Traces:
-                    var trace = JsonSerializer.Deserialize<TracesRoot>(message.Data.ToString());
+                    var trace = JsonSerializer.Deserialize<Trace>(message.Data.ToString());
                     TracesUpdated?.Invoke(trace);
                     break;
 
