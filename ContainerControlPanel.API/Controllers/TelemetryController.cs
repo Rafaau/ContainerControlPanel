@@ -186,8 +186,8 @@ public class TelemetryController : ControllerBase
     {
         try
         {
-            List<TracesRoot> traces = await _dataStoreService.GetTraceAsync(traceId);
-            return Ok(traces);
+            Trace trace = await _dataStoreService.GetTraceAsync(traceId);
+            return Ok(trace);
         }
         catch (Exception ex)
         {

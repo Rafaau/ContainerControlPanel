@@ -31,7 +31,7 @@ public interface ITelemetryAPI
     /// <param name="traceId">Trace ID.</param>
     /// <returns>Returns the list of traces.</returns
     [Get("/v1/getTrace?traceId={traceId}")]
-    Task<List<TracesRoot>> GetTrace(string traceId);
+    Task<Trace> GetTrace(string traceId);
 
     /// <summary>
     /// Gets the logs.

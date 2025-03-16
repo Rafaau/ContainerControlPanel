@@ -26,7 +26,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private List<TracesRoot> traceRoots { get; set; } = new();
+    private ContainerControlPanel.Domain.Models.Trace trace { get; set; }
 
     private List<Span> spans { get; set; }
 
@@ -56,7 +56,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private async Task LoadTrace()
     {
-        traceRoots = await telemetryAPI.GetTrace(TraceId);
+        trace = await telemetryAPI.GetTrace(TraceId);
         LoadSpans();
     }
 
@@ -85,10 +85,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private void LoadSpans()
     {
-        spans = traceRoots
-            .SelectMany(x => x.ResourceSpans.SelectMany(x => x.ScopeSpans.Select(x => x.Spans[0])))
-            .OrderByDescending(s => s.GetDuration())
-            .ToList();
+        spans = trace.Spans;
 
         currentSpan = spans[0];
         start = spans[0].GetStartDate(int.Parse(Configuration["TimeOffset"]));

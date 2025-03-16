@@ -196,10 +196,10 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a list of traces</returns>
-    public async Task<List<TracesRoot>> GetTraceAsync(string traceId)
+    public async Task<Trace> GetTraceAsync(string traceId)
     {
-        var collection = _database.GetCollection<TracesRoot>("Traces");
-        return await collection.Find(x => x.Id == traceId).ToListAsync();
+        var collection = _database.GetCollection<Trace>("Traces");
+        return await collection.Find(x => x.Id == traceId).FirstOrDefaultAsync();
     }
 
     /// <summary>

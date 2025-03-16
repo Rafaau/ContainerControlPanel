@@ -69,7 +69,7 @@ public interface IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a trace</returns>
-    Task<List<TracesRoot>> GetTraceAsync(string traceId);
+    Task<Trace> GetTraceAsync(string traceId);
 
     /// <summary>
     /// Gets a list of metrics
