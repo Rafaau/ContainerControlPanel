@@ -108,21 +108,23 @@ public class RedisService : IDataStoreService
     }
 
     /// <summary>
-    /// Gets a list of traces
+    /// Gets traces from the MongoDB data store
     /// </summary>
     /// <param name="timeOffset">Time offset</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="timestamp">Timestamp</param>
+    /// <param name="routesOnly">Flag to get only routes</param>
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
     public async Task<List<Trace>> GetTracesAsync(
-        int timeOffset, 
-        string? resource, 
+        int timeOffset,
+        string? resource,
         string? timestamp,
+        bool routesOnly,
         int page,
         int pageSize)
-    {
+    {      
         List<Trace> traces = new();
         var result = await ScanKeysByPatternAsync("trace");
 

@@ -152,6 +152,7 @@ public class MongoService : IDataStoreService
     /// <param name="timeOffset">Time offset</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="timestamp">Timestamp</param>
+    /// <param name="routesOnly">Flag to get only routes</param>
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
@@ -159,6 +160,7 @@ public class MongoService : IDataStoreService
         int timeOffset, 
         string? resource, 
         string? timestamp,
+        bool routesOnly,
         int page,
         int pageSize)
     {
@@ -181,6 +183,12 @@ public class MongoService : IDataStoreService
             filterD &= filterBuilder.Eq(x => x.ResourceName, resource);
         }
 
+        if (routesOnly)
+        {
+            var requestWordCountFilter = filterBuilder.Regex(x => x.Request, new MongoDB.Bson.BsonRegularExpression(@"^\S+\s+\S+"));
+            filterD &= requestWordCountFilter;
+        }
+        
         var query = collection.Find(filterD).SortByDescending(x => x.CreatedAt);
 
         if (page > 0 && pageSize > 0)

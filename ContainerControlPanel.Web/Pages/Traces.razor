@@ -23,7 +23,7 @@
 			<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
 			@if (allTraces.Count > 0)
 			{
-				@foreach (var resource in allTraces.GetResources())
+				@foreach (var resource in allTraces.Select(x => x.ResourceName).Distinct())
 				{
 					<MudSelectItem Value="@(resource)">@resource</MudSelectItem>
 				}
@@ -63,7 +63,7 @@
 	else 
 	{
 		<div class="data-container">			
-			@foreach (var trace in allTraces)
+			@foreach (var trace in allTraces.OrderByDescending(x => x.Timestamp))
 			{
 				<div @onclick="() => { LoadTrace(trace.Id); }" class="data-grid-row data">
 					<div class="data-grid-cell">

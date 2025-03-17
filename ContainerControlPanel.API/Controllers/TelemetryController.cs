@@ -159,13 +159,14 @@ public class TelemetryController : ControllerBase
         int timeOffset, 
         string? resource, 
         string? timestamp,
+        bool routesOnly = false,
         int page = 0,
         int pageSize = 0)
     {
         try
         {
             List<Trace> traces = 
-                await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp, page, pageSize);
+                await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp, routesOnly, page, pageSize);
 
             return Ok(traces);
         }
