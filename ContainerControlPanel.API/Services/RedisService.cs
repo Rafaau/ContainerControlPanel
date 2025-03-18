@@ -78,7 +78,7 @@ public class RedisService : IDataStoreService
     /// <param name="metrics">Metrics to save</param>
     /// <param name="serviceName">Name of the service</param>
     /// <param name="routeName">Name of the route</param>
-    public async Task SaveMetricsAsync(MetricsRoot metrics, string serviceName, string routeName)
+    public async Task SaveMetricsAsync(Metrics metrics, string serviceName, string routeName)
     {
         string value = JsonSerializer.Serialize(metrics);
         await SetValueAsync($"metrics{serviceName}{routeName}", value, TimeSpan.FromDays(14));
@@ -156,14 +156,14 @@ public class RedisService : IDataStoreService
     /// Gets a list of metrics
     /// </summary>
     /// <returns>Returns a list of metrics</returns>
-    public async Task<List<MetricsRoot>> GetMetricsAsync()
+    public async Task<List<Metrics>> GetMetricsAsync()
     {
-        List<MetricsRoot> metrics = new();
+        List<Metrics> metrics = new();
         var result = await ScanKeysByPatternAsync("metrics");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<MetricsRoot>(item);
+            var deserialized = JsonSerializer.Deserialize<Metrics>(item);
             metrics.Add(deserialized);
         }
 

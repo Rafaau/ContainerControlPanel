@@ -31,8 +31,8 @@ public class MongoService : IDataStoreService
     /// <returns></returns>
     public async Task InitializeAsync()
     {
-        var metricsCollection = _database.GetCollection<MetricsRoot>("Metrics");
-        var tracesCollection = _database.GetCollection<TracesRoot>("Traces");
+        var metricsCollection = _database.GetCollection<Metrics>("Metrics");
+        var tracesCollection = _database.GetCollection<Trace>("Traces");
         var logsCollection = _database.GetCollection<Log>("Logs");
 
         var metricsIndexes = await metricsCollection.Indexes.List().ToListAsync();
@@ -40,8 +40,8 @@ public class MongoService : IDataStoreService
 
         if (!metricsTTLIndexExists)
         {
-            var metricsIndexModel = new CreateIndexModel<MetricsRoot>(
-                Builders<MetricsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
+            var metricsIndexModel = new CreateIndexModel<Metrics>(
+                Builders<Metrics>.IndexKeys.Ascending(x => x.CreatedAt),
                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await metricsCollection.Indexes.CreateOneAsync(metricsIndexModel);
         }
@@ -51,8 +51,8 @@ public class MongoService : IDataStoreService
 
         if (!tracesTTLIndexExists)
         {
-            var tracesIndexModel = new CreateIndexModel<TracesRoot>(
-                Builders<TracesRoot>.IndexKeys.Ascending(x => x.CreatedAt),
+            var tracesIndexModel = new CreateIndexModel<Trace>(
+                Builders<Trace>.IndexKeys.Ascending(x => x.CreatedAt),
                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await tracesCollection.Indexes.CreateOneAsync(tracesIndexModel);
         }
@@ -117,9 +117,9 @@ public class MongoService : IDataStoreService
     /// <param name="metrics">Metrics to save</param>
     /// <param name="serviceName">Name of the service</param>
     /// <param name="routeName">Name of the route</param>
-    public async Task SaveMetricsAsync(MetricsRoot metrics, string? serviceName = "", string? routeName = "")
+    public async Task SaveMetricsAsync(Metrics metrics, string? serviceName = "", string? routeName = "")
     {
-        var collection = _database.GetCollection<MetricsRoot>("Metrics");
+        var collection = _database.GetCollection<Metrics>("Metrics");
         await collection.InsertOneAsync(metrics);
     }
 
@@ -214,9 +214,9 @@ public class MongoService : IDataStoreService
     /// Gets metrics from the MongoDB data store
     /// </summary>
     /// <returns>Returns a list of metrics</returns>
-    public async Task<List<MetricsRoot>> GetMetricsAsync()
+    public async Task<List<Metrics>> GetMetricsAsync()
     {
-        var collection = _database.GetCollection<MetricsRoot>("Metrics");
+        var collection = _database.GetCollection<Metrics>("Metrics");
         return await collection.Aggregate().ToListAsync();
     }
 

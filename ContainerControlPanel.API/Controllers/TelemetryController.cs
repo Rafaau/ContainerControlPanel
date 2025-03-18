@@ -40,23 +40,24 @@ public class TelemetryController : ControllerBase
         {
             MessageBindable<ExportMetricsServiceRequest>? bindable =
                 await MessageBindable<ExportMetricsServiceRequest>.BindAsync(HttpContext, null);
-
-            var message = new WebSocketMessage
-            {
-                Type = WebSocketMessageType.Metrics,
-                Data = bindable?.Message.ToString()
-            };
-
+           
             MetricsRoot metricsRoot = JsonSerializer.Deserialize<MetricsRoot>(bindable?.Message.ToString());
             string? serviceName = metricsRoot?.GetResource()?.GetResourceName();
             string? routeName = metricsRoot?.GetRouteName();
-
-            string json = JsonSerializer.Serialize(message);
-            
+     
             if (serviceName != null 
                 && routeName != null)
             {
-                await _dataStoreService.SaveMetricsAsync(metricsRoot, serviceName, routeName);               
+                Metrics metrics = metricsRoot.GetMetrics();
+
+                var message = new WebSocketMessage
+                {
+                    Type = WebSocketMessageType.Metrics,
+                    Data = metrics
+                };
+                string json = JsonSerializer.Serialize(message);
+
+                await _dataStoreService.SaveMetricsAsync(metrics, serviceName, routeName);               
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
                  
@@ -94,8 +95,8 @@ public class TelemetryController : ControllerBase
                     Type = WebSocketMessageType.Traces,
                     Data = trace
                 };
-
                 string json = JsonSerializer.Serialize(message);
+
                 await _dataStoreService.SaveTraceAsync(trace, span.TraceId);
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
@@ -118,23 +119,22 @@ public class TelemetryController : ControllerBase
         try
         {
             MessageBindable<ExportLogsServiceRequest>? bindable =
-                await MessageBindable<ExportLogsServiceRequest>.BindAsync(HttpContext, null);
-
-            var message = new WebSocketMessage
-            {
-                Type = WebSocketMessageType.Logs,
-                Data = bindable?.Message.ToString()
-            };
+                await MessageBindable<ExportLogsServiceRequest>.BindAsync(HttpContext, null);         
 
             LogsRoot logsRoot = JsonSerializer.Deserialize<LogsRoot>(bindable?.Message.ToString());
 
             foreach (var logRecord in logsRoot.GetLogRecords())
             {
                 Log log = logsRoot.GetLog(logRecord);
-                await _dataStoreService.SaveLogAsync(log, logRecord.TraceId);
 
-                message.Data = log;
+                var message = new WebSocketMessage
+                {
+                    Type = WebSocketMessageType.Logs,
+                    Data = log
+                };
                 string json = JsonSerializer.Serialize(message);
+
+                await _dataStoreService.SaveLogAsync(log, logRecord.TraceId);         
                 await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
             }
        
@@ -206,7 +206,7 @@ public class TelemetryController : ControllerBase
     {
         try
         {
-            List<MetricsRoot> metrics = await _dataStoreService.GetMetricsAsync();
+            List<Metrics> metrics = await _dataStoreService.GetMetricsAsync();
             return Ok(metrics);
         }
         catch (Exception ex)

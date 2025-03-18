@@ -4,6 +4,27 @@ using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
+public class Metrics
+{
+    /// <summary>
+    /// Gets or sets the ID of the metrics
+    /// </summary>
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
+
+    public string ResourceName { get; set; }
+
+    public List<ScopeMetric> ScopeMetrics { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DateTime when the metrics were created
+    /// </summary>
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+}
+
 /// <summary>
 /// Class to represent the metrics output
 /// </summary>
@@ -177,6 +198,8 @@ public class ScopeMetric
     [JsonPropertyName("scope")]
     public Scope Scope { get; set; }
 
+    public string ScopeName { get; set; }
+
     /// <summary>
     /// Gets or sets the metrics
     /// </summary>
@@ -316,6 +339,14 @@ public static class MetricsExtensions
     /// <returns>Returns the timestamp</returns>
     public static string CalculateP99Seconds(this DataPoint dataPoint)
         => CalculatePercentile(dataPoint, 99).ToString("0.000");
+
+    public static Metrics GetMetrics(this MetricsRoot metricsRoot)
+        => new()
+        {
+            Id = metricsRoot.Id,
+            ResourceName = metricsRoot?.GetResource()?.GetResourceName(),
+            ScopeMetrics = metricsRoot.ResourceMetrics.SelectMany(rm => rm.ScopeMetrics).ToList()
+        };
 
     /// <summary>
     /// Calculates the percentile

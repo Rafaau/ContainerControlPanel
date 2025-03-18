@@ -37,7 +37,7 @@ public interface IDataStoreService
     /// <param name="metrics">Metrics to save</param>
     /// <param name="serviceName">Name of the service</param>
     /// <param name="routeName">Name of the route</param>
-    Task SaveMetricsAsync(MetricsRoot metrics, string? serviceName = "", string? routeName = "");
+    Task SaveMetricsAsync(Metrics metrics, string? serviceName = "", string? routeName = "");
 
     /// <summary>
     /// Saves traces
@@ -82,7 +82,7 @@ public interface IDataStoreService
     /// Gets a list of metrics
     /// </summary>
     /// <returns>Returns a list of metrics</returns>
-    Task<List<MetricsRoot>> GetMetricsAsync();
+    Task<List<Metrics>> GetMetricsAsync();
 
     /// <summary>
     /// Gets a list of logs
