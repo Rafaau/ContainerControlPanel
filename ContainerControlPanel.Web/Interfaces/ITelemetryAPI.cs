@@ -23,7 +23,7 @@ public interface ITelemetryAPI
     /// </summary>
     /// <returns>Returns the list of metrics.</returns>
     [Get("/v1/getMetrics")]
-    Task<List<MetricsRoot>> GetMetrics();
+    Task<List<Metrics>> GetMetrics();
 
     /// <summary>
     /// Gets the trace.

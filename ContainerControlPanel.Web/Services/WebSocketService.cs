@@ -23,7 +23,7 @@ public class WebSocketService
     /// <summary>
     /// Event for metrics updated.
     /// </summary>
-    public event Action<MetricsRoot>? MetricsUpdated;
+    public event Action<Metrics>? MetricsUpdated;
 
     /// <summary>
     /// Event for logs updated.
@@ -66,7 +66,7 @@ public class WebSocketService
                     break;
 
                 case Domain.Models.WebSocketMessageType.Metrics:
-                    var metrics = JsonSerializer.Deserialize<MetricsRoot>(message.Data.ToString());
+                    var metrics = JsonSerializer.Deserialize<Metrics>(message.Data.ToString());
                     MetricsUpdated?.Invoke(metrics);
                     break;
 

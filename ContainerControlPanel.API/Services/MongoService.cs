@@ -120,7 +120,7 @@ public class MongoService : IDataStoreService
     public async Task SaveMetricsAsync(Metrics metrics, string? serviceName = "", string? routeName = "")
     {
         var collection = _database.GetCollection<Metrics>("Metrics");
-        await collection.InsertOneAsync(metrics);
+        await collection.ReplaceOneAsync(x => x.ResourceName == metrics.ResourceName, metrics, new ReplaceOptions { IsUpsert = true });
     }
 
     /// <summary>

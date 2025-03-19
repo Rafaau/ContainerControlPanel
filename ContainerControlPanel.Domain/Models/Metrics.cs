@@ -198,8 +198,6 @@ public class ScopeMetric
     [JsonPropertyName("scope")]
     public Scope Scope { get; set; }
 
-    public string ScopeName { get; set; }
-
     /// <summary>
     /// Gets or sets the metrics
     /// </summary>
