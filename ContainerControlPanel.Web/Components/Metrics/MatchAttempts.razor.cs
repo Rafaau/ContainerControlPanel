@@ -25,7 +25,7 @@ public partial class MatchAttempts(ITelemetryAPI telemetryAPI) : IDisposable
     IConfiguration Configuration { get; set; }
 
     [Parameter]
-    public Metric Metric { get; set; }
+    public ContainerControlPanel.Domain.Models.Metric Metric { get; set; }
 
     [Parameter]
     public string ResourceName { get; set; }

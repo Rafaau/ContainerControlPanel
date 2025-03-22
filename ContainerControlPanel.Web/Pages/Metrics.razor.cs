@@ -59,12 +59,12 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
             return allMetrics
                 .FirstOrDefault(x => x.ResourceName == currentResource)?.ScopeMetrics
-                .FirstOrDefault().Metrics
-                .FirstOrDefault(x => x.Name == MetricParameter);
+                .FirstOrDefault(x => x.Metrics.Any(x => x.Name == MetricParameter.Replace("-", "."))).Metrics
+                .FirstOrDefault(x => x.Name == MetricParameter.Replace("-", "."));
         }
         set
         {
-            MetricParameter = value?.Name;
+            MetricParameter = value?.Name.Replace(".", "-");
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastMetricsHref", currentRoute);
         }

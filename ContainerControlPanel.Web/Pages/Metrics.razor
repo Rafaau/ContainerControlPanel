@@ -70,12 +70,12 @@
 
 			if (currentMetric.Name == "http.server.request.duration") 
 			{
-				<RequestDuration Metric="currentMetric" ResourceName="@currentResource" />				
+				<Metric Metrics="currentMetric" ResourceName="@currentResource" />				
 			}
 
 			if (currentMetric.Name == "aspnetcore.routing.match_attempts") 
 			{
-				<MatchAttempts Metric="currentMetric" ResourceName="@currentResource" />
+				<Metric Metrics="currentMetric" ResourceName="@currentResource" />
 			}
 		}
 		else 
