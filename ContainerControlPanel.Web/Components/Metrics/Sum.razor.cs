@@ -13,7 +13,7 @@ using ContainerControlPanel.Web.Services;
 
 namespace ContainerControlPanel.Web.Components.Metrics;
 
-public partial class Metric(ITelemetryAPI telemetryAPI) : IDisposable
+public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
 {
     [Inject]
     WebSocketService WebSocketService { get; set; }
@@ -25,7 +25,7 @@ public partial class Metric(ITelemetryAPI telemetryAPI) : IDisposable
     IConfiguration Configuration { get; set; }
 
     [Parameter]
-    public ContainerControlPanel.Domain.Models.Metric Metrics { get; set; }
+    public Metric Metrics { get; set; }
 
     [Parameter]
     public string ResourceName { get; set; }
@@ -34,7 +34,7 @@ public partial class Metric(ITelemetryAPI telemetryAPI) : IDisposable
 
     private string? currentDataPoint { get; set; } = "all";
 
-    private List<ContainerControlPanel.Domain.Models.Metric> metrics { get; set; } = new();
+    private List<Metric> metrics { get; set; } = new();
 
     private int timestamp = 5;
     private decimal averageDuration;
@@ -169,14 +169,7 @@ public partial class Metric(ITelemetryAPI telemetryAPI) : IDisposable
 
                 int lastValue = 0;
 
-                if (metrics.Last().Histogram != null)
-                {
-                    lastValue = int.Parse(metrics.Last().Histogram.DataPoints.Last().AsInt);
-                }
-                else
-                {
-                    lastValue = int.Parse(metrics.Last().Sum.DataPoints.Last().AsInt);
-                }
+                lastValue = int.Parse(metrics.Last().Sum.DataPoints.Last().AsInt);
 
                 var may = new List<object>
                 {
@@ -258,7 +251,7 @@ public partial class Metric(ITelemetryAPI telemetryAPI) : IDisposable
     {
         if (metrics != null)
         {
-            ContainerControlPanel.Domain.Models.Metric metricToAdd = metrics.ScopeMetrics
+            Metric metricToAdd = metrics.ScopeMetrics
                 .Find(x => x.Metrics.Any(x => x.Name == this.metrics.First().Name)).Metrics
                 .Find(x => x.Name == this.metrics.First().Name);
 

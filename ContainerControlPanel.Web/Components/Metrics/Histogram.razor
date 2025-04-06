@@ -1,0 +1,30 @@
+﻿@using ContainerControlPanel.Domain.Models;
+@using MudBlazor
+
+<div class="chart-container">
+	<PlotlyChart @bind-Config="config" @bind-Data="data" @ref="chart" @bind-Layout="layout" />
+	<div class="method-select">
+		<MudSelect Label="@Localizer[Locales.Resource.Method]" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseMethod]" TransformOrigin="Origin.TopCenter" @bind-Value="CurrentMethod">
+			<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "http.request.method").Value.StringValue).Distinct())
+			{
+				<MudSelectItem Value="@key">@key</MudSelectItem>
+			}
+		</MudSelect>
+	</div>
+	<div class="status-select">
+		<MudSelect Label="@Localizer[Locales.Resource.Status]" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseStatus]" TransformOrigin="Origin.TopCenter" @bind-Value="CurrentStatus">
+			<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "http.response.status_code").Value.IntValue).Distinct())
+			{
+				<MudSelectItem Value="@key">@key</MudSelectItem>
+			}
+		</MudSelect>
+	</div>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div class="refresh">
+			<MudIconButton @onclick="async () => { }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
+</div>

@@ -169,6 +169,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wybierz metodę.
+        /// </summary>
+        public static string ChooseMethod {
+            get {
+                return ResourceManager.GetString("ChooseMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wybierz zasób....
         /// </summary>
         public static string ChooseResource {
@@ -201,6 +210,15 @@ namespace Locales {
         public static string ChooseSeverity {
             get {
                 return ResourceManager.GetString("ChooseSeverity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wybierz status.
+        /// </summary>
+        public static string ChooseStatus {
+            get {
+                return ResourceManager.GetString("ChooseStatus", resourceCulture);
             }
         }
         
@@ -570,6 +588,15 @@ namespace Locales {
         public static string Message {
             get {
                 return ResourceManager.GetString("Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metoda.
+        /// </summary>
+        public static string Method {
+            get {
+                return ResourceManager.GetString("Method", resourceCulture);
             }
         }
         

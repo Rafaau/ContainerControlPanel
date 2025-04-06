@@ -50,7 +50,8 @@
 						<NestedList>
 							@foreach (var metric in scopeMetric.Metrics) 
 							{
-								<MudListItem Disabled="@(!compatibleMetrics.Contains(metric.Name))">
+								@* <MudListItem Disabled="@(!compatibleMetrics.Contains(metric.Name))"> *@
+								<MudListItem>
 									<span @onclick="() => { currentMetric = metric; }">
 										@metric.Name
 									</span>							
@@ -68,14 +69,13 @@
 			<h2>@currentMetric.Name</h2>
 			<span>@currentMetric.Description</span>
 
-			if (currentMetric.Name == "http.server.request.duration") 
+			if (currentMetric.Histogram != null) 
 			{
-				<Metric Metrics="currentMetric" ResourceName="@currentResource" />				
+				<Histogram Metrics="currentMetric" />
 			}
-
-			if (currentMetric.Name == "aspnetcore.routing.match_attempts") 
+			else
 			{
-				<Metric Metrics="currentMetric" ResourceName="@currentResource" />
+				<Sum Metrics="currentMetric" ResourceName="@currentResource" />
 			}
 		}
 		else 
