@@ -68,7 +68,7 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         cancellationToken = new CancellationTokenSource();
 
@@ -108,6 +108,12 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
         };
 
         RefreshHistogram();
+
+        if (bool.Parse(Configuration["Realtime"]))
+        {
+            WebSocketService.MetricsUpdated += OnMetricsUpdated;
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
+        }
 
         base.OnInitialized();
     }
@@ -179,6 +185,22 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
         }
 
         stopwatch.Stop();
+    }
+
+    private void OnMetricsUpdated(ContainerControlPanel.Domain.Models.Metrics metrics)
+    {
+        if (metrics != null)
+        {
+            var newMetrics = metrics.ScopeMetrics
+                .Find(x => x.Metrics.Find(x => x.Name == Metrics.Name) != null).Metrics
+                .Find(x => x.Name == Metrics.Name);
+
+            if (newMetrics != null)
+            {
+                Metrics = newMetrics;
+                RefreshHistogram();
+            }
+        }
     }
 
     public void Dispose()
