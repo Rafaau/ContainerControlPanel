@@ -63,6 +63,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             RoutesOnlyParameter = value.ToString();
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastTracesHref", currentRoute);
+            LoadTraces();
         }
     }
 
@@ -82,7 +83,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
-    private List<TracesRoot> allTraces { get; set; } = new();
+    private List<ContainerControlPanel.Domain.Models.Trace> allTraces { get; set; } = new();
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -94,8 +95,8 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             NavigationManager.NavigateTo(cachedHref);
 
-            if (cachedHref.Split("/")[3] == "null" && !bool.Parse(Configuration["LazyLoading"]))
-                await LoadTraces();
+            await Task.Delay(1);
+            await LoadTraces();
         }
         else
         {
@@ -112,8 +113,8 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     private async Task LoadTraces()
     {
-        List<TracesRoot> result = new();
-        if (MemoryCache.TryGetValue("traces", out List<TracesRoot> cachedTraces))
+        List<ContainerControlPanel.Domain.Models.Trace> result = new();
+        if (MemoryCache.TryGetValue("traces", out List<ContainerControlPanel.Domain.Models.Trace> cachedTraces))
         {
             allTraces = cachedTraces;
             this.StateHasChanged();
@@ -125,13 +126,14 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
                         Configuration["TimeOffset"]), 
                         currentResource, 
                         currentTimestamp?.ToString(),
+                        routesOnly,
                         1,
                         10);
             }
             else
             {
                 result = await telemetryAPI
-                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
+                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString(), routesOnly);
             }
             
             if (result.Count != allTraces.Count)
@@ -150,13 +152,14 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
                         Configuration["TimeOffset"]),
                         currentResource,
                         currentTimestamp?.ToString(),
+                        routesOnly,
                         1,
                         10);
             }
             else
             {
                 result = await telemetryAPI
-                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString());
+                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString(), routesOnly);
             }
 
             MemoryCache.Set("traces", result);
@@ -167,7 +170,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         page = 1;
     }
 
-    private void OnTracesUpdated(TracesRoot traces)
+    private void OnTracesUpdated(ContainerControlPanel.Domain.Models.Trace traces)
     {
         if (traces != null)
         {
@@ -187,6 +190,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
                         Configuration["TimeOffset"]),
                         currentResource,
                         currentTimestamp?.ToString(),
+                        routesOnly,
                         page,
                         10);
             allTraces.AddRange(result);

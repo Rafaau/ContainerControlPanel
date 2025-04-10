@@ -24,7 +24,7 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
     [Inject]
     IConfiguration Configuration { get; set; }
 
-    private List<MetricsRoot> allMetrics { get; set; } = new();
+    private List<ContainerControlPanel.Domain.Models.Metrics> allMetrics { get; set; } = new();
 
     private ITelemetryAPI telemetryAPI { get; set; } = telemetryAPI;
 
@@ -57,11 +57,14 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
                 return null;
             }
 
-            return allMetrics.FirstOrDefault(x => x.GetResource().GetResourceName() == currentResource)?.GetMetrics(MetricParameter.Replace("-", "."))[0];
+            return allMetrics
+                .FirstOrDefault(x => x.ResourceName == currentResource)?.ScopeMetrics
+                .FirstOrDefault(x => x.Metrics.Any(x => x.Name == MetricParameter.Replace("-", "."))).Metrics
+                .FirstOrDefault(x => x.Name == MetricParameter.Replace("-", "."));
         }
         set
         {
-            MetricParameter = value?.Name;
+            MetricParameter = value?.Name.Replace(".", "-");
             NavigationManager.NavigateTo(currentRoute);
             MemoryCache.Set("lastMetricsHref", currentRoute);
         }
@@ -92,23 +95,23 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         }
     }
 
-    private void OnMetricsUpdated(MetricsRoot metricsRoot)
+    private void OnMetricsUpdated(ContainerControlPanel.Domain.Models.Metrics metrics)
     {
-        if (metricsRoot != null)
+        if (metrics != null)
         {
-            if (allMetrics.GetResources().GetResourceNames().Contains(metricsRoot.GetResource().GetResourceName()))
+            if (allMetrics.Any(x => x.ResourceName == metrics.ResourceName))
             {
-                var current = allMetrics.FirstOrDefault(x => x.GetResource().GetResourceName() == metricsRoot.GetResource().GetResourceName());
+                var current = allMetrics.FirstOrDefault(x => x.ResourceName == metrics.ResourceName);
 
                 if (current != null)
                 {
                     allMetrics.Remove(current);
-                    allMetrics.Add(metricsRoot);
+                    allMetrics.Add(metrics);
                 }
             }
             else
             {
-                allMetrics.Add(metricsRoot);
+                allMetrics.Add(metrics);
             }
 
             this.StateHasChanged();

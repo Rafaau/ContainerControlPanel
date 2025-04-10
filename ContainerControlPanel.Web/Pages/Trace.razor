@@ -41,20 +41,20 @@
 	}
 </script>
 
-@if (traceRoots.Count > 0) 
+@if (trace != null) 
 {
 	<div class="flex">
 		<div class="label">
-			@traceRoots[0].ResourceSpans[0].GetServiceName(): @traceRoots[0].ResourceSpans[0].GetTraceName()
+			@trace.ResourceName: @trace.Request
 		</div>
 		<div class="trace-id">
-			@traceRoots[0].GetTraceId()
+			@trace.Id
 		</div>
 	</div>
 	<div class="flex">
 		@Localizer[Locales.Resource.TraceDetails]:
 		<span class="details-span">
-			<b>@traceRoots[0].ResourceSpans[0].GetTimestamp(int.Parse(Configuration["TimeOffset"])).ToString("dd.MM.yyyy HH:mm:ss")</b>
+			<b>@trace.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</b>
 		</span>	
 		@Localizer[Locales.Resource.Duration]:
 		<span class="details-span">
@@ -62,7 +62,7 @@
 		</span>
 		@Localizer[Locales.Resource.Resources]:
 		<span class="details-span">
-			<b>@traceRoots[0].ResourceSpans.Count</b>
+			<b>@trace.Source.Count</b>
 		</span>
 		@Localizer[Locales.Resource.Depth]:
 		<span class="details-span">
@@ -98,7 +98,7 @@
 					@if (index == 0) 
 					{
 						<span>
-							<svg class="span-kind-icon" style="filter: saturate(2000%); width: 16px; margin-right: 6px; fill: @($"#{GetHexString(@traceRoots[0].ResourceSpans[0].GetServiceName())}");" focusable="false" viewBox="0 0 16 16" aria-hidden="true">
+							<svg class="span-kind-icon" style="filter: saturate(2000%); width: 16px; margin-right: 6px; fill: @($"#{GetHexString(@trace.ResourceName)}");" focusable="false" viewBox="0 0 16 16" aria-hidden="true">
 								<path d="M11.41 1.59A2 2 0 0 0 10 1H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V3a2 2 0 0 0-.59-1.41ZM9.85 12.85a.5.5 0 0 1-.35.15h-3a.5.5 0 1 1 0-1h3a.5.5 0 0 1 .35.85Zm0-2a.5.5 0 0 1-.35.15h-3a.5.5 0 1 1 0-1h3a.5.5 0 0 1 .35.85Zm0-6A.5.5 0 0 1 9.5 5h-3a.5.5 0 0 1-.5-.5.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.85Z"></path>
 							</svg>
 						</span>
@@ -119,7 +119,7 @@
 				<div class="data-grid-cell">
 					<div 
 					class="duration-marker"
-						style="background-color: @($"#{GetHexString(@traceRoots[0].ResourceSpans[0].GetServiceName())}");
+						style="background-color: @($"#{GetHexString(@trace.ResourceName)}");
 							   width: @(GetMarkerWidth(span));
 							   left: @(GetMarkerLeft(span));">
 					</div>

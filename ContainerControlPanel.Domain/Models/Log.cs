@@ -6,6 +6,54 @@ using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
+public class Log
+{
+    /// <summary>
+    /// Gets or sets the ID of the log
+    /// </summary>
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the resource
+    /// </summary>
+    public string ResourceName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the severity of the log
+    /// </summary>
+    public string Severity { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message of the log
+    /// </summary>
+    public string Message { get; set; }
+
+    /// <summary>
+    /// Gets or sets the DateTime of the log creation
+    /// </summary>
+    [BsonElement("createdAt")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+    public string Scope { get; set; }
+
+    public string ServiceInstance { get; set; }
+
+    public string TraceId { get; set; }
+
+    public string SpanId { get; set; }
+
+    public int Flags { get; set; }
+
+    public string TelemetrySdkName { get; set; }
+
+    public string TelemetrySdkLanguage { get; set; }
+
+    public string TelemetrySdkVersion { get; set; }
+}
+
 /// <summary>
 /// Class to represent the logs output
 /// </summary>
@@ -385,36 +433,28 @@ public static class LogsExtensions
     /// </summary>
     /// <param name="logsRoots">Logs root objects</param>
     /// <returns>Returns the resources</returns>
-    public static List<string> GetResources(this List<LogsRoot> logsRoots)
-    {
-        var resources = new List<string>();
-        foreach (var logsRoot in logsRoots)
-        {
-            if (!resources.Contains(logsRoot.GetResourceName()))
-                resources.Add(logsRoot.GetResourceName());
-        }
-        return resources;
-    }
+    public static List<string> GetResources(this List<Log> logs)
+        => logs.Select(x => x.ResourceName).Distinct().ToList();
 
     /// <summary>
     /// Gets the request response object
     /// </summary>
     /// <param name="logsRoot">Logs root object</param>
     /// <returns>Returns the request response object</returns>
-    public static RequestResponse? GetRequestResponse(this LogsRoot logsRoot)
+    public static RequestResponse? GetRequestResponse(this List<Log> logs)
     {
-        var request = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[REQUEST]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[REQUEST]"));
-        var response = logsRoot.ResourceLogs[0].ScopeLogs.Find(sl => sl.LogRecords.Exists(x => x.Body.StringValue.Contains("[RESPONSE]")))?.LogRecords.Find(x => x.Body.StringValue.Contains("[RESPONSE]"));
+        var request = logs.Find(x => x.Message.Contains("[REQUEST]"))?.Message;
+        var response = logs.Find(x => x.Message.Contains("[RESPONSE]"))?.Message;
 
         if (request != null || response != null)
         {
             var requestJson = request is null 
                 ? null 
-                : JsonObject.Parse(request.Body.StringValue.Replace("[REQUEST]", ""));
+                : JsonObject.Parse(request.Replace("[REQUEST]", ""));
             return new RequestResponse
             {
                 Request = JsonSerializer.Deserialize<Request>(requestJson) ?? null,
-                Response = response.Body.StringValue.Replace("[RESPONSE]", "") ?? null
+                Response = response?.Replace("[RESPONSE]", "") ?? null
             };
         }
 
@@ -465,4 +505,30 @@ public static class LogsExtensions
     /// <returns>Returns the log records</returns>
     public static List<LogRecord> GetLogRecords(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords;
+
+    public static Log GetLog(this LogsRoot logsRoot, LogRecord logRecord)
+    {
+        return new Log
+        {
+            ResourceName = logsRoot.GetResourceName(),
+            Severity = logRecord.SeverityText,
+            Message = logRecord.Body.StringValue,
+            CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).DateTime,
+            Scope = logsRoot.ResourceLogs[0].ScopeLogs[0].Scope.Name,
+            ServiceInstance = logsRoot.ResourceLogs[0].Resource.GetAttributeValue("service.instance.id"),
+            TraceId = logRecord.TraceId,
+            SpanId = logRecord.SpanId,
+            Flags = logRecord.Flags,
+            TelemetrySdkName = logsRoot.ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.name"),
+            TelemetrySdkLanguage = logsRoot.ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.language"),
+            TelemetrySdkVersion = logsRoot.ResourceLogs[0].Resource.GetAttributeValue("telemetry.sdk.version")
+        };
+    }
+
+    public static bool ContainsReqRes(this Log log)
+    {
+        return log.Message.Contains("[REQUEST]")
+            || log.Message.Contains("[RESPONSE]")
+            || log.Message.Contains("[ERROR]");
+    }
 }

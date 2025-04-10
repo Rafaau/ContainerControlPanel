@@ -31,17 +31,17 @@ public class MongoService : IDataStoreService
     /// <returns></returns>
     public async Task InitializeAsync()
     {
-        var metricsCollection = _database.GetCollection<MetricsRoot>("Metrics");
-        var tracesCollection = _database.GetCollection<TracesRoot>("Traces");
-        var logsCollection = _database.GetCollection<LogsRoot>("Logs");
+        var metricsCollection = _database.GetCollection<Metrics>("Metrics");
+        var tracesCollection = _database.GetCollection<Trace>("Traces");
+        var logsCollection = _database.GetCollection<Log>("Logs");
 
         var metricsIndexes = await metricsCollection.Indexes.List().ToListAsync();
         bool metricsTTLIndexExists = metricsIndexes.Any(x => x["name"].AsString == "CreatedAtTTL");
 
         if (!metricsTTLIndexExists)
         {
-            var metricsIndexModel = new CreateIndexModel<MetricsRoot>(
-                Builders<MetricsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
+            var metricsIndexModel = new CreateIndexModel<Metrics>(
+                Builders<Metrics>.IndexKeys.Ascending(x => x.CreatedAt),
                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await metricsCollection.Indexes.CreateOneAsync(metricsIndexModel);
         }
@@ -51,8 +51,8 @@ public class MongoService : IDataStoreService
 
         if (!tracesTTLIndexExists)
         {
-            var tracesIndexModel = new CreateIndexModel<TracesRoot>(
-                Builders<TracesRoot>.IndexKeys.Ascending(x => x.CreatedAt),
+            var tracesIndexModel = new CreateIndexModel<Trace>(
+                Builders<Trace>.IndexKeys.Ascending(x => x.CreatedAt),
                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await tracesCollection.Indexes.CreateOneAsync(tracesIndexModel);
         }
@@ -62,8 +62,8 @@ public class MongoService : IDataStoreService
 
         if (!logsTTLIndexExists)
         {
-            var logsIndexModel = new CreateIndexModel<LogsRoot>(
-                Builders<LogsRoot>.IndexKeys.Ascending(x => x.CreatedAt),
+            var logsIndexModel = new CreateIndexModel<Log>(
+                Builders<Log>.IndexKeys.Ascending(x => x.CreatedAt),
                 new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(14), Name = "CreatedAtTTL" });
             await logsCollection.Indexes.CreateOneAsync(logsIndexModel);
         }
@@ -117,10 +117,10 @@ public class MongoService : IDataStoreService
     /// <param name="metrics">Metrics to save</param>
     /// <param name="serviceName">Name of the service</param>
     /// <param name="routeName">Name of the route</param>
-    public async Task SaveMetricsAsync(MetricsRoot metrics, string? serviceName = "", string? routeName = "")
+    public async Task SaveMetricsAsync(Metrics metrics, string? serviceName = "", string? routeName = "")
     {
-        var collection = _database.GetCollection<MetricsRoot>("Metrics");
-        await collection.InsertOneAsync(metrics);
+        var collection = _database.GetCollection<Metrics>("Metrics");
+        await collection.ReplaceOneAsync(x => x.ResourceName == metrics.ResourceName, metrics, new ReplaceOptions { IsUpsert = true });
     }
 
     /// <summary>
@@ -128,10 +128,10 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="trace">Trace to save</param>
     /// <param name="traceId">Trace ID</param>
-    public async Task SaveTraceAsync(TracesRoot trace, string? traceId = "")
+    public async Task SaveTraceAsync(Trace trace, string? traceId = "")
     {
         trace.Id = traceId;
-        var collection = _database.GetCollection<TracesRoot>("Traces");
+        var collection = _database.GetCollection<Trace>("Traces");
         await collection.InsertOneAsync(trace);
     }
 
@@ -140,11 +140,10 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="log">Log to save</param>
     /// <param name="traceId">Trace ID</param>
-    public async Task SaveLogAsync(LogsRoot log, string? traceId = "")
+    public async Task SaveLogAsync(Log log, string? traceId = "")
     {
-        log.Id = traceId;
-        var collection = _database.GetCollection<LogsRoot>("Logs");
-        await collection.FindOneAndReplaceAsync(x => x.Id == traceId, log, new FindOneAndReplaceOptions<LogsRoot> { IsUpsert = true });
+        var collection = _database.GetCollection<Log>("Logs");
+        await collection.InsertOneAsync(log);
     }
 
     /// <summary>
@@ -153,19 +152,21 @@ public class MongoService : IDataStoreService
     /// <param name="timeOffset">Time offset</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="timestamp">Timestamp</param>
+    /// <param name="routesOnly">Flag to get only routes</param>
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
-    public async Task<List<TracesRoot>> GetTracesAsync(
+    public async Task<List<Trace>> GetTracesAsync(
         int timeOffset, 
         string? resource, 
         string? timestamp,
+        bool routesOnly,
         int page,
         int pageSize)
     {
-        var collection = _database.GetCollection<TracesRoot>("Traces");
+        var collection = _database.GetCollection<Trace>("Traces");
 
-        var filterBuilder = Builders<TracesRoot>.Filter;
+        var filterBuilder = Builders<Trace>.Filter;
         var filterD = filterBuilder.Empty;
 
         if (!string.IsNullOrEmpty(timestamp) && timestamp != null)
@@ -182,6 +183,12 @@ public class MongoService : IDataStoreService
             filterD &= filterBuilder.Eq(x => x.ResourceName, resource);
         }
 
+        if (routesOnly)
+        {
+            var requestWordCountFilter = filterBuilder.Regex(x => x.Request, new MongoDB.Bson.BsonRegularExpression(@"^\S+\s+\S+"));
+            filterD &= requestWordCountFilter;
+        }
+        
         var query = collection.Find(filterD).SortByDescending(x => x.CreatedAt);
 
         if (page > 0 && pageSize > 0)
@@ -197,19 +204,19 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a list of traces</returns>
-    public async Task<List<TracesRoot>> GetTraceAsync(string traceId)
+    public async Task<Trace> GetTraceAsync(string traceId)
     {
-        var collection = _database.GetCollection<TracesRoot>("Traces");
-        return await collection.Find(x => x.Id == traceId).ToListAsync();
+        var collection = _database.GetCollection<Trace>("Traces");
+        return await collection.Find(x => x.Id == traceId).FirstOrDefaultAsync();
     }
 
     /// <summary>
     /// Gets metrics from the MongoDB data store
     /// </summary>
     /// <returns>Returns a list of metrics</returns>
-    public async Task<List<MetricsRoot>> GetMetricsAsync()
+    public async Task<List<Metrics>> GetMetricsAsync()
     {
-        var collection = _database.GetCollection<MetricsRoot>("Metrics");
+        var collection = _database.GetCollection<Metrics>("Metrics");
         return await collection.Aggregate().ToListAsync();
     }
 
@@ -224,7 +231,7 @@ public class MongoService : IDataStoreService
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of logs</returns>
-    public async Task<List<LogsRoot>> GetLogsAsync(
+    public async Task<List<Log>> GetLogsAsync(
         int timeOffset, 
         string? timestamp, 
         string? resource,
@@ -233,9 +240,9 @@ public class MongoService : IDataStoreService
         int page, 
         int pageSize)
     {
-        var collection = _database.GetCollection<LogsRoot>("Logs");
+        var collection = _database.GetCollection<Log>("Logs");
 
-        var filterBuilder = Builders<LogsRoot>.Filter;
+        var filterBuilder = Builders<Log>.Filter;
         var filterD = filterBuilder.Empty;
 
         if (!string.IsNullOrEmpty(timestamp) && timestamp != "null")
@@ -277,9 +284,9 @@ public class MongoService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a log</returns>
-    public async Task<LogsRoot> GetLogAsync(string traceId)
+    public async Task<List<Log>> GetLogsByTraceAsync(string traceId)
     {
-        var collection = _database.GetCollection<LogsRoot>("Logs");
-        return await collection.Find(x => x.Id == traceId).FirstOrDefaultAsync();
+        var collection = _database.GetCollection<Log>("Logs");
+        return await collection.Find(x => x.TraceId == traceId).ToListAsync();
     }
 }

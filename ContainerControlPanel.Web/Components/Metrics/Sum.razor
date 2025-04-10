@@ -1,0 +1,36 @@
+﻿@using ContainerControlPanel.Domain.Models;
+@using MudBlazor
+
+<div class="chart-container">
+	<PlotlyChart @bind-Config="config" @bind-Data="data" @ref="chart" @bind-Layout="layout" />
+	<div class="timestamp-select">
+		<MudSelect T="int" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="timestamp">
+			<MudSelectItem Value="@(1)">1 @Localizer[Locales.Resource.Minute]</MudSelectItem>
+			<MudSelectItem Value="@(5)">5 @Localizer[Locales.Resource.Minutes]</MudSelectItem>
+			<MudSelectItem Value="@(15)">15 @Localizer[Locales.Resource.Minutes]</MudSelectItem>
+			<MudSelectItem Value="@(30)">30 @Localizer[Locales.Resource.Minutes]</MudSelectItem>
+			<MudSelectItem Value="@(60)">1 @Localizer[Locales.Resource.Hour]</MudSelectItem>
+			<MudSelectItem Value="@(180)">3 @Localizer[Locales.Resource.Hours1]</MudSelectItem>
+			<MudSelectItem Value="@(360)">6 @Localizer[Locales.Resource.Hours]</MudSelectItem>
+			<MudSelectItem Value="@(720)">12 @Localizer[Locales.Resource.Hours]</MudSelectItem>
+		</MudSelect>
+	</div>
+	<div class="datapoint-select">
+		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentDataPoint">
+			<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+			@foreach (var endpoint in Metrics.Sum.DataPoints.Where(dp => dp.Attributes.Any(a => a.Key == "http.route")))
+			{
+				<MudSelectItem Value="@endpoint.GetRouteName()">@endpoint.GetRouteName()</MudSelectItem>
+			}
+		</MudSelect>
+	</div>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div class="refresh">
+			<MudIconButton @onclick="async () => { }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
+	<div class="total-span">
+		Total: <b>@metrics.Count()</b>
+	</div>
+</div>

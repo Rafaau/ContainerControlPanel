@@ -78,7 +78,7 @@ public class RedisService : IDataStoreService
     /// <param name="metrics">Metrics to save</param>
     /// <param name="serviceName">Name of the service</param>
     /// <param name="routeName">Name of the route</param>
-    public async Task SaveMetricsAsync(MetricsRoot metrics, string serviceName, string routeName)
+    public async Task SaveMetricsAsync(Metrics metrics, string serviceName, string routeName)
     {
         string value = JsonSerializer.Serialize(metrics);
         await SetValueAsync($"metrics{serviceName}{routeName}", value, TimeSpan.FromDays(14));
@@ -90,7 +90,7 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="trace">Traces to save</param>
     /// <param name="traceId">ID of the trace</param>
-    public async Task SaveTraceAsync(TracesRoot trace, string traceId)
+    public async Task SaveTraceAsync(Trace trace, string traceId)
     {
         string value = JsonSerializer.Serialize(trace);
         await SetValueAsync($"trace{traceId}{Guid.NewGuid().ToString()}", value, TimeSpan.FromDays(14));
@@ -101,37 +101,39 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="log">Logs to save</param>
     /// <param name="traceId">Trace ID</param>
-    public async Task SaveLogAsync(LogsRoot log, string traceId)
+    public async Task SaveLogAsync(Log log, string traceId)
     {
         string value = JsonSerializer.Serialize(log);
         await SetValueAsync($"log{traceId}", value, TimeSpan.FromDays(14));
     }
 
     /// <summary>
-    /// Gets a list of traces
+    /// Gets traces from the MongoDB data store
     /// </summary>
     /// <param name="timeOffset">Time offset</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="timestamp">Timestamp</param>
+    /// <param name="routesOnly">Flag to get only routes</param>
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
-    public async Task<List<TracesRoot>> GetTracesAsync(
-        int timeOffset, 
-        string? resource, 
+    public async Task<List<Trace>> GetTracesAsync(
+        int timeOffset,
+        string? resource,
         string? timestamp,
+        bool routesOnly,
         int page,
         int pageSize)
-    {
-        List<TracesRoot> traces = new();
+    {      
+        List<Trace> traces = new();
         var result = await ScanKeysByPatternAsync("trace");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
+            var deserialized = JsonSerializer.Deserialize<Trace>(item);
 
-            if ((resource == "all" || deserialized.HasResource(resource))
-                && (string.IsNullOrEmpty(timestamp) || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
+            if ((resource == "all" || deserialized.ResourceName == resource)
+                && (string.IsNullOrEmpty(timestamp) || deserialized.Timestamp.Date == DateTime.Parse(timestamp).Date))
                 traces.Add(deserialized);
         }
 
@@ -143,32 +145,25 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a trace</returns>
-    public async Task<List<TracesRoot>> GetTraceAsync(string traceId)
+    public async Task<Trace> GetTraceAsync(string traceId)
     {
-        List<TracesRoot> traces = new();
         var result = await ScanKeysByPatternAsync($"trace{traceId}");
 
-        foreach (var item in result)
-        {
-            var deserialized = JsonSerializer.Deserialize<TracesRoot>(item);
-            traces.Add(deserialized);
-        }
-
-        return traces;
+        return JsonSerializer.Deserialize<Trace>(result.FirstOrDefault());
     }
 
     /// <summary>
     /// Gets a list of metrics
     /// </summary>
     /// <returns>Returns a list of metrics</returns>
-    public async Task<List<MetricsRoot>> GetMetricsAsync()
+    public async Task<List<Metrics>> GetMetricsAsync()
     {
-        List<MetricsRoot> metrics = new();
+        List<Metrics> metrics = new();
         var result = await ScanKeysByPatternAsync("metrics");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<MetricsRoot>(item);
+            var deserialized = JsonSerializer.Deserialize<Metrics>(item);
             metrics.Add(deserialized);
         }
 
@@ -186,7 +181,7 @@ public class RedisService : IDataStoreService
     /// <param name="page">Number of the page</param>
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of logs</returns>
-    public async Task<List<LogsRoot>> GetLogsAsync(
+    public async Task<List<Log>> GetLogsAsync(
         int timeOffset, 
         string? timestamp, 
         string? resource, 
@@ -195,15 +190,15 @@ public class RedisService : IDataStoreService
         int page, 
         int pageSize)
     {
-        List<LogsRoot> logs = new();
+        List<Log> logs = new();
         var result = await ScanKeysByPatternAsync("log");
 
         foreach (var item in result)
         {
-            var deserialized = JsonSerializer.Deserialize<LogsRoot>(item);
+            var deserialized = JsonSerializer.Deserialize<Log>(item);
 
-            if ((resource == "all" || resource == deserialized.GetResourceName())
-                && (timestamp == "null" || deserialized.GetTimestamp(timeOffset).Date == DateTime.Parse(timestamp).Date))
+            if ((resource == "all" || resource == deserialized.ResourceName)
+                && (timestamp == "null" || deserialized.CreatedAt.AddHours(timeOffset).Date == DateTime.Parse(timestamp).Date))
                 logs.Add(deserialized);
         }
 
@@ -215,10 +210,18 @@ public class RedisService : IDataStoreService
     /// </summary>
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a log</returns>
-    public async Task<LogsRoot> GetLogAsync(string traceId)
+    public async Task<List<Log>> GetLogsByTraceAsync(string traceId)
     {
+        List<Log> logs = new();
         var result = await ScanKeysByPatternAsync($"log{traceId}");
-        return JsonSerializer.Deserialize<LogsRoot>(result[0]);
+
+        foreach (var item in result)
+        {
+            var deserialized = JsonSerializer.Deserialize<Log>(item);
+            logs.Add(deserialized);
+        }
+
+        return logs;
     }
 
     /// <summary>

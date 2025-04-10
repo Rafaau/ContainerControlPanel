@@ -169,3 +169,9 @@ h1 {
 	bottom: 6px;
 	left: 22px;
 }
+
+.message {
+	overflow-y: scroll;
+	height: 200px;
+	width: 100%;
+}

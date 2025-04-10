@@ -1,0 +1,36 @@
+﻿.chart-container {
+	position: relative;
+}
+
+.options-stack {
+	position: absolute;
+	left: 752px;
+	top: 85px;
+	width: 180px;
+}
+
+.single-option {
+	margin-bottom: 5px;
+}
+
+.total-span {
+	position: absolute;
+	left: 663px;
+	top: 335px;
+	width: 180px;
+}
+
+::deep .xgrid {
+	stroke: #484848 !important;
+	stroke-width: 0.5px !important;
+}
+
+::deep .crisp {
+	stroke: #484848 !important;
+}
+
+.refresh {
+	position: absolute;
+	left: 860px;
+	top: 43px;
+}

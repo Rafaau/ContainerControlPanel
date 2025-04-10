@@ -26,7 +26,7 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
     IConfiguration Configuration { get; set; }
 
     [Parameter]
-    public Metric Metric { get; set; }
+    public ContainerControlPanel.Domain.Models.Metric Metric { get; set; }
 
     [Parameter]
     public string ResourceName { get; set; }
@@ -62,7 +62,7 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
 
         if (bool.Parse(Configuration["Realtime"]))
         {
-            WebSocketService.TracesUpdated += OnTracesUpdated;
+            //WebSocketService.TracesUpdated += OnTracesUpdated;
             await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
         }
 
@@ -285,8 +285,8 @@ public partial class RequestDuration(ITelemetryAPI telemetryAPI) : IDisposable
     private async Task GetTraces()
     {
         var result = await telemetryAPI
-            .GetTraces(int.Parse(Configuration["TimeOffset"]), ResourceName, null, 0, 0);
-        traces = result.GetTracesList(routesOnly: true);
+            .GetTraces(int.Parse(Configuration["TimeOffset"]), ResourceName, null, true, 0, 0);
+        //traces = result.GetTracesList(routesOnly: true);
     }
 
     private async Task<List<Scatter>> AssignDataJobs()

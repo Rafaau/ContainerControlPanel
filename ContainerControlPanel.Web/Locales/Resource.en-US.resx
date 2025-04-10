@@ -468,4 +468,13 @@
   <data name="Unpin" xml:space="preserve">
     <value>Unpin</value>
   </data>
+  <data name="ChooseMethod" xml:space="preserve">
+    <value>Choose method</value>
+  </data>
+  <data name="ChooseStatus" xml:space="preserve">
+    <value>Choose status</value>
+  </data>
+  <data name="Method" xml:space="preserve">
+    <value>Method</value>
+  </data>
 </root>

@@ -15,7 +15,7 @@
 		<MudSelect T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseResource]" TransformOrigin="Origin.TopCenter" @bind-Value="currentResource">
 			@if (allMetrics.Count > 0)
 			{
-				@foreach (var resource in allMetrics.GetResources().GetResourceNames())
+				@foreach (var resource in allMetrics.Select(x => x.ResourceName).Distinct())
 				{
 					<MudSelectItem Value="@resource">@resource</MudSelectItem>
 				}
@@ -38,28 +38,29 @@
 {
 	<div class="metrics-list">
 		<MudList T="string">
-		@foreach (var scopeMetric in allMetrics[0].GetScopeMetricsByResource(currentResource))
-		{
-			<div class="position-relative">
-				<span class="expand-icon">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
-						<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
-					</svg>
-				</span>
-				<MudListItem Text="@scopeMetric.Scope.Name" Expanded>
-					<NestedList>
-						@foreach (var metric in scopeMetric.Metrics) 
-						{
-							<MudListItem Disabled="@(!compatibleMetrics.Contains(metric.Name))">
-								<span @onclick="() => { currentMetric = metric; }">
-									@metric.Name
-								</span>							
-							</MudListItem>
-						}				
-					</NestedList>
-				</MudListItem>
-			</div>
-		}
+			@foreach (var scopeMetric in allMetrics.Find(x => x.ResourceName == currentResource).ScopeMetrics)
+			{
+				<div class="position-relative">
+					<span class="expand-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+							<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708" />
+						</svg>
+					</span>
+					<MudListItem Text="@scopeMetric.Scope.Name" Expanded>
+						<NestedList>
+							@foreach (var metric in scopeMetric.Metrics) 
+							{
+								@* <MudListItem Disabled="@(!compatibleMetrics.Contains(metric.Name))"> *@
+								<MudListItem>
+									<span @onclick="() => { currentMetric = metric; }">
+										@metric.Name
+									</span>							
+								</MudListItem>
+							}				
+						</NestedList>
+					</MudListItem>
+				</div>
+			}
 		</MudList>
 	</div>
 	<div class="metric-details">
@@ -68,14 +69,13 @@
 			<h2>@currentMetric.Name</h2>
 			<span>@currentMetric.Description</span>
 
-			if (currentMetric.Name == "http.server.request.duration") 
+			if (currentMetric.Histogram != null) 
 			{
-				<RequestDuration Metric="currentMetric" ResourceName="@currentResource" />				
+				<Histogram Metrics="currentMetric" />
 			}
-
-			if (currentMetric.Name == "aspnetcore.routing.match_attempts") 
+			else
 			{
-				<MatchAttempts Metric="currentMetric" ResourceName="@currentResource" />
+				<Sum Metrics="currentMetric" ResourceName="@currentResource" />
 			}
 		}
 		else 

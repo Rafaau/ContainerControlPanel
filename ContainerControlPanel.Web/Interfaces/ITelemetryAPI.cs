@@ -15,15 +15,15 @@ public interface ITelemetryAPI
     /// <param name="resource">Resource name.</param>
     /// <param name="timestamp">Timestamp.</param>
     /// <returns>Returns the list of traces.</returns>
-    [Get("/v1/getTraces?resource={resource}&timestamp={timestamp}&timeOffset={timeOffset}&page={page}&pageSize={pageSize}")]
-    Task<List<TracesRoot>> GetTraces(int timeOffset, string? resource = null, string? timestamp = null, int page = 0, int pageSize = 0);
+    [Get("/v1/getTraces?resource={resource}&timestamp={timestamp}&timeOffset={timeOffset}&page={page}&pageSize={pageSize}&routesOnly={routesOnly}")]
+    Task<List<Trace>> GetTraces(int timeOffset, string? resource = null, string? timestamp = null, bool routesOnly = false, int page = 0, int pageSize = 0);
 
     /// <summary>
     /// Gets the metrics.
     /// </summary>
     /// <returns>Returns the list of metrics.</returns>
     [Get("/v1/getMetrics")]
-    Task<List<MetricsRoot>> GetMetrics();
+    Task<List<Metrics>> GetMetrics();
 
     /// <summary>
     /// Gets the trace.
@@ -31,7 +31,7 @@ public interface ITelemetryAPI
     /// <param name="traceId">Trace ID.</param>
     /// <returns>Returns the list of traces.</returns
     [Get("/v1/getTrace?traceId={traceId}")]
-    Task<List<TracesRoot>> GetTrace(string traceId);
+    Task<Trace> GetTrace(string traceId);
 
     /// <summary>
     /// Gets the logs.
@@ -41,7 +41,7 @@ public interface ITelemetryAPI
     /// <param name="resource">Resource name.</param>
     /// <returns>Returns the list of logs.</returns>
     [Get("/v1/getLogs?timestamp={timestamp}&resource={resource}&timeOffset={timeOffset}&severity={severity}&filter={filter}&page={page}&pageSize={pageSize}")]
-    Task<List<LogsRoot>> GetLogs(
+    Task<List<Log>> GetLogs(
         int timeOffset, 
         string? timestamp = "null", 
         string? resource = "all",
@@ -56,7 +56,7 @@ public interface ITelemetryAPI
     /// <param name="traceId">Trace ID.</param>
     /// <returns>Returns the log.</returns>
     [Get("/v1/getLogs?traceId={traceId}")]
-    Task<LogsRoot> GetLog(string traceId);
+    Task<Log> GetLog(string traceId);
 
     /// <summary>
     /// Gets the request and response.

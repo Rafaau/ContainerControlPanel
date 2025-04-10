@@ -18,17 +18,17 @@ public class WebSocketService
     /// <summary>
     /// Event for traces updated.
     /// </summary>
-    public event Action<TracesRoot>? TracesUpdated;
+    public event Action<Trace>? TracesUpdated;
 
     /// <summary>
     /// Event for metrics updated.
     /// </summary>
-    public event Action<MetricsRoot>? MetricsUpdated;
+    public event Action<Metrics>? MetricsUpdated;
 
     /// <summary>
     /// Event for logs updated.
     /// </summary>
-    public event Action<LogsRoot>? LogsUpdated;
+    public event Action<Log>? LogsUpdated;
 
     /// <summary>
     /// Connects to the WebSocket.
@@ -61,17 +61,17 @@ public class WebSocketService
             switch (message.Type)
             {
                 case Domain.Models.WebSocketMessageType.Traces:
-                    var trace = JsonSerializer.Deserialize<TracesRoot>(message.Data.ToString());
+                    var trace = JsonSerializer.Deserialize<Trace>(message.Data.ToString());
                     TracesUpdated?.Invoke(trace);
                     break;
 
                 case Domain.Models.WebSocketMessageType.Metrics:
-                    var metrics = JsonSerializer.Deserialize<MetricsRoot>(message.Data.ToString());
+                    var metrics = JsonSerializer.Deserialize<Metrics>(message.Data.ToString());
                     MetricsUpdated?.Invoke(metrics);
                     break;
 
                 case Domain.Models.WebSocketMessageType.Logs:
-                    var logs = JsonSerializer.Deserialize<LogsRoot>(message.Data.ToString());
+                    var logs = JsonSerializer.Deserialize<Log>(message.Data.ToString());
                     LogsUpdated?.Invoke(logs);
                     break;
             }

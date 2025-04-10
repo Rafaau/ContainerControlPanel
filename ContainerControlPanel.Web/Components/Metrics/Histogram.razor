@@ -1,0 +1,170 @@
+﻿@using ContainerControlPanel.Domain.Models;
+@using MudBlazor
+
+<div class="chart-container">
+	<PlotlyChart @bind-Config="config" @bind-Data="data" @ref="chart" @bind-Layout="layout" />
+	<div class="options-stack">
+		@if (filterOptions.Contains("http.request.method"))
+		{
+			<div class="single-option">
+				<MudSelect Label="@Localizer[Locales.Resource.Method]" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseMethod]" TransformOrigin="Origin.TopCenter" @bind-Value="CurrentMethod">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "http.request.method").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("http.response.status_code"))
+		{
+			<div class="single-option">
+				<MudSelect Label="@Localizer[Locales.Resource.Status]" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="@Localizer[Locales.Resource.ChooseStatus]" TransformOrigin="Origin.TopCenter" @bind-Value="CurrentStatus">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "http.response.status_code").Value.IntValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("network.protocol.name"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Network Protocol Name" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose network protocol name" TransformOrigin="Origin.TopCenter" @bind-Value="NetworkProtocolName">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "network.protocol.name").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("network.protocol.version"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Network Protocol Version" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose network protocol version" TransformOrigin="Origin.TopCenter" @bind-Value="NetworkProtocolVersion">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "network.protocol.version").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("network.transport"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Network Transport" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose network transport" TransformOrigin="Origin.TopCenter" @bind-Value="NetworkTransport">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "network.transport").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("network.type"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Network Type" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose network type" TransformOrigin="Origin.TopCenter" @bind-Value="NetworkType">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "network.type").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("server.address"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Server Address" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose server address" TransformOrigin="Origin.TopCenter" @bind-Value="ServerAddress">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "server.address").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("server.port"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Server Port" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose server port" TransformOrigin="Origin.TopCenter" @bind-Value="ServerPort">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "server.port").Value.IntValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("tls.protocol.version"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Tls Protocol Version" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose tls protocol version" TransformOrigin="Origin.TopCenter" @bind-Value="TlsProtocolVersion">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "tls.protocol.version").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("url.scheme"))
+		{
+			<div class="single-option">
+				<MudSelect Label="URL Scheme" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose URL scheme" TransformOrigin="Origin.TopCenter" @bind-Value="UrlScheme">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "url.scheme").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("error.type"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Error Type" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose error type" TransformOrigin="Origin.TopCenter" @bind-Value="ErrorType">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "error.type").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("network.peer.address"))
+		{
+			<div class="single-option">
+				<MudSelect Label="Network Peer Address" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose network peer address" TransformOrigin="Origin.TopCenter" @bind-Value="NetworkPeerAddress">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "network.peer.address").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+		@if (filterOptions.Contains("dns.question.name"))
+		{
+			<div class="single-option">
+				<MudSelect Label="DNS Question Name" T="string" AnchorOrigin="Origin.BottomCenter" Placeholder="Choose dns question name" TransformOrigin="Origin.TopCenter" @bind-Value="DnsQuestionName">
+					<MudSelectItem Value="@("all")">(@Localizer[Locales.Resource.All])</MudSelectItem>
+					@foreach (var key in Metrics.Histogram.DataPoints.Select(dp => dp.Attributes.FirstOrDefault(a => a.Key == "dns.question.name").Value.StringValue).Distinct())
+					{
+						<MudSelectItem Value="@key">@key</MudSelectItem>
+					}
+				</MudSelect>
+			</div>
+		}
+	</div>
+	@if (!bool.Parse(Configuration["Realtime"]))
+	{
+		<div class="refresh">
+			<MudIconButton @onclick="async () => { }" Color="Color.Primary" Icon="@Icons.Material.Filled.Refresh" />
+		</div>
+	}
+</div>
