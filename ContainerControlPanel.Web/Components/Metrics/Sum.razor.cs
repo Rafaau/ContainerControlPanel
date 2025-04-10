@@ -123,7 +123,7 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
         {
             new Scatter
             {
-                Name = "Match Attempts",
+                Name = "Sum",
                 Mode = ModeFlag.Lines,
 
                 X = new List<object>{ DateTime.Now.AddMinutes(-timestamp), DateTime.Now },

@@ -35,12 +35,123 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
             RefreshHistogram();
         }
     }
+
     private string? CurrentStatus
     {
         get => currentStatus;
         set
         {
             currentStatus = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? NetworkProtocolName
+    {
+        get => networkProtocolName;
+        set
+        {
+            networkProtocolName = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? NetworkProtocolVersion
+    {
+        get => networkProtocolVersion;
+        set
+        {
+            networkProtocolVersion = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? NetworkTransport
+    {
+        get => networkTransport;
+        set
+        {
+            networkTransport = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? NetworkType
+    {
+        get => networkType;
+        set
+        {
+            networkType = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? ServerAddress
+    {
+        get => serverAddress;
+        set
+        {
+            serverAddress = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? ServerPort
+    {
+        get => serverPort;
+        set
+        {
+            serverPort = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? TlsProtocolVersion
+    {
+        get => tlsProtocolVersion;
+        set
+        {
+            tlsProtocolVersion = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? UrlScheme
+    {
+        get => urlScheme;
+        set
+        {
+            urlScheme = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? ErrorType
+    {
+        get => errorType;
+        set
+        {
+            errorType = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? NetworkPeerAddress
+    {
+        get => networkPeerAddress;
+        set
+        {
+            networkPeerAddress = value;
+            RefreshHistogram();
+        }
+    }
+
+    private string? DnsQuestionName
+    {
+        get => dnsQuestionName;
+        set
+        {
+            dnsQuestionName = value;
             RefreshHistogram();
         }
     }
@@ -58,6 +169,30 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
 
     private string? currentStatus = "all";
 
+    private string? networkProtocolName = "all";
+
+    private string? networkProtocolVersion = "all";
+
+    private string? networkTransport = "all";
+
+    private string? networkType = "all";
+
+    private string? serverAddress = "all";
+
+    private string? serverPort = "all";
+
+    private string? tlsProtocolVersion = "all";
+
+    private string? urlScheme = "all";
+
+    private string? errorType = "all";
+
+    private string? networkPeerAddress = "all";
+
+    private string? dnsQuestionName = "all";
+
+    private List<string> filterOptions = new();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -70,6 +205,11 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
+        foreach (var attribute in Metrics.Histogram.DataPoints.First().Attributes)
+        {
+            filterOptions.Add(attribute.Key);
+        }
+
         cancellationToken = new CancellationTokenSource();
 
         config = new Plotly.Blazor.Config
@@ -124,9 +264,7 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
         explicitBounds.Add($"{explicitBounds.Last()}+");
         object[] bucketCounts = new object[Metrics.Histogram.DataPoints.First().BucketCounts.Count()];
 
-        foreach (var item in Metrics.Histogram.DataPoints
-            .Where(x => currentMethod == "all" || x.Attributes.Any(x => x.Key == "http.request.method" && x.Value.StringValue == currentMethod))
-            .Where(x => currentStatus == "all" || x.Attributes.Any(x => x.Key == "http.response.status_code" && x.Value.IntValue == currentStatus)))
+        foreach (var item in GetDataPoints())
         {
             int[] bucketCount = item.BucketCounts.Select(x => int.Parse(x)).ToArray();
 
@@ -160,6 +298,25 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
         };
 
         DataEvent?.Invoke(this, new DataJob(new DataEventArgs(explicitBounds.ToList(), bucketCounts.ToList(), 0), chart, data));
+    }
+
+    private List<DataPoint> GetDataPoints()
+    {
+        return Metrics.Histogram.DataPoints
+            .Where(x => currentMethod == "all" || x.Attributes.Any(x => x.Key == "http.request.method" && x.Value.StringValue == currentMethod))
+            .Where(x => currentStatus == "all" || x.Attributes.Any(x => x.Key == "http.response.status_code" && x.Value.IntValue == currentStatus))
+            .Where(x => networkProtocolName == "all" || x.Attributes.Any(x => x.Key == "network.protocol.name" && x.Value.StringValue == networkProtocolName))
+            .Where(x => networkProtocolVersion == "all" || x.Attributes.Any(x => x.Key == "network.protocol.version" && x.Value.StringValue == networkProtocolVersion))
+            .Where(x => networkTransport == "all" || x.Attributes.Any(x => x.Key == "network.transport" && x.Value.StringValue == networkTransport))
+            .Where(x => networkType == "all" || x.Attributes.Any(x => x.Key == "network.type" && x.Value.StringValue == networkType))
+            .Where(x => serverAddress == "all" || x.Attributes.Any(x => x.Key == "server.address" && x.Value.StringValue == serverAddress))
+            .Where(x => serverPort == "all" || x.Attributes.Any(x => x.Key == "server.port" && x.Value.IntValue == serverPort))
+            .Where(x => tlsProtocolVersion == "all" || x.Attributes.Any(x => x.Key == "tls.protocol.version" && x.Value.StringValue == tlsProtocolVersion))
+            .Where(x => urlScheme == "all" || x.Attributes.Any(x => x.Key == "url.scheme" && x.Value.StringValue == urlScheme))
+            .Where(x => errorType == "all" || x.Attributes.Any(x => x.Key == "error.type" && x.Value.StringValue == errorType))
+            .Where(x => networkPeerAddress == "all" || x.Attributes.Any(x => x.Key == "network.peer.address" && x.Value.StringValue == networkPeerAddress))
+            .Where(x => dnsQuestionName == "all" || x.Attributes.Any(x => x.Key == "dns.question.name" && x.Value.StringValue == dnsQuestionName))
+            .ToList();
     }
 
     private async void UpdateData(object sender, DataJob job)

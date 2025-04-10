@@ -2,18 +2,15 @@
 	position: relative;
 }
 
-.method-select {
+.options-stack {
 	position: absolute;
 	left: 752px;
 	top: 85px;
 	width: 180px;
 }
 
-.status-select {
-	position: absolute;
-	left: 752px;
-	top: 145px;
-	width: 180px;
+.single-option {
+	margin-bottom: 5px;
 }
 
 .total-span {
