@@ -477,4 +477,7 @@
   <data name="Method" xml:space="preserve">
     <value>Metoda</value>
   </data>
+  <data name="Output" xml:space="preserve">
+    <value>Wynik</value>
+  </data>
 </root>

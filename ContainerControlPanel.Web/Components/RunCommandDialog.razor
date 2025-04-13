@@ -6,16 +6,23 @@
         @Localizer[Locales.Resource.RunCommand]
     </TitleContent>
     <DialogContent>
-        <MudTextField Adornment="Adornment.Start" AdornmentText="docker" Immediate="true" Style="font-family: Consolas;" @bind-Value="Command" Label="@Localizer[Locales.Resource.Command]" />
+        @if (string.IsNullOrEmpty(Output))
+        {
+            <MudTextField Adornment="Adornment.Start" AdornmentText="docker" Immediate="true" Style="font-family: Consolas;" @bind-Value="Command" Label="@Localizer[Locales.Resource.Command]" />
+        }
+        else
+        {
+            <MudTextField Adornment="Adornment.Start" Immediate="true" Style="font-family: Consolas;" @bind-Value="Output" Label="@Localizer[Locales.Resource.Output]" Variant="Variant.Outlined" ReadOnly="true" AutoGrow/>
+        }
     </DialogContent>
     <DialogActions>
-        @if (!string.IsNullOrEmpty(Command))
+        @if (!string.IsNullOrEmpty(Command) && string.IsNullOrEmpty(Output))
         {
             <div class="exec-btn">
                 <MudButton Color="Color.Primary" OnClick="ExecuteCommand">@Localizer[Locales.Resource.Execute]</MudButton>
             </div>
         }
-        <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Cancel]</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>
     </DialogActions>
 </MudDialog>
 @if (loading)

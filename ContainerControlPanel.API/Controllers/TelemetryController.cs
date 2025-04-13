@@ -58,7 +58,7 @@ public class TelemetryController : ControllerBase
                 string json = JsonSerializer.Serialize(message);
 
                 await _dataStoreService.SaveMetricsAsync(metrics, serviceName, routeName);               
-                await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+                await WebSocketHandler.BroadcastMessageAsync(json);
             }
                  
             return Ok();
@@ -98,7 +98,7 @@ public class TelemetryController : ControllerBase
                 string json = JsonSerializer.Serialize(message);
 
                 await _dataStoreService.SaveTraceAsync(trace, span.TraceId);
-                await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+                await WebSocketHandler.BroadcastMessageAsync(json);
             }
            
             return Ok();
@@ -135,7 +135,7 @@ public class TelemetryController : ControllerBase
                 string json = JsonSerializer.Serialize(message);
 
                 await _dataStoreService.SaveLogAsync(log, logRecord.TraceId);         
-                await TelemetryWebSocketHandler.BroadcastMessageAsync(json);
+                await WebSocketHandler.BroadcastMessageAsync(json);
             }
        
             return Ok();

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
 using ContainerControlPanel.Domain.Methods;
 using ContainerControlPanel.Domain.Models;
 using Microsoft.Extensions.Configuration;
@@ -243,36 +244,79 @@ public static class ContainerManager
     /// <returns>Returns a boolean indicating whether the command was executed successfully</returns>
     public static async Task<bool> ExecuteCommand(string command)
     {
+        var tcs = new TaskCompletionSource<bool>();
+
         ProcessStartInfo _executeCommandProcessStartInfo = new ProcessStartInfo
         {
-            FileName = command.Contains("compose") 
+            FileName = command.Contains("compose")
                 ? "docker-compose"
                 : "docker",
             Arguments = command.Contains("compose")
                 ? command.Substring(7)
                 : command,
             RedirectStandardOutput = true,
+            RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true
         };
 
+        Process process = new Process
+        {
+            StartInfo = _executeCommandProcessStartInfo,
+            EnableRaisingEvents = true
+        };
+
+        process.OutputDataReceived += async (sender, e) =>
+        {
+            if (string.IsNullOrEmpty(e.Data))
+                return;
+
+            var message = new WebSocketMessage
+            {
+                Type = WebSocketMessageType.CommandOutput,
+                Data = e.Data
+            };
+
+            string json = JsonSerializer.Serialize(message);
+            await WebSocketHandler.BroadcastMessageAsync(json);
+        };
+
+        process.ErrorDataReceived += async (sender, e) =>
+        {
+            if (string.IsNullOrEmpty(e.Data))
+                return;
+
+            var message = new WebSocketMessage
+            {
+                Type = WebSocketMessageType.CommandOutput,
+                Data = e.Data
+            };
+
+            string json = JsonSerializer.Serialize(message);
+            await WebSocketHandler.BroadcastMessageAsync(json);
+        };
+
+        process.Exited += (sender, e) =>
+        {
+            tcs.SetResult(process.ExitCode == 0);
+            process.Dispose();
+        };
+
         try
         {
-            using (Process process = Process.Start(_executeCommandProcessStartInfo))
+            if (!process.Start())
             {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    string output = await reader.ReadToEndAsync();
-                    return command.Contains("load") && output.Contains("Loaded")
-                        || _executeCommandProcessStartInfo.FileName.Contains("compose") 
-                            && (output.Contains("done") || output.Contains("Stopped") || output.Contains("Started"))
-                        || command.Contains("run") && !output.Contains("Error");
-                }
+                tcs.SetResult(false);
             }
+
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return false;
+            tcs.SetResult(false);
         }
+
+        return await tcs.Task;
     }
 }

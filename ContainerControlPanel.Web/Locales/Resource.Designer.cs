@@ -691,6 +691,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wynik.
+        /// </summary>
+        public static string Output {
+            get {
+                return ResourceManager.GetString("Output", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Przypnij.
         /// </summary>
         public static string Pin {

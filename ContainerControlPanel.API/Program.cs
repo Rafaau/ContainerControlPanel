@@ -55,7 +55,7 @@ app.Use(async (context, next) =>
         if (context.WebSockets.IsWebSocketRequest)
         {
             var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-            await TelemetryWebSocketHandler.HandleWebSocketConnectionAsync(webSocket);
+            await WebSocketHandler.HandleWebSocketConnectionAsync(webSocket);
         }
         else
         {

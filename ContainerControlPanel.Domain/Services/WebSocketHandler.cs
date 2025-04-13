@@ -4,7 +4,7 @@ using System.Text;
 /// <summary>
 /// Handles WebSocket connections for telemetry data.
 /// </summary>
-public static class TelemetryWebSocketHandler
+public static class WebSocketHandler
 {
     /// <summary>
     /// List of active WebSockets

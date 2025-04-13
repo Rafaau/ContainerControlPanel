@@ -121,6 +121,6 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
     public ValueTask DisposeAsync()
     {
         WebSocketService.MetricsUpdated -= OnMetricsUpdated;
-        return ValueTask.CompletedTask;
+        return WebSocketService.DisposeAsync();
     }
 }

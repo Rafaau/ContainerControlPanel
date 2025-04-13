@@ -23,5 +23,6 @@ public enum WebSocketMessageType
 {
     Traces,
     Metrics,
-    Logs
+    Logs,
+    CommandOutput
 }

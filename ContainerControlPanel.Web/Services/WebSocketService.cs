@@ -31,6 +31,11 @@ public class WebSocketService
     public event Action<Log>? LogsUpdated;
 
     /// <summary>
+    /// Event for command output updated.
+    /// </summary>
+    public event Action<string>? CommandOutputUpdated;
+
+    /// <summary>
     /// Connects to the WebSocket.
     /// </summary>
     /// <param name="uri">URI string.</param>
@@ -73,6 +78,10 @@ public class WebSocketService
                 case Domain.Models.WebSocketMessageType.Logs:
                     var logs = JsonSerializer.Deserialize<Log>(message.Data.ToString());
                     LogsUpdated?.Invoke(logs);
+                    break;
+
+                case Domain.Models.WebSocketMessageType.CommandOutput:
+                    CommandOutputUpdated?.Invoke(message.Data.ToString());
                     break;
             }
         }
