@@ -20,7 +20,7 @@ public static class LoggerExtensions
         string body = string.Empty;
         request.Body.Seek(0, SeekOrigin.Begin);
 
-        using (StreamReader stream = new StreamReader(request.Body))
+        using (StreamReader stream = new StreamReader(request.Body, leaveOpen: true))
         {
             try
             {
