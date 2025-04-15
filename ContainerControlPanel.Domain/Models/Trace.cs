@@ -451,7 +451,10 @@ public static class TracesExtensions
     /// <param name="span">Span object</param>
     /// <returns>Returns a list of attributes</returns>
     public static List<(string Key, string Value)> GetAttributes(this Span span)
-        => span.Attributes.Select(attr => (attr.Key, attr.Value.StringValue ?? attr.Value.IntValue)).ToList();
+        => span.Attributes
+            .Where(x => x.Key != "http.request.body" && x.Key != "http.response.body")
+            .Select(attr => (attr.Key, attr.Value.StringValue ?? attr.Value.IntValue))          
+            .ToList();
 
     /// <summary>
     /// Checks if the traces root has a resource

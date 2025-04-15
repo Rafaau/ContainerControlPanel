@@ -38,13 +38,13 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private Span currentSpan { get; set; }
 
-    private RequestResponse? requestResponse { get; set; } = null;
+    private RequestResponse? requestResponse { get; set; } = new();
 
     private RequestTab requestTab { get; set; } = RequestTab.Headers;
 
-    private string formattedRequestJson { get; set; }
+    private string formattedRequestJson { get; set; } = string.Empty;
 
-    private string formattedResponseJson { get; set; }
+    private string formattedResponseJson { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,26 +62,53 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private async Task LoadRequestAndResponse()
     {
-        var result = await telemetryAPI.GetRequestAndResponse(TraceId);
+        var request = trace.Spans.FirstOrDefault(x => x.Attributes
+            .Any(x => x.Key == "http.request.body" && !string.IsNullOrEmpty(x.Value.StringValue)))?.Attributes
+            .Find(x => x.Key == "http.request.body")!.Value.StringValue;
 
-        if (result.IsSuccessStatusCode)
+        var response = trace.Spans.FirstOrDefault(x => x.Attributes
+            .Any(x => x.Key == "http.response.body" && !string.IsNullOrEmpty(x.Value.StringValue)))?.Attributes
+            .Find(x => x.Key == "http.response.body")!.Value.StringValue;
+
+        if (request != null)
         {
-            requestResponse = result.Content;
+            requestResponse!.Request = JsonSerializer.Deserialize<Request>(request);
+            var json = JsonSerializer.Serialize(requestResponse.Request.Body, new JsonSerializerOptions { WriteIndented = true });
+            formattedRequestJson = await JS.InvokeAsync<string>("colorizeJson", json);
+        }
 
-            if (requestResponse?.Request?.Body != null)
-            {
-                var json = JsonSerializer.Serialize(requestResponse.Request.Body, new JsonSerializerOptions { WriteIndented = true });
-                formattedRequestJson = await JS.InvokeAsync<string>("colorizeJson", json);
-            }
-            
-            if (requestResponse?.Response != null)
-            {
-                var preJson = JsonObject.Parse(requestResponse.Response);
-                var json = JsonSerializer.Serialize(preJson, new JsonSerializerOptions { WriteIndented = true });
-                formattedResponseJson = await JS.InvokeAsync<string>("colorizeJson", json);
-            }
+        if (response != null)
+        {
+            requestResponse!.Response = response;
+            var preJson = JsonObject.Parse(response);
+            var json = JsonSerializer.Serialize(preJson, new JsonSerializerOptions { WriteIndented = true });
+            formattedResponseJson = await JS.InvokeAsync<string>("colorizeJson", json);
         }
     }
+
+    // Old Request and Response loading method
+    //private async Task LoadRequestAndResponse()
+    //{
+    //    var result = await telemetryAPI.GetRequestAndResponse(TraceId);
+
+    //    if (result.IsSuccessStatusCode)
+    //    {
+    //        requestResponse = result.Content;
+
+    //        if (requestResponse?.Request?.Body != null)
+    //        {
+    //            var json = JsonSerializer.Serialize(requestResponse.Request.Body, new JsonSerializerOptions { WriteIndented = true });
+    //            formattedRequestJson = await JS.InvokeAsync<string>("colorizeJson", json);
+    //        }
+
+    //        if (requestResponse?.Response != null)
+    //        {
+    //            var preJson = JsonObject.Parse(requestResponse.Response);
+    //            var json = JsonSerializer.Serialize(preJson, new JsonSerializerOptions { WriteIndented = true });
+    //            formattedResponseJson = await JS.InvokeAsync<string>("colorizeJson", json);
+    //        }
+    //    }
+    //}
 
     private void LoadSpans()
     {

@@ -30,16 +30,18 @@ public static class BuilderExtensions
                 tracing
                     .SetSampler(new AlwaysOnSampler())
                     .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(resourceName))
-                    .AddAspNetCoreInstrumentation(options =>
-                    {
-                        options.EnrichWithHttpRequest = (activity, httpContext) =>
-                        {
-                            if (Activity.Current?.ParentId == null)
-                            {
-                                activity.SetParentId(ActivityTraceId.CreateRandom(), ActivitySpanId.CreateRandom());
-                            }
-                        };
-                    })
+                    // Removed for request and response body logging
+                    //.AddAspNetCoreInstrumentation(options =>
+                    //{
+                    //    options.EnrichWithHttpRequest = (activity, httpContext) =>
+                    //    {
+                    //        if (Activity.Current?.ParentId == null)
+                    //        {
+                    //            activity.SetParentId(ActivityTraceId.CreateRandom(), ActivitySpanId.CreateRandom());
+                    //        }
+                    //    };
+                    //})
+                    .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
                     .AddOtlpExporter(options =>
                     {

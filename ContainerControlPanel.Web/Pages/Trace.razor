@@ -175,7 +175,7 @@
 			}			
 		</div>
 		<div class="details-container">
-			@if (requestResponse == null)
+			@if (string.IsNullOrEmpty(formattedRequestJson) && string.IsNullOrEmpty(formattedResponseJson))
 			{
 				<div class="details-label">@Localizer[Locales.Resource.Attributes]</div>
 				@foreach (var attr in currentSpan.GetAttributes())
@@ -188,7 +188,7 @@
 			}
 			else 
 			{
-				@if (requestResponse.Request != null) 
+				@if (!string.IsNullOrEmpty(formattedRequestJson))
 				{
 					<div class="details-label">@Localizer[Locales.Resource.Request]</div>
 					<div class="tabs">
@@ -241,8 +241,8 @@
 							<div></div>
 							break;
 					}
-				}				
-				@if (requestResponse.Response != null)
+				}
+				@if (!string.IsNullOrEmpty(formattedResponseJson))
 				{
 					<div class="details-label">@Localizer[Locales.Resource.Response]</div>
 					<div class="response-content json">
