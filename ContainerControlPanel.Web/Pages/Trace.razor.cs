@@ -80,7 +80,15 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
         if (response != null)
         {
             requestResponse!.Response = response;
-            var preJson = JsonObject.Parse(response);
+            JsonNode? preJson = null;
+            try
+            {
+                preJson = JsonNode.Parse(response);
+            }
+            catch (JsonException)
+            {
+                preJson = null;
+            }
             var json = JsonSerializer.Serialize(preJson, new JsonSerializerOptions { WriteIndented = true });
             formattedResponseJson = await JS.InvokeAsync<string>("colorizeJson", json);
         }

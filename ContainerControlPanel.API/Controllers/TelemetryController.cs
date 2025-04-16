@@ -41,7 +41,7 @@ public class TelemetryController : ControllerBase
             MessageBindable<ExportMetricsServiceRequest>? bindable =
                 await MessageBindable<ExportMetricsServiceRequest>.BindAsync(HttpContext, null);
            
-            MetricsRoot metricsRoot = JsonSerializer.Deserialize<MetricsRoot>(bindable?.Message.ToString());
+            MetricsRoot metricsRoot = JsonSerializer.Deserialize<MetricsRoot>(bindable?.Message?.ToString());
             string? serviceName = metricsRoot?.GetResource()?.GetResourceName();
             string? routeName = metricsRoot?.GetRouteName();
      

@@ -546,7 +546,7 @@ public static class TracesExtensions
             Request = span.Name,
             Source = new List<string> { tracesRoot.GetResourceName() },
             Duration = span.GetDuration(),
-            Spans = tracesRoot.GetSpans()
+            Spans = new List<Span> { span }
         };
     }
 }
