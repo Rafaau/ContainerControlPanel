@@ -225,6 +225,20 @@ namespace ContainerControlPanel.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetVolumes")]
+        public async Task<IActionResult> GetVolumes()
+        {
+            var volumes = await ContainerManager.GetVolumesAsync();
+            return Ok(volumes);
+        }
+
+        [HttpGet("RemoveVolume")]
+        public async Task<IActionResult> RemoveVolume(string volumeId)
+        {
+            var result = await ContainerManager.RemoveVolumeAsync(volumeId);
+            return Ok(result);
+        }
+
         /// <summary>
         /// Executes a shell command
         /// </summary>

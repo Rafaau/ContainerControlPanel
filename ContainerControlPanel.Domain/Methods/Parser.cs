@@ -119,4 +119,18 @@ public static class Parser
 
         return images.OrderByDescending(i => i.CreatedAt).ToList();
     }
+
+    public async static Task<List<Volume>> ParseVolumes(string output)
+    {
+        List<Volume> volumes = new List<Volume>();
+        var volumesOutput = output.Split(new[] { '{' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var volumeOutput in volumesOutput)
+        {
+            string volumeObj = $"{{{volumeOutput}";
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(volumeObj));
+            Volume volume = await JsonSerializer.DeserializeAsync<Volume>(stream);
+            volumes.Add(volume);
+        }
+        return volumes.ToList();
+    }
 }

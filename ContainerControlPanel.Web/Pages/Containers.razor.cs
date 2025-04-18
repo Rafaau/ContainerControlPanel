@@ -48,6 +48,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private List<ComposeFile> composeFiles { get; set; } = new();
     private List<ImageFile> imageFiles { get; set; } = new();
     private List<Image> images { get; set; } = new();
+    private List<Volume> volumes { get; set; } = new();
     private bool loading { get; set; } = false;
 
     private bool _open;
@@ -77,6 +78,7 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
         await LoadComposeFiles();
         await LoadImageFiles();
         await LoadImages();
+        await LoadVolumes();
 
         if (bool.Parse(Configuration["Realtime"]))
         {
@@ -151,6 +153,12 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
     private async Task LoadImages()
     {
         images = await containerAPI.GetImages();
+        this.StateHasChanged();
+    }
+
+    private async Task LoadVolumes()
+    {
+        volumes = await containerAPI.GetVolumes();
         this.StateHasChanged();
     }
 
@@ -299,6 +307,25 @@ public partial class Containers(IContainerAPI containerAPI) : IDisposable
             new DialogParameters()
             {
                 { "Images", images }
+            },
+            options
+        );
+    }
+
+    private Task OpenVolumesListDialogAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large
+        };
+
+        return DialogService.ShowAsync<DockerVolumesListDialog>(
+            "",
+            new DialogParameters()
+            {
+                { "Volumes", volumes }
             },
             options
         );

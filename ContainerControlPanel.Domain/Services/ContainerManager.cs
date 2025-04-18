@@ -237,6 +237,46 @@ public static class ContainerManager
         }
     }
 
+    public static async Task<List<Volume>> GetVolumesAsync()
+    {
+        ProcessStartInfo _volumesProcessStartInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = "volume ls --format=\"{{json .}}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        using (Process process = Process.Start(_volumesProcessStartInfo))
+        {
+            using (StreamReader reader = process.StandardOutput)
+            {
+                string output = await reader.ReadToEndAsync();
+                return await Parser.ParseVolumes(output);
+            }
+        }
+    }
+
+    public static async Task<bool> RemoveVolumeAsync(string volumeId)
+    {
+        ProcessStartInfo _removeVolumeProcessStartInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = $"volume rm {volumeId}",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        using (Process process = Process.Start(_removeVolumeProcessStartInfo))
+        {
+            using (StreamReader reader = process.StandardOutput)
+            {
+                string output = await reader.ReadToEndAsync();
+                return output.Contains("Deleted");
+            }
+        }
+    }
+
     /// <summary>
     /// Executes a shell command
     /// </summary>

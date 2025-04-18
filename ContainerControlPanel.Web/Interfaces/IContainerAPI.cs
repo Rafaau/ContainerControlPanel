@@ -129,6 +129,12 @@ public interface IContainerAPI
     [Delete("/api/removeImage?imageId={imageId}")]
     Task<bool> RemoveImage(string imageId);
 
+    [Get("/api/getVolumes")]
+    Task<List<Volume>> GetVolumes();
+
+    [Delete("/api/removeVolume?volumeId={volumeId}")]
+    Task<bool> RemoveVolume(string volumeId);
+
     /// <summary>
     /// Executes a shell command.
     /// </summary>

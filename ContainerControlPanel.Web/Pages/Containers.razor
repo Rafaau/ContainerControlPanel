@@ -36,12 +36,22 @@
 			</AuthorizeView>
 		}
 	</div>
-	<div style="margin-right: 14px;">
+	<div style="margin-right: 4px;">
 		@if (imageFiles.Count > 0)
 		{
 			<AuthorizeView Roles="Administrator">
 				<MudTooltip Text="@Localizer[Locales.Resource.ViewImages]" ShowOnFocus="false" ShowOnClick="false">
 					<MudIconButton @onclick="async () => { await OpenImagesListDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.CloudCircle" />
+				</MudTooltip>
+			</AuthorizeView>
+		}
+	</div>
+	<div style="margin-right: 14px;">
+		@if (volumes.Count > 0)
+		{
+			<AuthorizeView Roles="Administrator">
+				<MudTooltip Text="@Localizer[Locales.Resource.ViewVolumes]" ShowOnFocus="false" ShowOnClick="false">
+					<MudIconButton @onclick="async () => { await OpenVolumesListDialogAsync(); }" Color="Color.Default" Icon="@Icons.Material.Filled.Memory" />
 				</MudTooltip>
 			</AuthorizeView>
 		}

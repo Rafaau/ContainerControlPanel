@@ -691,6 +691,15 @@ namespace Locales {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nie znaleziono żadnych woluminów.
+        /// </summary>
+        public static string NoVolumesFound {
+            get {
+                return ResourceManager.GetString("NoVolumesFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wynik.
         /// </summary>
         public static string Output {
@@ -1137,6 +1146,42 @@ namespace Locales {
         public static string ViewLogs {
             get {
                 return ResourceManager.GetString("ViewLogs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wyświetl woluminy.
+        /// </summary>
+        public static string ViewVolumes {
+            get {
+                return ResourceManager.GetString("ViewVolumes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Błąd podczas usuwania wolumenu.
+        /// </summary>
+        public static string VolumeRemoveError {
+            get {
+                return ResourceManager.GetString("VolumeRemoveError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wolumin usunięty pomyślnie.
+        /// </summary>
+        public static string VolumeRemoveSuccess {
+            get {
+                return ResourceManager.GetString("VolumeRemoveSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Woluminy.
+        /// </summary>
+        public static string Volumes {
+            get {
+                return ResourceManager.GetString("Volumes", resourceCulture);
             }
         }
         

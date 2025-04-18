@@ -1,0 +1,86 @@
+﻿@using MudBlazor;
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        @Localizer[Locales.Resource.Volumes]
+    </TitleContent>
+    <DialogContent>
+        @if (Volumes.Count > 0)
+        {
+            <div class="data-grid">
+                <div class="data-grid-row header">
+                    <div class="data-grid-cell">
+                        DRIVER
+                    </div>
+                    <div class="data-grid-cell">
+                        NAME
+                    </div>
+                    <div class="data-grid-cell">
+                        LABELS
+                    </div>
+                    <div class="data-grid-cell">
+                        LINKS
+                    </div>
+                    <div class="data-grid-cell">
+                        MOUNTPOINT
+                    </div>
+                    <div class="data-grid-cell">
+                        SCOPE
+                    </div>
+                    <div class="data-grid-cell">
+                        SIZE
+                    </div>
+                </div>
+                @foreach (var volume in Volumes)
+                {
+                    <div class="data-grid-row data @(chosenVolume == volume ? "chosen-image" : "")" @onclick="() => { chosenVolume = volume; }">
+                        <div class="data-grid-cell">
+                            @volume.Driver
+                        </div>
+                        <div class="data-grid-cell text-overflow">
+                            @volume.Name
+                        </div>
+                        <div class="data-grid-cell text-overflow">
+                            @volume.Labels
+                        </div>
+                        <div class="data-grid-cell text-overflow">
+                            @volume.Links
+                        </div>
+                        <div class="data-grid-cell text-overflow">
+                            @volume.Mountpoint
+                        </div>
+                        <div class="data-grid-cell">
+                            @volume.Scope
+                        </div>
+                        <div class="data-grid-cell">
+                            @volume.Size
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="not-found">
+                @Localizer[Locales.Resource.NoVolumesFound].
+            </div>
+        }
+    </DialogContent>
+    <DialogActions>
+        @if (chosenVolume != null)
+        {
+            <div class="remove-btn">
+                <MudButton Color="Color.Primary" OnClick="OpenDockerRunDialogAsync">@Localizer[Locales.Resource.Run]</MudButton>
+                <MudButton Color="Color.Primary" OnClick="RemoveVolume">@Localizer[Locales.Resource.Remove]</MudButton>
+            </div>
+        }
+        <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>
+    </DialogActions>
+</MudDialog>
+@if (loading)
+{
+    <div class="loading">
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    </div>
+}

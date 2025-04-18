@@ -480,4 +480,19 @@
   <data name="Output" xml:space="preserve">
     <value>Wynik</value>
   </data>
+  <data name="ViewVolumes" xml:space="preserve">
+    <value>Wyświetl woluminy</value>
+  </data>
+  <data name="VolumeRemoveError" xml:space="preserve">
+    <value>Błąd podczas usuwania wolumenu</value>
+  </data>
+  <data name="VolumeRemoveSuccess" xml:space="preserve">
+    <value>Wolumin usunięty pomyślnie</value>
+  </data>
+  <data name="NoVolumesFound" xml:space="preserve">
+    <value>Nie znaleziono żadnych woluminów</value>
+  </data>
+  <data name="Volumes" xml:space="preserve">
+    <value>Woluminy</value>
+  </data>
 </root>
