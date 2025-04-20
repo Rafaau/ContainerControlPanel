@@ -68,13 +68,13 @@
         }
     </DialogContent>
     <DialogActions>
-        @if (chosenVolume != null)
-        {
-            <div class="remove-btn">
-                <MudButton Color="Color.Primary" OnClick="OpenDockerRunDialogAsync">@Localizer[Locales.Resource.Run]</MudButton>
-                <MudButton Color="Color.Primary" OnClick="RemoveVolume">@Localizer[Locales.Resource.Remove]</MudButton>
-            </div>
-        }
+        <div class="remove-btn">  
+            <MudButton Color="Color.Primary" OnClick="OpenCreateVolumeDialogAsync">@Localizer[Locales.Resource.Create]</MudButton>
+            @if (chosenVolume != null)
+            {                     
+                <MudButton Color="Color.Primary" OnClick="RemoveVolume">@Localizer[Locales.Resource.Remove]</MudButton>         
+            }
+        </div>
         <MudButton Color="Color.Primary" OnClick="Close">@Localizer[Locales.Resource.Close]</MudButton>
     </DialogActions>
 </MudDialog>

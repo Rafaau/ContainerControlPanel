@@ -262,7 +262,7 @@ public static class ContainerManager
         ProcessStartInfo _removeVolumeProcessStartInfo = new ProcessStartInfo
         {
             FileName = "docker",
-            Arguments = $"volume rm {volumeId}",
+            Arguments = $"volume rm {volumeId} -f",
             RedirectStandardOutput = true,
             UseShellExecute = false,
             CreateNoWindow = true
@@ -272,7 +272,7 @@ public static class ContainerManager
             using (StreamReader reader = process.StandardOutput)
             {
                 string output = await reader.ReadToEndAsync();
-                return output.Contains("Deleted");
+                return output.Contains(volumeId);
             }
         }
     }

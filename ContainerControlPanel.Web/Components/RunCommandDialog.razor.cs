@@ -30,6 +30,9 @@ public partial class RunCommandDialog(IContainerAPI containerAPI) : IAsyncDispos
     [Parameter]
     public string Command { get; set; }
 
+    [Parameter]
+    public Func<Task>? OnVolumeCreated { get; set; } = null;
+
     private bool loading { get; set; } = false;
 
     private string Output { get; set; } = string.Empty;
@@ -82,7 +85,15 @@ public partial class RunCommandDialog(IContainerAPI containerAPI) : IAsyncDispos
         StateHasChanged();
     }
 
-    private void Close() => MudDialog.Close(DialogResult.Ok(true));
+    private void Close()
+    {
+        if (Command.Contains("volume"))
+        {
+            OnVolumeCreated?.Invoke();
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
 
     public ValueTask DisposeAsync()
     {

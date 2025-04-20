@@ -495,4 +495,7 @@
   <data name="Volumes" xml:space="preserve">
     <value>Woluminy</value>
   </data>
+  <data name="Create" xml:space="preserve">
+    <value>Utwórz</value>
+  </data>
 </root>

@@ -28,9 +28,12 @@ public partial class DockerVolumesListDialog(IContainerAPI containerAPI)
 
     private bool loading { get; set; } = false;
 
+    private Func<Task> onVolumeCreated { get; set; } = null;
+
     protected override async Task OnInitializedAsync()
     {
         Volumes = await containerAPI.GetVolumes();
+        onVolumeCreated += OnCreateVolume;
     }
 
     private async Task RemoveVolume()
@@ -41,7 +44,7 @@ public partial class DockerVolumesListDialog(IContainerAPI containerAPI)
         {
             loading = true;
 
-            var result = await containerAPI.RemoveImage(chosenVolume.Name);
+            var result = await containerAPI.RemoveVolume(chosenVolume.Name);
 
             if (result)
             {
@@ -65,7 +68,7 @@ public partial class DockerVolumesListDialog(IContainerAPI containerAPI)
         }
     }
 
-    private Task OpenDockerRunDialogAsync()
+    private Task OpenCreateVolumeDialogAsync()
     {
         var options = new DialogOptions
         {
@@ -78,10 +81,17 @@ public partial class DockerVolumesListDialog(IContainerAPI containerAPI)
             "",
             new DialogParameters()
             {
-                { "Command", $"" }
+                { "Command", $"volume create [OPTIONS] [VOLUME]" },
+                { "OnVolumeCreated", onVolumeCreated }
             },
             options
         );
+    }
+
+    private async Task OnCreateVolume()
+    {
+        Volumes = await containerAPI.GetVolumes();
+        this.StateHasChanged();
     }
 
     private void Close() => MudDialog.Close(DialogResult.Ok(true));

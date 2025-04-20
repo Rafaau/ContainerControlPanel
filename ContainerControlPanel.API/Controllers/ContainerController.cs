@@ -232,7 +232,7 @@ namespace ContainerControlPanel.API.Controllers
             return Ok(volumes);
         }
 
-        [HttpGet("RemoveVolume")]
+        [HttpDelete("RemoveVolume")]
         public async Task<IActionResult> RemoveVolume(string volumeId)
         {
             var result = await ContainerManager.RemoveVolumeAsync(volumeId);
