@@ -110,4 +110,16 @@ public interface IDataStoreService
     /// <param name="traceId">Trace ID</param>
     /// <returns>Returns a list of logs</returns>
     Task<List<Log>> GetLogsByTraceAsync(string traceId);
+
+    /// <summary>
+    /// Gets a magic input
+    /// </summary>
+    /// <returns>Returns a magic input</returns>
+    Task<string> GetMagicInput();
+
+    /// <summary>
+    /// Saves a magic input
+    /// </summary>
+    /// <param name="magicInput">The magic input to save</param>
+    Task SaveMagicInput(string magicInput);
 }

@@ -326,5 +326,33 @@ namespace ContainerControlPanel.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetMagicInput")]
+        public async Task<IActionResult> GetMagicInput()
+        {
+            try
+            {
+                var result = await _dataStoreService.GetMagicInput();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("SaveMagicInput")]
+        public async Task<IActionResult> SaveMagicInput(string magicInput)
+        {
+            try
+            {
+                await _dataStoreService.SaveMagicInput(magicInput);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -173,4 +173,10 @@ public interface IContainerAPI
     /// <returns>Returns the result of the operation.</returns>
     [Patch("/api/pinRequest?requestId={requestId}")]
     Task PinRequest(string requestId);
+
+    [Get("/api/getMagicInput")]
+    Task<string> GetMagicInput();
+
+    [Post("/api/saveMagicInput?magicInput={magicInput}")]
+    Task SaveMagicInput(string magicInput);
 }

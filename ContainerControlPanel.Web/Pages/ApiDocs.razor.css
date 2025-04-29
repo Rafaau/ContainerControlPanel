@@ -206,8 +206,11 @@ pre {
 	margin-left: 10px;
 }
 
-.history-btn {
-	margin-left: auto;
+.magic-input {
+	display: flex;
+	padding: 12px;
+	gap: 8px;
+	width: 500px;
 }
 
 .history-container {

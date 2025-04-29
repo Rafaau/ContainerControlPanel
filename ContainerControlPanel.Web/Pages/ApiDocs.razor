@@ -56,6 +56,20 @@
 	</div>
 	@if (savedRequests.Count > 0)
 	{		
+		<div style="margin-left: auto;"></div>
+		<MudMenu  PositionAtCursor="true" Color="Color.Dark" AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopRight">
+            <ActivatorContent>
+                <div class="magic-btn">
+					<MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.AutoFixHigh"></MudIconButton>
+				</div>
+            </ActivatorContent>
+            <ChildContent>
+				<div class="magic-input">
+					<MudTextField Immediate="true" FullWidth="true" T="string" @bind-Value="magicInput"/>
+					<MudButton Color="Color.Primary" @onclick="async () => { await SaveMagicInput(); }" Variant="Variant.Outlined">@Localizer[Locales.Resource.Save]</MudButton>
+				</div>
+			</ChildContent>
+		</MudMenu>			
 		<div class="history-btn">
 			<MudTooltip Text="@Localizer[Locales.Resource.History]" ShowOnFocus="false" ShowOnClick="false">
 				<MudIconButton Color="Color.Default" OnClick="() => { historyExpanded = !historyExpanded; }" Icon="@Icons.Material.Outlined.History"></MudIconButton>

@@ -224,6 +224,17 @@ public class RedisService : IDataStoreService
         return logs;
     }
 
+    public async Task<string> GetMagicInput()
+    {
+        var result = await ScanKeysByPatternAsync("magicInput");
+        return result.FirstOrDefault();
+    }
+
+    public async Task SaveMagicInput(string magicInput)
+    {
+        await SetValueAsync("magicInput", magicInput);
+    }
+
     /// <summary>
     /// Sets a value in the cache
     /// </summary>

@@ -77,6 +77,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
 
     private bool historyExpanded { get; set; } = false;
 
+    private string magicInput { get; set; } = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadContainers();
@@ -93,6 +95,8 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         }
 
         await LoadHistory();
+        await LoadMagicInput();
+        HandleMagicInput();
     }
 
     private async Task LoadData()
@@ -184,6 +188,21 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         }
 
         this.StateHasChanged();
+    }
+
+    private async Task LoadMagicInput()
+    {
+        var result = await containerAPI.GetMagicInput();
+
+        if (result != null)
+        {
+            magicInput = result;
+        }
+    }
+
+    private async Task SaveMagicInput()
+    {
+        await containerAPI.SaveMagicInput(magicInput);
     }
 
     private bool IsASPNETCoreContainer(string containerId)
@@ -545,5 +564,32 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         }
 
         return (primary, listItemStyle);
+    }
+
+
+    private void HandleMagicInput()
+    {
+        List<string> subs = magicInput.Split(";").ToList();
+
+        switch (subs.Count)
+        {
+            case 1:
+                break;
+            case 2:
+                foreach (var controller in controllers)
+                {
+                    foreach (var action in controller.Actions)
+                    {
+                        action.Headers.Add(new HeaderView() { Action = action.Name, Key = subs[0], Value = subs[1] });
+                    }
+                }
+                break;
+            case 3:
+                httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri(subs[2])
+                };
+                break;
+        }
     }
 }

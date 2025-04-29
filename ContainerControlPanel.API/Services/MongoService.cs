@@ -289,4 +289,30 @@ public class MongoService : IDataStoreService
         var collection = _database.GetCollection<Log>("Logs");
         return await collection.Find(x => x.TraceId == traceId).ToListAsync();
     }
+
+    public async Task<string> GetMagicInput()
+    {
+        var collection = _database.GetCollection<MagicInput>("MagicInput");
+        var magicInput = collection.Find(_ => true).ToListAsync();
+        return magicInput.Result.FirstOrDefault()?.Content ?? string.Empty;
+    }
+
+    public async Task SaveMagicInput(string magicInput)
+    {
+        var collection = _database.GetCollection<MagicInput>("MagicInput");
+        var currentMagicInput = await collection.Find(_ => true).FirstOrDefaultAsync();
+        if (currentMagicInput == null)
+        {
+            var newMagicInput = new MagicInput
+            {
+                Content = magicInput
+            };
+            await collection.InsertOneAsync(newMagicInput);
+        }
+        else
+        {
+            currentMagicInput.Content = magicInput;
+            await collection.ReplaceOneAsync(x => x.Id == currentMagicInput.Id, currentMagicInput);
+        }
+    }
 }
