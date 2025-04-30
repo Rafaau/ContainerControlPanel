@@ -42,7 +42,7 @@ public partial class RunCommandDialog(IContainerAPI containerAPI) : IAsyncDispos
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.CommandOutputUpdated += OnOutputUpdated;
-            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:{Configuration["WebAPIPort"]}/ws");
         }
     }
 

@@ -91,7 +91,7 @@ public partial class Metrics(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.MetricsUpdated += OnMetricsUpdated;
-            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:{Configuration["WebAPIPort"]}/ws");
         }
     }
 

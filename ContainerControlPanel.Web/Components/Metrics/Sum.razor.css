@@ -4,14 +4,14 @@
 
 .timestamp-select {
 	position: absolute;
-	left: 663px;
+	left: 750px;
 	top: 85px;
 	width: 180px;
 }
 
 .datapoint-select {
 	position: absolute;
-	left: 663px;
+	left: 750px;
 	top: 135px;
 	width: 180px;
 }
@@ -25,7 +25,7 @@
 
 .total-span {
 	position: absolute;
-	left: 663px;
+	left: 750px;
 	top: 335px;
 	width: 180px;
 }

@@ -252,7 +252,7 @@ public partial class Histogram(ITelemetryAPI telemetryAPI) : IDisposable
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.MetricsUpdated += OnMetricsUpdated;
-            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:{Configuration["WebAPIPort"]}/ws");
         }
 
         base.OnInitialized();

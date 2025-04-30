@@ -107,7 +107,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.TracesUpdated += OnTracesUpdated;
-            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:{Configuration["WebAPIPort"]}/ws");
         }
     }
 

@@ -47,7 +47,6 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
     private CancellationTokenSource cancellationToken;
     private BlockingCollection<DataJob> queue;
     private event EventHandler<DataJob> DataEvent;
-    private IndicatorChart averageDurationIndicator;
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -61,7 +60,7 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
         if (bool.Parse(Configuration["Realtime"]))
         {
             WebSocketService.MetricsUpdated += OnMetricsUpdated;
-            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:5121/ws");
+            await WebSocketService.ConnectAsync($"ws://{Configuration["WebAPIHost"]}:{Configuration["WebAPIPort"]}/ws");
         }
 
         base.OnInitialized();
@@ -293,5 +292,43 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
     {
         DataEvent -= UpdateData;
         cancellationToken?.Cancel();
+    }
+}
+
+internal class DataEventArgs : EventArgs
+{
+    public DataEventArgs(IEnumerable<object> x, IEnumerable<object> y, int traceIndex)
+    {
+        X = x;
+        Y = y;
+        TraceIndex = traceIndex;
+    }
+
+    public IEnumerable<object> X { get; set; }
+    public IEnumerable<object> Y { get; set; }
+    public int TraceIndex { get; set; }
+}
+
+internal class DataJob
+{
+    public DataJob(DataEventArgs dataEventArgs, PlotlyChart chart, IList<ITrace> traces)
+    {
+        DataEventArgs = dataEventArgs;
+        Chart = chart;
+        Traces = traces;
+    }
+
+    public DataEventArgs DataEventArgs { get; set; }
+
+    public PlotlyChart Chart { get; set; }
+
+    public IList<ITrace> Traces { get; set; }
+
+    public string Id
+    {
+        get
+        {
+            return $"{DataEventArgs.X.First().ToString()}_{DataEventArgs.Y.First().ToString()}";
+        }
     }
 }

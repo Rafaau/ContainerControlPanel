@@ -5,7 +5,7 @@
 	<Description>Extension methods for CCP stack</Description>
 	<Authors>Rafaau</Authors>
 	<PackageId>ContainerControlPanel.Extensions</PackageId>
-	<Version>1.0.2</Version>
+	<Version>1.0.3</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
