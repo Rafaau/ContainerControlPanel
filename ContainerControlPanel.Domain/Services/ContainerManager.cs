@@ -237,6 +237,10 @@ public static class ContainerManager
         }
     }
 
+    /// <summary>
+    /// Gets the currently available Docker volumes
+    /// </summary>
+    /// <returns>Returns a list of <see cref="Volume"/> objects</returns>
     public static async Task<List<Volume>> GetVolumesAsync()
     {
         ProcessStartInfo _volumesProcessStartInfo = new ProcessStartInfo
@@ -257,6 +261,11 @@ public static class ContainerManager
         }
     }
 
+    /// <summary>
+    /// Removes a Docker volume by ID
+    /// </summary>
+    /// <param name="volumeId">Volume ID</param>
+    /// <returns>Returns a boolean indicating whether the volume was removed</returns>
     public static async Task<bool> RemoveVolumeAsync(string volumeId)
     {
         ProcessStartInfo _removeVolumeProcessStartInfo = new ProcessStartInfo

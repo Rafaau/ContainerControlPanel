@@ -536,6 +536,12 @@ public static class TracesExtensions
         return traceList;
     }
 
+    /// <summary>
+    /// Gets the trace
+    /// </summary>
+    /// <param name="tracesRoot">Traces root object</param>
+    /// <param name="span">Span object</param>
+    /// <returns>Returns a new instance of <see cref="Trace"/></returns>
     public static Trace GetTrace(this TracesRoot tracesRoot, Span span)
     {
         return new Trace

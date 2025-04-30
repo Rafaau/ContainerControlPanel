@@ -6,15 +6,29 @@ using System.Text.Json.Nodes;
 
 namespace ContainerControlPanel.Extensions;
 
+/// <summary>
+/// Middleware for logging OpenTelemetry data.
+/// </summary>
 public class OpenTelemetryLoggingMiddleware
 {
+    /// <summary>
+    /// Request delegate to the next middleware in the pipeline.
+    /// </summary>
     private readonly RequestDelegate _next;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OpenTelemetryLoggingMiddleware"/> class.
+    /// </summary>
+    /// <param name="next">Request delegate to the next middleware</param>
     public OpenTelemetryLoggingMiddleware(RequestDelegate next)
     {
         _next = next;
     }
 
+    /// <summary>
+    /// Invokes the middleware to log OpenTelemetry data.
+    /// </summary>
+    /// <param name="context">HTTP context</param>
     public async Task Invoke(HttpContext context)
     {
         context.Request.EnableBuffering();

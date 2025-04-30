@@ -290,6 +290,10 @@ public class MongoService : IDataStoreService
         return await collection.Find(x => x.TraceId == traceId).ToListAsync();
     }
 
+    /// <summary>
+    /// Gets the magic input from the MongoDB data store
+    /// </summary>
+    /// <returns>Returns the magic input</returns>
     public async Task<string> GetMagicInput()
     {
         var collection = _database.GetCollection<MagicInput>("MagicInput");
@@ -297,6 +301,10 @@ public class MongoService : IDataStoreService
         return magicInput.Result.FirstOrDefault()?.Content ?? string.Empty;
     }
 
+    /// <summary>
+    /// Saves the magic input to the MongoDB data store
+    /// </summary>
+    /// <param name="magicInput">Magic input to save</param>
     public async Task SaveMagicInput(string magicInput)
     {
         var collection = _database.GetCollection<MagicInput>("MagicInput");

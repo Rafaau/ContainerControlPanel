@@ -566,30 +566,19 @@ public partial class ApiDocs(IContainerAPI containerAPI)
         return (primary, listItemStyle);
     }
 
-
     private void HandleMagicInput()
     {
         List<string> subs = magicInput.Split(";").ToList();
 
-        switch (subs.Count)
+        if (subs.Count == 2)
         {
-            case 1:
-                break;
-            case 2:
-                foreach (var controller in controllers)
+            foreach (var controller in controllers)
+            {
+                foreach (var action in controller.Actions)
                 {
-                    foreach (var action in controller.Actions)
-                    {
-                        action.Headers.Add(new HeaderView() { Action = action.Name, Key = subs[0], Value = subs[1] });
-                    }
+                    action.Headers.Add(new HeaderView() { Action = action.Name, Key = subs[0], Value = subs[1] });
                 }
-                break;
-            case 3:
-                httpClient = new HttpClient
-                {
-                    BaseAddress = new Uri(subs[2])
-                };
-                break;
+            }
         }
     }
 }

@@ -6,6 +6,9 @@ using System.Text.Json.Serialization;
 
 namespace ContainerControlPanel.Domain.Models;
 
+/// <summary>
+/// Class to represent a log
+/// </summary>
 public class Log
 {
     /// <summary>
@@ -37,20 +40,44 @@ public class Log
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    /// <summary>
+    /// Gets or sets the scope of the log
+    /// </summary>
     public string Scope { get; set; }
 
+    /// <summary>
+    /// Gets or sets the service instance ID
+    /// </summary>
     public string ServiceInstance { get; set; }
 
+    /// <summary>
+    /// Gets or sets the request ID
+    /// </summary>
     public string TraceId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the span ID
+    /// </summary>
     public string SpanId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the flags
+    /// </summary>
     public int Flags { get; set; }
 
+    /// <summary>
+    /// Gets or sets the telemetry SDK name
+    /// </summary>
     public string TelemetrySdkName { get; set; }
 
+    /// <summary>
+    /// Gets or sets the telemetry SDK language
+    /// </summary>
     public string TelemetrySdkLanguage { get; set; }
 
+    /// <summary>
+    /// Gets or sets the telemetry SDK version
+    /// </summary>
     public string TelemetrySdkVersion { get; set; }
 }
 
@@ -389,6 +416,12 @@ public static class LogsExtensions
             : logs.OrderBy(x => x.Timestamp).ToList();
     }
 
+    /// <summary>
+    /// Gets the structured logs
+    /// </summary>
+    /// <param name="logsRoots">Logs root objects</param>
+    /// <param name="timeOffset">Time offset</param>
+    /// <returns>Returns the structured logs</returns>
     public static List<LogView> GetStructuredLogs(this List<LogsRoot> logsRoots, int timeOffset)
     {
         var logs = new List<LogView>();
@@ -506,6 +539,12 @@ public static class LogsExtensions
     public static List<LogRecord> GetLogRecords(this LogsRoot logsRoot)
         => logsRoot.ResourceLogs[0].ScopeLogs[0].LogRecords;
 
+    /// <summary>
+    /// Gets the log
+    /// </summary>
+    /// <param name="logsRoot">Logs root object</param>
+    /// <param name="logRecord">Log record object</param>
+    /// <returns>Returns the log object</returns>
     public static Log GetLog(this LogsRoot logsRoot, LogRecord logRecord)
     {
         return new Log
@@ -525,6 +564,11 @@ public static class LogsExtensions
         };
     }
 
+    /// <summary>
+    /// Checks if the log contains request/response
+    /// </summary>
+    /// <param name="log">Log object</param>
+    /// <returns>Returns true if the log contains request/response</returns>
     public static bool ContainsReqRes(this Log log)
     {
         return log.Message.Contains("[REQUEST]")

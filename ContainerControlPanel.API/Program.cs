@@ -1,9 +1,6 @@
 ﻿using ContainerControlPanel.API.Authorization;
 using ContainerControlPanel.API.Interfaces;
 using ContainerControlPanel.API.Services;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);

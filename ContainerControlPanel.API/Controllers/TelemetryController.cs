@@ -252,26 +252,6 @@ public class TelemetryController : ControllerBase
     }
 
     /// <summary>
-    /// Gets the stored log.
-    /// </summary>
-    /// <param name="traceId">Trace ID</param>
-    /// <returns>Returns the stored log</returns>
-    //[HttpGet("GetLog")]
-    //[TokenAuthorize]
-    //public async Task<IActionResult> GetLog(string traceId)
-    //{
-    //    try
-    //    {
-    //        Log log = await _dataStoreService.GetLogsByTraceAsync(traceId);
-    //        return Ok(log);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return BadRequest(ex.Message);
-    //    }
-    //}
-
-    /// <summary>
     /// Gets the request and response for a trace.
     /// </summary>
     /// <param name="traceId">Trace ID</param>

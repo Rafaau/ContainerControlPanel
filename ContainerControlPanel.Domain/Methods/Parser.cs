@@ -120,6 +120,11 @@ public static class Parser
         return images.OrderByDescending(i => i.CreatedAt).ToList();
     }
 
+    /// <summary>
+    /// Parses the output of the Docker volume ls command
+    /// </summary>
+    /// <param name="output">The output of the Docker volume ls command</param>
+    /// <returns>Returns a list of <see cref="Volume"/> objects</returns>
     public async static Task<List<Volume>> ParseVolumes(string output)
     {
         List<Volume> volumes = new List<Volume>();

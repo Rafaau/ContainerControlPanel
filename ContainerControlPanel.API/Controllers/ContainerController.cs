@@ -4,7 +4,6 @@ using ContainerControlPanel.Domain.Models;
 using ContainerControlPanel.Domain.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System.Text.Json;
 
 namespace ContainerControlPanel.API.Controllers
 {
@@ -225,6 +224,10 @@ namespace ContainerControlPanel.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets the currently available Docker volumes
+        /// </summary>
+        /// <returns>Returns the list of volumes</returns>
         [HttpGet("GetVolumes")]
         public async Task<IActionResult> GetVolumes()
         {
@@ -232,6 +235,11 @@ namespace ContainerControlPanel.API.Controllers
             return Ok(volumes);
         }
 
+        /// <summary>
+        /// Removes a Docker volume by ID
+        /// </summary>
+        /// <param name="volumeId">Volume ID</param>
+        /// <returns>Returns the result of the operation</returns>
         [HttpDelete("RemoveVolume")]
         public async Task<IActionResult> RemoveVolume(string volumeId)
         {
@@ -327,6 +335,10 @@ namespace ContainerControlPanel.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets the MagicInput from data store
+        /// </summary>
+        /// <returns>Returns the MagicInput</returns>
         [HttpGet("GetMagicInput")]
         public async Task<IActionResult> GetMagicInput()
         {
@@ -341,6 +353,11 @@ namespace ContainerControlPanel.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Saves the MagicInput to data store
+        /// </summary>
+        /// <param name="magicInput">MagicInput string</param>
+        /// <returns>Returns the result of the operation</returns>
         [HttpPost("SaveMagicInput")]
         public async Task<IActionResult> SaveMagicInput(string magicInput)
         {
