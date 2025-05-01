@@ -6,7 +6,7 @@
 <p float="left">
 	<img src="https://img.shields.io/badge/.NET-9.0-blue">
 	<a href="https://www.nuget.org/packages/ContainerControlPanel.Extensions/">
-		<img src="https://img.shields.io/badge/ContainerControlPanel.Extensions-1.0.0-blue">
+		<img src="https://img.shields.io/badge/ContainerControlPanel.Extensions-1.0.3-blue">
 	</a>
 </p>
 
@@ -27,11 +27,11 @@ services:
         ports:
             - 5121:8080
         depends_on:
-            - redis
+            - mongodb
         networks:
             - ccp-network
         environment:
-            - Redis__ConnectionString=redis:6379
+            - MongoDB__ConnectionString=mongodb://localhost:27017
             - WebApp__Port=5069
             - WebApp__Host=localhost
             - ComposeDir=C:\\Users\\user\\Desktop\composes
@@ -54,11 +54,13 @@ services:
             - AppName=NotAspire
             - WebAPIPort=5121
             - WebAPIHost=localhost
+            - Realtime=true
+            - LazyLoading=true
 
-    redis:
-        image: redis:latest
+    mongodb:
+        image: mongo:latest
         ports:
-            - "6379:6379"
+            - "27017:27017"
         networks:
             - ccp-network     
 
@@ -79,12 +81,29 @@ The sample implementation should look like this:
 builder.AddOpenTelemetry(host: "host.docker.internal", port: 5121, resourceName: "WeatherForecastAPI");
 ```
 
-And then:
+And then to enable <b>ApiDocs</b> handling:
 
 ```
 app.MapApiDocs();
 ```
 <br>
+
+Also to enable request and response logging (optional):
+```
+app.UseMiddleware<OpenTelemetryLoggingMiddleware>();
+```
+<br>
+
+> [!NOTE]
+> There is a probability that Controller will return <i>NotSupportedException</i> due to logging requests. In that case you need to specify the additional middleware in your <i>Program.cs</i> as below:
+
+```
+app.Use(async (context, next) =>
+    {
+        context.Request.EnableBuffering();
+        await next();
+    });
+```
 
 > [!IMPORTANT]
 > It is also recommended to specify CORS policy for the CCP API:
@@ -109,60 +128,30 @@ And then:
 app.UseCors("AllowCCP");
 ```
 
-To allow CCP to capture your detailed requests, responses and summaries of your API calls, you need to implement request and response logging as in the sample below:
-
-```
-[Display(Description = "Method to get weather forecast.")]
-[HttpPost("weatherForecast")]
-public IEnumerable<WeatherForecast> Get([FromBody] Body data, int forecastId)
-{
-    _logger.LogRequest(Request);
-    _logger.LogInformation("Getting weather forecast");
-
-    IEnumerable<WeatherForecast> result = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-    {
-        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-        TemperatureC = Random.Shared.Next(-20, 55),
-        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-    }).ToArray();
-
-    _logger.LogResponse(result);
-
-    return result;
-}
-```
-
-> [!NOTE]
-> There is a probability that Controller will return <i>NotSupportedException</i> due to logging requests. In that case you need to specify the additional middleware in your <i>Program.cs</i> as below:
-
-```
-app.Use(async (context, next) =>
-    {
-        context.Request.EnableBuffering();
-        await next();
-    });
-```
-
 ## Configuration
 You can configure your CCP stack by specifing following environment variables in your docker-compose file:
 
-| Service | ENV                     | DataType   | Description                                                     |
-| ------- | ----------------------- | ---------- | --------------------------------------------------------------- |
-| WebAPI  | Redis__ConnectionString | String     | Specifies the connection string for the Redis server.           |
-| WebAPI  | WebApp__Port            | Int        | Specifies the port number for the WebApp service.               |
-| WebAPI  | WebApp__Host            | String     | Specifies the host address of the WebApp service.               |
-| WebAPI  | ComposeDir              | String     | Specifies the path to Docker composes directory.                |
-| WebAPI  | ImagesDir               | String     | Specifies the path to Docker images directory.                  |
-| WebAPI  | AuthToken               | String     | Specifies the authorization token.                              |
-| WebApp  | AppName                 | String     | Specifies the name of the application.                          |
-| WebApp  | AdminToken              | String     | Specifies the token for the admin user.                         |
-| WebApp  | UserToken               | String     | Specifies the token for the regular user.                       |
-| WebApp  | WebAPIPort              | Int        | Specifies the port number for the WebAPI service.               |
-| WebApp  | WebAPIHost              | String     | Specifies the host of the WebAPI service.                       |
-| WebApp  | Realtime                | Boolean    | Specifies whether the application should use real-time updates. |
-| WebApp  | TimeOffset              | Int        | Specifies the time offset for the application.                  |
-| WebApp  | AuthToken               | String     | Specifies the authorization token for WebAPI calls.             |
-| WebApp  | Context                 | String     | Specifies the project identificator for docker-compose (-p flag)|
+| Service | ENV                       | DataType   | Description                                                                |
+| ------- | ------------------------- | ---------- | -------------------------------------------------------------------------- |
+| WebAPI  | Redis__ConnectionString   | String     | Specifies the connection string for the Redis server.                      |
+| WebAPI  | MongoDB__ConnectionString | String     | Specifies the connection string for the Mongo server (RECOMMENDED).        |
+| WebAPI  | WebApp__Port              | Int        | Specifies the port number for the WebApp service.                          |
+| WebAPI  | WebApp__Host              | String     | Specifies the host address of the WebApp service.                          |
+| WebAPI  | ComposeDir                | String     | Specifies the path to Docker composes directory.                           |
+| WebAPI  | ImagesDir                 | String     | Specifies the path to Docker images directory.                             |
+| WebAPI  | AuthToken                 | String     | Specifies the authorization token.                                         |
+| WebAPI  | ExcludeByName             | String     | Specifies the names of containers that will be hidden (separated by ;).    |
+| WebAPI  | ExcludeByImage            | String     | Specifies the names of images that will be hidden (separated by ;).        |
+| WebApp  | AppName                   | String     | Specifies the name of the application.                                     |
+| WebApp  | AdminToken                | String     | Specifies the token for the admin user.                                    |
+| WebApp  | UserToken                 | String     | Specifies the token for the regular user.                                  |
+| WebApp  | WebAPIPort                | Int        | Specifies the port number for the WebAPI service.                          |
+| WebApp  | WebAPIHost                | String     | Specifies the host of the WebAPI service.                                  |
+| WebApp  | Realtime                  | Boolean    | Specifies whether the application should use real-time updates.            |
+| WebApp  | TimeOffset                | Int        | Specifies the time offset for the application.                             |
+| WebApp  | AuthToken                 | String     | Specifies the authorization token for WebAPI calls.                        |
+| WebApp  | Context                   | String     | Specifies the project identificator for docker-compose (-p flag)           |
+| WebApp  | LazyLoading               | Boolean    | Specifies whether the application should use lazy loading (MONGO CASE ONLY)|
 
 ## Screenshots
 
