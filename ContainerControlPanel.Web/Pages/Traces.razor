@@ -91,7 +91,7 @@
 								@trace.Timestamp.ToString("dd MMMM")
 							</span>
 						}
-						@trace.Timestamp.ToString("HH:mm:ss")
+						@trace.Timestamp.ToLocalTime().ToString("HH:mm:ss")
 					</div>
 					<div class="data-grid-cell">
 						<div class="text-overflow">@trace.Request</div>

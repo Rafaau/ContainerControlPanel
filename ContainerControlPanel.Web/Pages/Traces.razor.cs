@@ -91,7 +91,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        if (MemoryCache.TryGetValue("lastTracesHref", out string cachedHref))
+		if (MemoryCache.TryGetValue("lastTracesHref", out string cachedHref))
         {
             NavigationManager.NavigateTo(cachedHref);
 
@@ -122,8 +122,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             if (bool.Parse(Configuration["LazyLoading"]))
             {
                 result = await telemetryAPI
-                    .GetTraces(int.Parse(
-                        Configuration["TimeOffset"]), 
+                    .GetTraces(
                         currentResource, 
                         currentTimestamp?.ToString(),
                         routesOnly,
@@ -133,7 +132,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             else
             {
                 result = await telemetryAPI
-                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString(), routesOnly);
+                    .GetTraces(currentResource, currentTimestamp?.ToString(), routesOnly);
             }
             
             if (result.Count != allTraces.Count)
@@ -148,8 +147,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             if (bool.Parse(Configuration["LazyLoading"]))
             {
                 result = await telemetryAPI
-                    .GetTraces(int.Parse(
-                        Configuration["TimeOffset"]),
+                    .GetTraces(
                         currentResource,
                         currentTimestamp?.ToString(),
                         routesOnly,
@@ -159,7 +157,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
             else
             {
                 result = await telemetryAPI
-                    .GetTraces(int.Parse(Configuration["TimeOffset"]), currentResource, currentTimestamp?.ToString(), routesOnly);
+                    .GetTraces(currentResource, currentTimestamp?.ToString(), routesOnly);
             }
 
             MemoryCache.Set("traces", result);
@@ -186,8 +184,7 @@ public partial class Traces(ITelemetryAPI telemetryAPI) : IAsyncDisposable
         {
             page++;
             var result = await telemetryAPI
-                    .GetTraces(int.Parse(
-                        Configuration["TimeOffset"]),
+                    .GetTraces(
                         currentResource,
                         currentTimestamp?.ToString(),
                         routesOnly,

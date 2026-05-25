@@ -149,7 +149,6 @@ public class MongoService : IDataStoreService
     /// <summary>
     /// Gets traces from the MongoDB data store
     /// </summary>
-    /// <param name="timeOffset">Time offset</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="timestamp">Timestamp</param>
     /// <param name="routesOnly">Flag to get only routes</param>
@@ -157,7 +156,6 @@ public class MongoService : IDataStoreService
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
     public async Task<List<Trace>> GetTracesAsync(
-        int timeOffset, 
         string? resource, 
         string? timestamp,
         bool routesOnly,
@@ -223,7 +221,6 @@ public class MongoService : IDataStoreService
     /// <summary>
     /// Gets logs from the MongoDB data store
     /// </summary>
-    /// <param name="timeOffset">Time offset</param>
     /// <param name="timestamp">Timestamp</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="severity">Name of the severity</param>
@@ -232,7 +229,6 @@ public class MongoService : IDataStoreService
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of logs</returns>
     public async Task<List<Log>> GetLogsAsync(
-        int timeOffset, 
         string? timestamp, 
         string? resource,
         string? severity,

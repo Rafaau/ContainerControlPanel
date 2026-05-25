@@ -56,7 +56,6 @@ public interface IDataStoreService
     /// <summary>
     /// Gets traces from the MongoDB data store
     /// </summary>
-    /// <param name="timeOffset">Time offset</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="timestamp">Timestamp</param>
     /// <param name="routesOnly">Flag to get only routes</param>
@@ -64,7 +63,6 @@ public interface IDataStoreService
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
     Task<List<Trace>> GetTracesAsync(
-        int timeOffset,
         string? resource,
         string? timestamp,
         bool routesOnly,
@@ -96,7 +94,6 @@ public interface IDataStoreService
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of logs</returns>
     Task<List<Log>> GetLogsAsync(
-        int timeOffset, 
         string? timestamp, 
         string? resource, 
         string? severity, 

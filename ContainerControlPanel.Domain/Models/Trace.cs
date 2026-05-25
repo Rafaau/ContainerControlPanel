@@ -20,10 +20,10 @@ public class Trace
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-    /// <summary>
-    /// Gets or sets the timestamp
-    /// </summary>
-    public DateTime Timestamp { get; set; }
+	/// <summary>
+	/// Gets or sets the timestamp
+	/// </summary>
+	public DateTime Timestamp { get; set; }
 
     /// <summary>
     /// Gets or sets the request
@@ -270,13 +270,11 @@ public static class TracesExtensions
     /// <param name="rootsList">List of traces roots</param>
     /// <param name="orderDesc">Order the list in descending order</param>
     /// <param name="routesOnly">Return only routes</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns a list of <see cref="ResourceSpan"/></returns>
     public static List<ResourceSpan> GetTracesList(
         this List<TracesRoot> rootsList,
         bool orderDesc = true,
-        bool routesOnly = false,
-        int timeOffset = 0)
+        bool routesOnly = false)
     {
         return rootsList
             .SelectMany(x => x.ResourceSpans)
@@ -294,10 +292,9 @@ public static class TracesExtensions
     /// Gets the timestamp of the trace
     /// </summary>
     /// <param name="tracesRoot">Traces root object</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns the timestamp of the trace</returns>
-    public static DateTime GetTimestamp(this TracesRoot tracesRoot, int timeOffset)
-        => tracesRoot.ResourceSpans[0].ScopeSpans[0].Spans[0].GetStartDate(timeOffset);
+    public static DateTime GetTimestamp(this TracesRoot tracesRoot)
+        => tracesRoot.ResourceSpans[0].ScopeSpans[0].Spans[0].GetStartDate();
 
     /// <summary>
     /// Gets the service name
@@ -371,52 +368,48 @@ public static class TracesExtensions
     /// Gets the timestamp of the resource span
     /// </summary>
     /// <param name="resourceSpan">Resource span object</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns the timestamp of the resource span</returns>
-    public static DateTime GetTimestamp(this ResourceSpan resourceSpan, int timeOffset)
+    public static DateTime GetTimestamp(this ResourceSpan resourceSpan)
     {
         var startTime = decimal.Parse(resourceSpan.ScopeSpans[0].Spans[0].StartTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).LocalDateTime;
     }
 
     /// <summary>
     /// Gets the timestamp of the span
     /// </summary>
     /// <param name="span">Span object</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns the timestamp of the span</returns>
-    public static DateTime GetTimestamp(this Span span, int timeOffset)
+    public static DateTime GetTimestamp(this Span span)
     {
         var startTime = decimal.Parse(span.StartTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).LocalDateTime;
     }
 
     /// <summary>
     /// Gets the start date of the span
     /// </summary>
     /// <param name="span">Span object</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns the start date of the span</returns>
-    public static DateTime GetStartDate(this Span span, int timeOffset)
+    public static DateTime GetStartDate(this Span span)
     {
         var startTime = decimal.Parse(span.StartTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).LocalDateTime;
     }
 
     /// <summary>
     /// Gets the end date of the span
     /// </summary>
     /// <param name="span">Span object</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns the end date of the span</returns>
-    public static DateTime GetEndDate(this Span span, int timeOffset)
+    public static DateTime GetEndDate(this Span span)
     {
         var endTime = decimal.Parse(span.EndTimeUnixNano);
         long milliseconds = Convert.ToInt64(Math.Round(endTime / 1000000));
-        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).LocalDateTime;
     }
 
     /// <summary>
@@ -475,10 +468,9 @@ public static class TracesExtensions
     /// </summary>
     /// <param name="resourceSpans">List of resource spans</param>
     /// <param name="dateTime">Date time</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns the trace route</returns>
-    public static int GetMatchAttemptsByTimestamp(this List<ResourceSpan> resourceSpans, DateTime dateTime, int timeOffset)
-        => resourceSpans.Count(rs => rs.GetTimestamp(timeOffset) <= dateTime);
+    public static int GetMatchAttemptsByTimestamp(this List<ResourceSpan> resourceSpans, DateTime dateTime)
+        => resourceSpans.Count(rs => rs.GetTimestamp() <= dateTime);
 
     /// <summary>
     /// Gets the trace route
@@ -501,9 +493,8 @@ public static class TracesExtensions
     /// Groups the traces
     /// </summary>
     /// <param name="resourceSpans">List of resource spans</param>
-    /// <param name="timeOffset">Time offset</param>
     /// <returns>Returns a list of <see cref="TraceListItemView"/></returns>
-    public static List<TraceListItemView> GroupTraces(this List<ResourceSpan> resourceSpans, int timeOffset)
+    public static List<TraceListItemView> GroupTraces(this List<ResourceSpan> resourceSpans)
     {
         List<TraceListItemView> traceList = new();
 
@@ -511,7 +502,7 @@ public static class TracesExtensions
         {
             var traceListItem = new TraceListItemView
             {
-                Timestamp = resourceSpan.GetTimestamp(timeOffset),
+                Timestamp = resourceSpan.GetTimestamp(),
                 Request = resourceSpan.ScopeSpans[0].Spans[0].Name,
                 TraceId = resourceSpan.GetTraceId(),
                 Source = new List<string> { resourceSpan.GetServiceName() },
@@ -548,7 +539,7 @@ public static class TracesExtensions
         {
             Id = span.TraceId,
             ResourceName = tracesRoot.GetResourceName(),
-            Timestamp = tracesRoot.GetTimestamp(1),
+            Timestamp = tracesRoot.GetTimestamp(),
             Request = span.Name,
             Source = new List<string> { tracesRoot.GetResourceName() },
             Duration = span.GetDuration(),

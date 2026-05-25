@@ -148,7 +148,6 @@ You can configure your CCP stack by specifing following environment variables in
 | WebApp  | WebAPIPort                | Int        | Specifies the port number for the WebAPI service.                          |
 | WebApp  | WebAPIHost                | String     | Specifies the host of the WebAPI service.                                  |
 | WebApp  | Realtime                  | Boolean    | Specifies whether the application should use real-time updates.            |
-| WebApp  | TimeOffset                | Int        | Specifies the time offset for the application.                             |
 | WebApp  | AuthToken                 | String     | Specifies the authorization token for WebAPI calls.                        |
 | WebApp  | Context                   | String     | Specifies the project identificator for docker-compose (-p flag)           |
 | WebApp  | LazyLoading               | Boolean    | Specifies whether the application should use lazy loading (MONGO CASE ONLY)|

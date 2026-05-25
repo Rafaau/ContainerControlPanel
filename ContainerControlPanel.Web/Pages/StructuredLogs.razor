@@ -63,7 +63,7 @@
 		</div>
 	</div>
 	<div class="data-container">
-		@foreach (var log in logs)
+		@foreach (var log in logs.OrderByDescending(log => log.CreatedAt))
 		{
 			<div @onclick="() => { detailsDrawer = true; currentLog = log; }" class="data-grid-row data">
 				<div class="data-grid-cell text-overflow">
@@ -74,7 +74,7 @@
 					@log.Severity
 				</div>
 				<div class="data-grid-cell">
-					@log.CreatedAt.ToString("dd.MM.yyyy HH:mm:ss")
+					@log.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss")
 				</div>
 				<div class="data-grid-cell text-overflow">
 					<MudHighlighter Text="@log.Message" HighlightedText="@currentFilter"

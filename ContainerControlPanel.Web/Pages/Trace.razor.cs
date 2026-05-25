@@ -123,8 +123,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
         spans = trace.Spans;
 
         currentSpan = spans[0];
-        start = spans[0].GetStartDate(int.Parse(Configuration["TimeOffset"]));
-        end = spans[0].GetEndDate(int.Parse(Configuration["TimeOffset"]));
+        start = spans[0].GetStartDate();
+        end = spans[0].GetEndDate();
 
         intervals[0] = new TimeSpan(0).FormatDuration();
         intervals[1] = (spans[0].GetDuration() * 0.25).FormatDuration();
@@ -141,8 +141,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private string GetMarkerWidth(Span span)
     {
-        var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
-        var spanEnd = span.GetEndDate(int.Parse(Configuration["TimeOffset"]));
+        var spanStart = span.GetStartDate();
+        var spanEnd = span.GetEndDate();
 
         var duration = spanEnd - spanStart;
         var totalDuration = end - start;
@@ -154,7 +154,7 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private string GetMarkerLeft(Span span)
     {
-        var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
+        var spanStart = span.GetStartDate();
         var totalDuration = end - start;
         var left = (spanStart - start).TotalMilliseconds / totalDuration.TotalMilliseconds * 400;
         return $"{left}%";
@@ -162,8 +162,8 @@ public partial class Trace(ITelemetryAPI telemetryAPI)
 
     private string GetDurationSpanLeft(Span span)
     {
-        var spanStart = span.GetStartDate(int.Parse(Configuration["TimeOffset"]));
-        var spanEnd = span.GetEndDate(int.Parse(Configuration["TimeOffset"]));
+        var spanStart = span.GetStartDate();
+        var spanEnd = span.GetEndDate();
 
         var duration = spanEnd - spanStart;
         var totalDuration = end - start;

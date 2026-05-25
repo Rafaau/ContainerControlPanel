@@ -118,7 +118,6 @@ public class RedisService : IDataStoreService
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of traces</returns>
     public async Task<List<Trace>> GetTracesAsync(
-        int timeOffset,
         string? resource,
         string? timestamp,
         bool routesOnly,
@@ -173,7 +172,6 @@ public class RedisService : IDataStoreService
     /// <summary>
     /// Gets a list of logs
     /// </summary>
-    /// <param name="timeOffset">Time offset</param>
     /// <param name="timestamp">Timestamp</param>
     /// <param name="resource">Name of the resource</param>
     /// <param name="severity">Name of the severity</param>
@@ -182,7 +180,6 @@ public class RedisService : IDataStoreService
     /// <param name="pageSize">Size of the page</param>
     /// <returns>Returns a list of logs</returns>
     public async Task<List<Log>> GetLogsAsync(
-        int timeOffset, 
         string? timestamp, 
         string? resource, 
         string? severity,
@@ -198,7 +195,7 @@ public class RedisService : IDataStoreService
             var deserialized = JsonSerializer.Deserialize<Log>(item);
 
             if ((resource == "all" || resource == deserialized.ResourceName)
-                && (timestamp == "null" || deserialized.CreatedAt.AddHours(timeOffset).Date == DateTime.Parse(timestamp).Date))
+                && (timestamp == "null" || deserialized.CreatedAt.Date == DateTime.Parse(timestamp).Date))
                 logs.Add(deserialized);
         }
 

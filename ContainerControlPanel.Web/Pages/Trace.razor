@@ -156,11 +156,11 @@
 			</div>
 			<div class="details-row">
 				<div>Start time</div>
-				<div class="text-overflow">@currentSpan.GetStartDate(int.Parse(Configuration["TimeOffset"])).ToString("HH:mm:ss.fffK")</div>
+				<div class="text-overflow">@currentSpan.GetStartDate().ToString("HH:mm:ss.fffK")</div>
 			</div>
 			<div class="details-row">
 				<div>End time</div>
-				<div class="text-overflow">@currentSpan.GetEndDate(int.Parse(Configuration["TimeOffset"])).ToString("HH:mm:ss.fffK")</div>
+				<div class="text-overflow">@currentSpan.GetEndDate().ToString("HH:mm:ss.fffK")</div>
 			</div>			
 			@if (requestResponse != null) 
 			{

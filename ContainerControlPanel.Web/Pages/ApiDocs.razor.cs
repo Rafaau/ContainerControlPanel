@@ -433,7 +433,7 @@ public partial class ApiDocs(IContainerAPI containerAPI)
     private string GetRequestCurlString(ActionView action)
     {
         string curl = $"curl -X {action.HttpMethod.ToUpper()} \\\n" +
-            $" '{httpClient.BaseAddress}{GetRouteString(action).Substring(1)}' \\\n";
+            $" '{httpClient.BaseAddress}{GetRouteString(action)}' \\\n";
 
         curl += " -H 'Accept: text/plain' \\\n";
 

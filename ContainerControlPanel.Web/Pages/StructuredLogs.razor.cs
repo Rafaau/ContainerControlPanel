@@ -145,7 +145,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             if (bool.Parse(Configuration["LazyLoading"]))
             {
                 result = await telemetryAPI.GetLogs(
-                    int.Parse(Configuration["TimeOffset"]),
                     currentTimestamp?.ToString() ?? "null",
                     currentResource,
                     currentSeverity,
@@ -156,7 +155,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             else
             {
                 result = await telemetryAPI.GetLogs(
-                    int.Parse(Configuration["TimeOffset"]),
                     currentTimestamp?.ToString() ?? "null",
                     currentResource);
             }
@@ -173,7 +171,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             if (bool.Parse(Configuration["LazyLoading"]))
             {
                 result = await telemetryAPI.GetLogs(
-                    int.Parse(Configuration["TimeOffset"]),
                     currentTimestamp?.ToString() ?? "null",
                     currentResource,
                     currentSeverity,
@@ -184,7 +181,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
             else
             {
                 result = await telemetryAPI.GetLogs(
-                    int.Parse(Configuration["TimeOffset"]), 
                     currentTimestamp?.ToString() ?? "null", 
                     currentResource);
             }
@@ -213,7 +209,6 @@ public partial class StructuredLogs(ITelemetryAPI telemetryAPI) : IAsyncDisposab
         {
             page++;
             var result = await telemetryAPI.GetLogs(
-                int.Parse(Configuration["TimeOffset"]),
                 currentTimestamp?.ToString() ?? "null",
                 currentResource,
                 currentSeverity,

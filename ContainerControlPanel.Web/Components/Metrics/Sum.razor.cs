@@ -168,28 +168,28 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
 
                 int lastValue = 0;
 
-                lastValue = int.Parse(metrics.Last().Sum.DataPoints.Last().AsInt);
+                lastValue = int.Parse(metrics.Last().Sum.DataPoints.MaxBy(dp => int.Parse(dp.AsInt)).AsInt);
 
-                var may = new List<object>
+				var may = new List<object>
                 {
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.9), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.85), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.8), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.75), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.7), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.65), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.6), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.55), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.5), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.45), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.4), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.35), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.3), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.25), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.2), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.15), int.Parse(Configuration["TimeOffset"])),
-                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.1), int.Parse(Configuration["TimeOffset"])),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.9)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.85)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.8)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.75)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.7)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.65)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.6)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.55)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.5)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.45)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.4)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.35)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.3)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.25)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.2)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.15)),
+                    GetMetricValueByTimestamp(DateTime.Now.AddMinutes(-timestamp * 0.1)),
                     lastValue
                 };
 
@@ -200,14 +200,14 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
         });
     }
 
-    private int GetMetricValueByTimestamp(DateTime timestamp, int timeOffset)
+    private int GetMetricValueByTimestamp(DateTime timestamp)
     {
-        bool isHistogram = metrics.Last().Histogram != null;
+		bool isHistogram = metrics.Last().Histogram != null;
 
         if (isHistogram)
         {
             var metric = metrics.LastOrDefault(x => x.Histogram.DataPoints.Any(x => x.Attributes.Any(x => x.Key.Contains("status") && x.Value.StringValue.Contains("success")) 
-                        && GetDateTimeFromTimestamp(x.TimeUnixNano, timeOffset) <= timestamp));
+                        && GetDateTimeFromTimestamp(x.TimeUnixNano) <= timestamp));
 
             if (metric == null)
             {
@@ -217,13 +217,13 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
             {
                 return int.Parse(metric.Histogram.DataPoints
                     .LastOrDefault(x => x.Attributes.Any(x => x.Key.Contains("status") && x.Value.StringValue.Contains("success"))
-                            && GetDateTimeFromTimestamp(x.TimeUnixNano, timeOffset) <= timestamp).AsInt);
+                            && GetDateTimeFromTimestamp(x.TimeUnixNano) <= timestamp).AsInt);
             }
         }
         else
         {
             var metric = metrics.LastOrDefault(x => x.Sum.DataPoints.Any(x => x.Attributes.Any(x => x.Key.Contains("status") && x.Value.StringValue.Contains("success"))
-                        && GetDateTimeFromTimestamp(x.TimeUnixNano, timeOffset) <= timestamp));
+                        && GetDateTimeFromTimestamp(x.TimeUnixNano) <= timestamp));
 
             if (metric == null)
             {
@@ -233,16 +233,16 @@ public partial class Sum(ITelemetryAPI telemetryAPI) : IDisposable
             {
                 return int.Parse(metric.Sum.DataPoints
                     .LastOrDefault(x => x.Attributes.Any(x => x.Key.Contains("status") && x.Value.StringValue.Contains("success"))
-                            && GetDateTimeFromTimestamp(x.TimeUnixNano, timeOffset) <= timestamp).AsInt);
+                            && GetDateTimeFromTimestamp(x.TimeUnixNano) <= timestamp).AsInt);
             }
         }
     }
 
-    private DateTime GetDateTimeFromTimestamp(string timestamp, int timeOffset)
+    private DateTime GetDateTimeFromTimestamp(string timestamp)
     {
         var startTime = decimal.Parse(timestamp);
         long milliseconds = Convert.ToInt64(Math.Round(startTime / 1000000));
-        DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).AddHours(timeOffset).DateTime;
+        DateTime dateTime = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).LocalDateTime;
         return dateTime;
     }
 

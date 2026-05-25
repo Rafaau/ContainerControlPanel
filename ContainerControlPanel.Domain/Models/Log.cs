@@ -552,7 +552,7 @@ public static class LogsExtensions
             ResourceName = logsRoot.GetResourceName(),
             Severity = logRecord.SeverityText,
             Message = logRecord.Body.StringValue,
-            CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).DateTime,
+            CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(logRecord.TimeUnixNano) / 1000000).LocalDateTime,
             Scope = logsRoot.ResourceLogs[0].ScopeLogs[0].Scope.Name,
             ServiceInstance = logsRoot.ResourceLogs[0].Resource.GetAttributeValue("service.instance.id"),
             TraceId = logRecord.TraceId,

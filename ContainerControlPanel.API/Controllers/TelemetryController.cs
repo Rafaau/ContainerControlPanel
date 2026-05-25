@@ -156,7 +156,6 @@ public class TelemetryController : ControllerBase
     [HttpGet("GetTraces")]
     [TokenAuthorize]
     public async Task<IActionResult> GetTraces(
-        int timeOffset, 
         string? resource, 
         string? timestamp,
         bool routesOnly = false,
@@ -166,7 +165,7 @@ public class TelemetryController : ControllerBase
         try
         {
             List<Trace> traces = 
-                await _dataStoreService.GetTracesAsync(timeOffset, resource, timestamp, routesOnly, page, pageSize);
+                await _dataStoreService.GetTracesAsync(resource, timestamp, routesOnly, page, pageSize);
 
             return Ok(traces);
         }
@@ -218,14 +217,12 @@ public class TelemetryController : ControllerBase
     /// <summary>
     /// Gets the stored logs.
     /// </summary>
-    /// <param name="timeOffset">Time offset</param>
     /// <param name="timestamp">Timestamp</param>
     /// <param name="resource">Resource name</param>
     /// <returns>Returns the stored logs</returns>
     [HttpGet("GetLogs")]
     [TokenAuthorize]
     public async Task<IActionResult> GetLogs(
-        int timeOffset, 
         string? timestamp, 
         string? resource,
         string? severity,
@@ -236,7 +233,6 @@ public class TelemetryController : ControllerBase
         try
         {
             List<Log> logs = await _dataStoreService.GetLogsAsync(
-                timeOffset, 
                 timestamp, 
                 resource,
                 severity,

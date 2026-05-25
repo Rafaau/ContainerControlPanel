@@ -92,7 +92,7 @@
 								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
 									@request.HttpMethod.ToUpper()
 								</span>
-								@($"{request.BaseAddress}{request.Route.Substring(1)}")
+								@($"{request.BaseAddress}{request.Route}")
 								<span style="margin-left: auto;" class="action-btn">
 									<MudTooltip Text="@Localizer[Locales.Resource.Unpin]">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />
@@ -252,7 +252,7 @@
 								<span style="color: @primary; width: 50px; margin-right: 8px; text-align: right; font-size: 10px; font-weight: 500;">
 									@request.HttpMethod.ToUpper()
 								</span>
-								@($"{request.BaseAddress}{request.Route.Substring(1)}")
+								@($"{request.BaseAddress}{request.Route}")
 								<span style="margin-left: auto;" class="action-btn">
 									<MudTooltip Text="@(request.IsPinned ? Localizer[Locales.Resource.Unpin] : Localizer[Locales.Resource.Pin])">
 										<MudIconButton Size="Size.Small" OnClick="async () => { await PinRequest(request.Id); }" Icon="@Icons.Material.Filled.PushPin" Color="Color.Default" />

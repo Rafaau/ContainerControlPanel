@@ -11,12 +11,11 @@ public interface ITelemetryAPI
     /// <summary>
     /// Gets the traces.
     /// </summary>
-    /// <param name="timeOffset">Time offset.</param>
     /// <param name="resource">Resource name.</param>
     /// <param name="timestamp">Timestamp.</param>
     /// <returns>Returns the list of traces.</returns>
-    [Get("/v1/getTraces?resource={resource}&timestamp={timestamp}&timeOffset={timeOffset}&page={page}&pageSize={pageSize}&routesOnly={routesOnly}")]
-    Task<List<Trace>> GetTraces(int timeOffset, string? resource = null, string? timestamp = null, bool routesOnly = false, int page = 0, int pageSize = 0);
+    [Get("/v1/getTraces?resource={resource}&timestamp={timestamp}&page={page}&pageSize={pageSize}&routesOnly={routesOnly}")]
+    Task<List<Trace>> GetTraces(string? resource = null, string? timestamp = null, bool routesOnly = false, int page = 0, int pageSize = 0);
 
     /// <summary>
     /// Gets the metrics.
@@ -36,13 +35,11 @@ public interface ITelemetryAPI
     /// <summary>
     /// Gets the logs.
     /// </summary>
-    /// <param name="timeOffset">Time offset.</param>
     /// <param name="timestamp">Timestamp.</param>
     /// <param name="resource">Resource name.</param>
     /// <returns>Returns the list of logs.</returns>
-    [Get("/v1/getLogs?timestamp={timestamp}&resource={resource}&timeOffset={timeOffset}&severity={severity}&filter={filter}&page={page}&pageSize={pageSize}")]
+    [Get("/v1/getLogs?timestamp={timestamp}&resource={resource}&severity={severity}&filter={filter}&page={page}&pageSize={pageSize}")]
     Task<List<Log>> GetLogs(
-        int timeOffset, 
         string? timestamp = "null", 
         string? resource = "all",
         string? severity = "all",
