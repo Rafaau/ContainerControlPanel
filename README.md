@@ -31,11 +31,12 @@ services:
         networks:
             - ccp-network
         environment:
-            - MongoDB__ConnectionString=mongodb://localhost:27017
+            - MongoDB__ConnectionString=mongodb://mongodb:27017
             - WebApp__Port=5069
             - WebApp__Host=localhost
             - ComposeDir=C:\\Users\\user\\Desktop\composes
             - ImagesDir=C:\\Users\\user\\Desktop\images
+            - ExcludeByImage=ccp
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:rw
         privileged: true
